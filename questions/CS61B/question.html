@@ -1,0 +1,206 @@
+<pl-question-panel>
+    <p> 1). Graph Traversal</p>
+</pl-question-panel>
+
+<div class="card my-2">
+    <div class="card-body">
+        <pl-question-panel>
+            <p> For the graph below, give the DFS preorder, postorder, and BFS order traversals starting from
+                vertex 9. The BFS order is the order in which vertices are enqueued. Assume ties are broken in
+                numerical order (i.e. the edge 15 → 16 would be considered before 15 → 17). When typing your 
+                answer, please separate each vertex with a "-" (i.e. one ordering is 9-8-7-6-5-4-3-2-1).
+            </p>
+        </pl-question-panel>
+        <pl-graph>
+            graph G {
+            0 -- 9 
+            1 -- 9 
+            6 -- 9
+            2 -- 9
+            7 -- 9
+            5 -- 7
+            2 -- 5
+            5 -- 6
+            1 -- 6
+            }
+        </pl-graph>
+        <pl-string-input answers-name="DFSPreorder" label="DFS Preorder:"></pl-string-input>
+        <pl-string-input answers-name="DFSPostorder" label="DFS Postorder:"></pl-string-input>
+        <pl-string-input answers-name="BFSOrder" label="BFS Order:"></pl-string-input>
+    </div>
+</div>
+
+<pl-question-panel>
+    <p> 2). Game Tree</p>
+</pl-question-panel>
+
+<div class="card my-2">
+    <div class="card-body">
+        <pl-question-panel>
+            <p>
+                In the partial game tree below, we represent maximizing nodes as △; minimizing nodes ▽. 
+                Determine the values for the nodes that would be determined by the minimax algorithm 
+                without pruning, and indicate which edges would not be traversed (would be pruned) 
+                as a result of alpha-beta pruning. Assume we evaluate the children of a node from 
+                left to right, and that all values are integers.
+            </p>
+        </pl-question-panel>
+    <pl-graph>
+      digraph G {
+
+  
+        A [shape=triangle];
+        B [shape=invtriangle];
+        C [shape=invtriangle];
+        
+        A -> B
+        A -> C
+      
+        D [shape=triangle];
+        E [shape=triangle];
+        F [shape=triangle];
+        G [shape=triangle];
+      
+        B -> D
+        B -> E
+        C -> F
+        C -> G
+        
+        H [shape=invtriangle];
+        I [shape=invtriangle];
+        J [shape=invtriangle];
+        K [shape=invtriangle];
+        L [shape=invtriangle];
+        M [shape=invtriangle];
+        N [shape=invtriangle];
+        O [shape=invtriangle];
+      
+        
+        D -> H
+        D -> I
+        E -> J
+        E -> K
+        F -> L
+        F -> M
+        G -> N
+        G -> O
+        
+        node [shape=record];
+        struct1 [label="10"];
+        struct2 [label="5"];
+        struct3 [label="7"];
+        struct4 [label="11"];
+        struct5 [label="12"];
+        struct6 [label="8"];
+        struct7 [label="9"];
+        struct8 [label="8"];
+        struct9 [label="5"];
+        struct10 [label="12"];
+        struct11 [label="11"];
+        struct12 [label="12"];
+        struct13 [label="9"];
+        struct14 [label="8"];
+        struct15 [label="7"];
+        struct16 [label="10"];
+      
+        H -> struct1
+        H -> struct2
+        
+        I -> struct3
+        I -> struct4
+      
+        J -> struct5
+        J -> struct6
+      
+        K -> struct7
+        K -> struct8
+      
+        L -> struct9
+        L -> struct10
+      
+        M -> struct11
+        M -> struct12
+      
+        N -> struct13
+        N -> struct14
+      
+        O -> struct15
+        O -> struct16}
+    </pl-graph>
+    <pl-string-input answers-name="trie1" label="a"></pl-string-input>
+    <pl-string-input answers-name="trie2" label="b"></pl-string-input>
+    <pl-string-input answers-name="trie3" label="c"></pl-string-input>
+    <pl-string-input answers-name="trie4" label="d"></pl-string-input>
+    <pl-string-input answers-name="trie5" label="e"></pl-string-input>
+    <pl-string-input answers-name="trie6" label="f"></pl-string-input>
+    <pl-string-input answers-name="trie7" label="g"></pl-string-input>
+    <pl-string-input answers-name="trie8" label="h"></pl-string-input>
+    <pl-string-input answers-name="trie9" label="i"></pl-string-input>
+    <pl-string-input answers-name="trie10" label="j"></pl-string-input>
+    <pl-string-input answers-name="trie11" label="k"></pl-string-input>
+    <pl-string-input answers-name="trie12" label="l"></pl-string-input>
+    <pl-string-input answers-name="trie13" label="m"></pl-string-input>
+    <pl-string-input answers-name="trie14" label="n"></pl-string-input>
+    <pl-string-input answers-name="trie15" label="o"></pl-string-input>
+    </div>
+</div>
+
+<pl-question-panel>
+    <p> 3). Trie</p>
+</pl-question-panel>
+<div class="card my-2">
+    <div class="card-body">
+        <pl-question-panel>
+            <p>
+                Given the existing trie, insert the words ”BLUE”, ”FIGMA”, ”FIG”, and ”TRUE” (in that order), 
+                and fill out what each node contains after insertion. Put N/A if a node is not used. Use underline 
+                to indicate the nodes that are the last letter of a word. When typing your answer for which nodes 
+                are underlined, please list the nodes in numerical order, and separate each node with a comma and 
+                space. For example, if node 1 and node 2 are underlined, put "1, 2" (you don't need to include k).
+            </p>
+        </pl-question-panel>
+        <pl-graph>
+            graph G {
+                0 -- B
+                B -- L
+                L -- 1
+                1 -- 2
+                2 -- 3
+                L -- A
+                A -- C
+                C -- K
+                
+                0 -- 4
+                4 -- 5
+                5 -- 6
+                6 -- 7
+                7 -- 8
+                
+                0 -- 9
+                9 -- 10
+                10 -- 11
+                11 -- 12
+                
+                0 -- 13
+                13 -- 14
+                14 -- 15     
+          }
+        </pl-graph>
+        <pl-string-input answers-name="trie1" label="1"></pl-string-input>
+        <pl-string-input answers-name="trie2" label="2"></pl-string-input>
+        <pl-string-input answers-name="trie3" label="3"></pl-string-input>
+        <pl-string-input answers-name="trie4" label="4"></pl-string-input>
+        <pl-string-input answers-name="trie5" label="5"></pl-string-input>
+        <pl-string-input answers-name="trie6" label="6"></pl-string-input>
+        <pl-string-input answers-name="trie7" label="7"></pl-string-input>
+        <pl-string-input answers-name="trie8" label="8"></pl-string-input>
+        <pl-string-input answers-name="trie9" label="9"></pl-string-input>
+        <pl-string-input answers-name="trie10" label="10"></pl-string-input>
+        <pl-string-input answers-name="trie11" label="11"></pl-string-input>
+        <pl-string-input answers-name="trie12" label="12"></pl-string-input>
+        <pl-string-input answers-name="trie13" label="13"></pl-string-input>
+        <pl-string-input answers-name="trie14" label="14"></pl-string-input>
+        <pl-string-input answers-name="trie15" label="15"></pl-string-input>
+        <pl-string-input answers-name="underlined" label="Nodes that are underlined: "></pl-string-input>
+    </div class="card-body">
+</div class="card my-2">
