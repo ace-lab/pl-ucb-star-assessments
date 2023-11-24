@@ -1,0 +1,48 @@
+{
+    "uuid": "e073375f-2988-4ac7-a2d7-2cec65ed4f02",
+    "type": "Homework",
+    "title": "Study",
+    "set": "Homework",
+    "number": "1",
+    "allowAccess": [],
+    "zones": [
+        {
+            "title": "Old Type",
+            "comment": "These are new questions created for this exam",
+            "questions": [
+                {
+                    "id": "DFS_New_1",
+                    "autoPoints": 1
+                },
+                {
+                    "id": "BFS_New_2",
+                    "autoPoints":1
+                },
+                                {
+                    "id": "DFS_New_2",
+                    "autoPoints": 1
+                },
+                {
+                    "id": "BFS_New_1",
+                    "autoPoints":1
+                },
+                {
+                    "id": "DFS_Old_1",
+                    "autoPoints": 1
+                },
+                {
+                    "id": "BFS_Old_2",
+                    "autoPoints":1
+                },
+                                {
+                    "id": "DFS_Old_2",
+                    "autoPoints": 1
+                },
+                {
+                    "id": "BFS_Old_1",
+                    "autoPoints":1
+                }
+            ]
+        }
+    ]
+}
