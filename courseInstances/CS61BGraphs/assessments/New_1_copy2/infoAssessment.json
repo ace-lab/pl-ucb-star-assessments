@@ -1,7 +1,7 @@
 {
-    "uuid": "cf7561f0-cb5b-40b8-9c03-2abf1dcc64e1",
+    "uuid": "fe23fc87-4c5c-4533-b9df-90577f479283",
     "type": "Homework",
-    "title": "Study (copy 1)",
+    "title": "Study (copy 2)",
     "set": "Homework",
     "number": "1",
     "allowAccess": [],
@@ -10,6 +10,7 @@
             "title": "Old Type",
             "comment": "These are new questions created for this exam",
             "questions": [
+
                 {
                     "id": "DFS_Old_1",
                     "autoPoints": 1
@@ -26,7 +27,7 @@
                     "id": "BFS_Old_1",
                     "autoPoints": 1
                 },
-                {
+                                {
                     "id": "DFS_New_1",
                     "autoPoints": 1
                 },
@@ -42,7 +43,6 @@
                     "id": "BFS_New_1",
                     "autoPoints": 1
                 }
-
             ]
         }
     ]
