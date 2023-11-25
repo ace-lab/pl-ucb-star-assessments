@@ -57,7 +57,7 @@ def grade(data):
         if bfs_final_graph[i] == user_selected_nodes[i]:
             score += 1
     
-    data["score"] = score/len(bfs_final_graph)
+    data["score"] = score/6
 
 
 """

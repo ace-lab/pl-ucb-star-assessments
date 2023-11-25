@@ -58,7 +58,7 @@ def grade(data):
         if dfs_final_graph[i] == user_selected_nodes[i]:
             score += 1
     
-    data["score"] = score/len(dfs_final_graph)
+    data["score"] = score/7
 
 
 """
