@@ -1,0 +1,8 @@
+{
+    "controller": "interactive-graphs.py",
+    "dependencies": {
+        "elementScripts": [
+            "interactive-graphs-js.js"
+        ]
+    }
+}
