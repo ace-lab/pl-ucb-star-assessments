@@ -22,6 +22,7 @@ To use the `pl-interactive-graph` element in your PrairieLearn course:
     - `params-type`: String. Type of graph representation, e.g., `"adjacency-matrix"` or `"networkx"`.
     - `negative-weights`: Boolean. Indicates if negative weights are to be shown.
     - `log-warnings`: Boolean. Toggles logging of warnings.
+Some of the attributes have been inherited from pl-graph, here is more information on those specific inherited attributes: https://prairielearn.readthedocs.io/en/latest/elements/#pl-graph-element
 
 4. **Modify server.py if Needed**: Determine how would you want to grade the question, to access the order given by the student as the nodes were clicked, you can do student_answer = data["submitted_answers"]["user_answer"]. Note: If you have used custom attributes, like preserve-ordering or answer, this part might be different
 
