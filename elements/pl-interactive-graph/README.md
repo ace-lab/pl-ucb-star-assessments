@@ -6,7 +6,7 @@
 ## Usage
 To use the `pl-interactive-graph` element in your PrairieLearn course:
 
-1. **Include the Element in Your Question**: Embed the custom element tag in your question HTML file.
+1. **Include the Element in Your Question**: Embed the custom element tag `<pl-interactive-graph>`in your question HTML file.
 2. **Define the Graph**: Specify the graph structure within the tag using your desired graph generation method. Use DOT language to specify your graph, to learn how to use DOT language, navigate to https://graphviz.org/
 3. **Set Attributes**: Customize the behavior and appearance of the graph using XML attributes. The element supports a variety of attributes to cater to different question types and requirements:
     - `preserve-ordering`: Boolean. If set to `True`, it requires the answer sequence to match exactly.
@@ -24,7 +24,7 @@ To use the `pl-interactive-graph` element in your PrairieLearn course:
     - `log-warnings`: Boolean. Toggles logging of warnings.
 Some of the attributes have been inherited from pl-graph, here is more information on those specific inherited attributes: https://prairielearn.readthedocs.io/en/latest/elements/#pl-graph-element
 
-4. **Modify server.py if Needed**: Determine how would you want to grade the question, to access the order given by the student as the nodes were clicked, you can do student_answer = data["submitted_answers"]["selectedNodes"]. Note: If you have used custom attributes, like preserve-ordering or answer, this part might be different
+4. **Modify server.py if Needed**: Determine how would you want to grade the question, to access the order given by the student as the nodes were clicked, you can do student_answer = data["submitted_answers"]["selectedNodes"]. Note: If you have used custom attributes, like preserve-ordering or answer, this part might be different. There is existing autograding if answers are provided in the `<pl-interactive-graph>` as `<pl-interactive-graph answers='["A","B","C"]'>`
 
 
 ## Description
