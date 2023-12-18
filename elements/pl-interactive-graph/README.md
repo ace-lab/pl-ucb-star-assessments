@@ -9,9 +9,9 @@ To use the `pl-interactive-graph` element in your PrairieLearn course:
 1. **Include the Element in Your Question**: Embed the custom element tag `<pl-interactive-graph>`in your question HTML file.
 2. **Define the Graph**: Specify the graph structure within the tag using your desired graph generation method. Use DOT language to specify your graph, to learn how to use DOT language, navigate to https://graphviz.org/
 3. **Set Attributes**: Customize the behavior and appearance of the graph using XML attributes. The element supports a variety of attributes to cater to different question types and requirements:
-    - `preserve-ordering`: Boolean. If set to `True`, it requires the answer sequence to match exactly.
+    - `preserve-ordering`: String. If set to `"True"`, it requires the answer sequence to match exactly.
     - `answers`: String. String of an array of node labels representing the correct answer. (Example: '["A","B","C"]')
-    - `partial-credit`: Boolean. If set to `True`, it allows partial credit for partially correct sequences.
+    - `partial-credit`: String. If set to `"True"`, it allows partial credit for partially correct sequences.
     - `directed`: Boolean. Specify whether the graph is directed.
     - `engine`: String. Defines the layout engine for graph rendering (default is `"dot"`).
     - `params-name-matrix`, `params-name`: String. Parameter names for matrix or other input types.
