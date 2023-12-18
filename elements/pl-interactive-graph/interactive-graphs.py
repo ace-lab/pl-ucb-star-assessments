@@ -242,7 +242,7 @@ def render(element_html: str, data: pl.QuestionData) -> str:
                 // Toggle node stroke color
 
                 //instead of red, do select-color
-                if (node.getAttribute('fill') !== '{SELECT_COLOR}') {
+                if (node.getAttribute('fill') !== 'red') {
                     node.setAttribute('fill', 'red');
                     selectedNodes.push(nodeLabel); // Add to selected nodes, using the text label
                 } else {
