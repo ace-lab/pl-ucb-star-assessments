@@ -1,5 +1,0 @@
-source 'https://www.rubygems.org'
-
-gem 'rspec'
-gem 'json'
-gem 'rails'

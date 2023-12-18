@@ -1,0 +1,27 @@
+{
+    "uuid": "7046c3d0-567a-4e1d-a352-ce82d031f7ab",
+    "type": "Homework",
+    "title": "Interactive Graph Examples",
+    "set": "Homework",
+    "number": "1",
+    "allowAccess": [],
+    "zones": [
+        {
+            "comment": "These are new questions created for the pl-interactive-graph element",
+            "questions": [
+                {
+                    "id": "Clickable_Nodes_Basic_Interaction",
+                    "autoPoints": 1
+                },
+                {
+                    "id": "Clickable_Nodes_BFS_In_Order",
+                    "autoPoints": 1
+                },
+                {
+                    "id": "Clickable_Nodes_Finite_State_Machine",
+                    "autoPoints": 1
+                }
+            ]
+        }
+    ]
+}

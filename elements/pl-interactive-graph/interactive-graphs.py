@@ -282,7 +282,13 @@ def render(element_html: str, data: pl.QuestionData) -> str:
 
 
 def grade(element_html, data):
-
+    if len(data["submitted_answers"]["selectedNodes"]) == 0:
+        data["partial_scores"]["score"] = {
+        "score": 0,
+        "weight": 1,
+        "feedback": "no nodes selected",
+        }
+        return data
     user_selected_nodes = eval(data["submitted_answers"]["selectedNodes"])
     # Use 'submitted_answers' instead of data["submitted_answers"]
     score = 0
@@ -291,15 +297,16 @@ def grade(element_html, data):
     correct_answer = eval(pl.from_json(element.get("answers", "[]")))
     preserve_ordering = pl.from_json(element.get("preserve-ordering"))
     partial_credit = pl.from_json(element.get("partial-credit"))
-    if preserve_ordering == None:
-        for i in range(len(correct_answer)):
-            if i < len(user_selected_nodes) and correct_answer[i] == user_selected_nodes[i]:
-                score += 1
-    else:
+    if preserve_ordering != "True":
         for i in range(len(user_selected_nodes)):
             if user_selected_nodes[i] in correct_answer:
                 score += 1
-    if partial_credit == None:
+    else:
+        for i in range(len(correct_answer)):
+            if i < len(user_selected_nodes) and correct_answer[i] == user_selected_nodes[i]:
+                score += 1
+       
+    if partial_credit != "True":
         if score != len(correct_answer):
             score = 0
         else:
@@ -308,8 +315,7 @@ def grade(element_html, data):
         score = score/len(correct_answer)
     data["partial_scores"]["score"] = {
     "score": score,
-    "weight": 1,
-    "feedback": "correct",
+    "weight": 1
     }
 
 
