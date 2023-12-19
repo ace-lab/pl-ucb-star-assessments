@@ -1,0 +1,18 @@
+{
+    "uuid": "293ad990-9750-4165-afa6-01848fa1fe59",
+    "longName": "Leetcode",
+    "allowAccess": [
+        {
+            "institution": "LTI",
+            "startDate": "2023-03-24T00:00:01",
+            "endDate": "2023-06-01T23:59:59"
+        },
+        {
+            "institution": "Any",
+            "startDate": "2023-03-24T00:00:01",
+            "endDate": "2023-06-01T23:59:59",
+            "uids": [
+            ]
+        }
+    ]
+}

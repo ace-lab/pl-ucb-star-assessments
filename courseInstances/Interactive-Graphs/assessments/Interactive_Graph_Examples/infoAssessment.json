@@ -10,15 +10,15 @@
             "comment": "These are new questions created for the pl-interactive-graph element",
             "questions": [
                 {
-                    "id": "Clickable_Nodes_Basic_Interaction",
+                    "id": "pl-interactive-graph-examples/Clickable_Nodes_Basic_Interaction",
                     "autoPoints": 1
                 },
                 {
-                    "id": "Clickable_Nodes_BFS_In_Order",
+                    "id": "pl-interactive-graph-examples/Clickable_Nodes_BFS_In_Order",
                     "autoPoints": 1
                 },
                 {
-                    "id": "Clickable_Nodes_Finite_State_Machine",
+                    "id": "pl-interactive-graph-examples/Clickable_Nodes_Finite_State_Machine",
                     "autoPoints": 1
                 }
             ]

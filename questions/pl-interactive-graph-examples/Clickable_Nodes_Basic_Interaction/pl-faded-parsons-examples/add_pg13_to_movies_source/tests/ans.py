@@ -1,0 +1,9 @@
+class Movie < ActiveRecord::Base
+  validate :rating_consistent_with_date
+  def rating_consistent_with_date()
+    pg13_invented = Time.parse "1 Jan 1984"
+    if (pg13_invented > self.release_date) and (self.rating == 'PG-13')
+       self.errors.add(:rating, 'only valid for 1984 and later')
+    end
+  end
+end

@@ -1,0 +1,18 @@
+{
+    "uuid": "a44750d4-f527-42c3-bbc4-e5b2834a461f",
+    "longName": "Mongo Queries",
+    "allowAccess": [
+        {
+            "institution": "LTI",
+            "startDate": "2023-03-24T00:00:01",
+            "endDate": "2023-06-01T23:59:59"
+        },
+        {
+            "institution": "Any",
+            "startDate": "2023-03-24T00:00:01",
+            "endDate": "2023-06-01T23:59:59",
+            "uids": [
+            ]
+        }
+    ]
+}
