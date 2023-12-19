@@ -1,0 +1,49 @@
+<p>
+  Consider an FSM representing an automated library system with a specific operational flow. The system is designed to handle a unique sequence of tasks each day, involving book checkouts, returns, catalog updates, and member services. Each transition between states involves an action with an associated weight.
+</p>
+<ol>
+  <li>The day starts with processing book returns.</li>
+  <li>After handling returns, the system updates the catalog.</li>
+  <li>If there are new members, their registration is processed next; otherwise, the system moves directly to restocking returned books.</li>
+  <li>After dealing with new members or restocking, the system addresses member queries.</li>
+  <li>The day ends with event planning and closing tasks.</li>
+  
+<p>Note: In your answer, do not try to click on start or end, just the states in between are needed. The order does not matter, and there is no partial credit. </p>
+</ol>
+  
+  
+  
+  <pl-question-panel>
+      
+    <pl-interactive-graph preserve-ordering="False" partial-credit="False" answers='["A","B","D","E","F","G"]'>
+      digraph automated_library_system {
+   
+        size="10,5"
+        edge [fontsize=10, fontcolor=blue, fontname="Helvetica"]
+        node [shape = circle,fontsize=12, fontname="Helvetica"]
+    
+        // States
+        A -> B [ label = "Check-in (weight: 2)" ];
+        A -> C [ label = "New Member (weight: 3)" ];
+        B -> D [ label = "Catalog Update (weight: 2)" ];
+        C -> D [ label = "Book Checkout (weight: 4)" ];
+        C -> E [ label = "Member Query (weight: 3)" ];
+        D -> F [ label = "Restock (weight: 1)" ];
+        E -> G [ label = "Event Planning (weight: 5)" ];
+        F -> G [ label = "Closing Tasks (weight: 2)" ];
+    
+        // Special States
+        node [shape = doublecircle];
+        A; G;
+    
+        // Start and End Points
+        node [shape = record, height=.1];
+        start [label="Start", shape=box, fillcolor=lightgreen];
+        start -> A;
+        end [label="End", shape=Msquare];
+        G -> end;
+    }
+    
+  }</pl-interactive-graph>
+  
+  </pl-question-panel>
