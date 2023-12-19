@@ -34,7 +34,7 @@ The students will be presented with a graph of your specified structure and each
 This element is not only limited to purely graph traversal questions. Some of the possible problems that could be modelled by this element are (but not limited to): Network Flow, Finite State Machines, Pathfinding Algorithms, etc.
 
 ## Example
-Different examples have been included in the questions folder. They are titled `Clickable_Nodes_BFS_In_Order`, `Clickable_Nodes_Basic_Interaction`, and `Clickable_Nodes_Finite_State_Machine` Here's an example of how you might use `pl-interactive-graph` in a question about graph traversal:
+Different examples have been included in the questions folder. They are titled `pl-interactive-graph-examples/Clickable_Nodes_BFS_In_Order`, `pl-interactive-graph-examples/Clickable_Nodes_Basic_Interaction`, and `pl-interactive-graph-examples/Clickable_Nodes_Finite_State_Machine` Here's an example of how you might use `pl-interactive-graph` in a question about graph traversal:
 
 ```html
 <p>
