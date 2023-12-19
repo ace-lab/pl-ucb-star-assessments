@@ -9,9 +9,9 @@ To use the `pl-interactive-graph` element in your PrairieLearn course:
 1. **Include the Element in Your Question**: Embed the custom element tag `<pl-interactive-graph>`in your question HTML file.
 2. **Define the Graph**: Specify the graph structure within the tag using your desired graph generation method. Use DOT language to specify your graph, to learn how to use DOT language, navigate to https://graphviz.org/
 3. **Set Attributes**: Customize the behavior and appearance of the graph using XML attributes. The element supports a variety of attributes to cater to different question types and requirements:
-    - `preserve-ordering`: Boolean. If set to `True`, it requires the answer sequence to match exactly.
-    - `answers`: String. String of an array of node labels representing the correct answer. (Example: "[A,B,C]")
-    - `partial-credit`: Boolean. If set to `True`, it allows partial credit for partially correct sequences.
+    - `preserve-ordering`: String. If set to `"True"`, it requires the answer sequence to match exactly.
+    - `answers`: String. String of an array of node labels representing the correct answer. (Example: '["A","B","C"]')
+    - `partial-credit`: String. If set to `"True"`, it allows partial credit for partially correct sequences.
     - `directed`: Boolean. Specify whether the graph is directed.
     - `engine`: String. Defines the layout engine for graph rendering (default is `"dot"`).
     - `params-name-matrix`, `params-name`: String. Parameter names for matrix or other input types.
@@ -24,7 +24,7 @@ To use the `pl-interactive-graph` element in your PrairieLearn course:
     - `log-warnings`: Boolean. Toggles logging of warnings.
 Some of the attributes have been inherited from pl-graph, here is more information on those specific inherited attributes: https://prairielearn.readthedocs.io/en/latest/elements/#pl-graph-element
 
-4. **Modify server.py if Needed**: Determine how would you want to grade the question, to access the order given by the student as the nodes were clicked, you can do student_answer = data["submitted_answers"]["selectedNodes"]. Note: If you have used custom attributes, like preserve-ordering or answer, this part might be different. There is existing autograding if answers are provided in the `<pl-interactive-graph>` as `<pl-interactive-graph answers='["A","B","C"]'>`
+4. **Modify server.py if Needed**: Determine how would you want to grade the question. To access the order given by the student as the nodes were clicked, you can do student_answer = data["submitted_answers"]["selectedNodes"]. Note: If you have used custom attributes, like preserve-ordering or answers, this part might be different. There is existing autograding if answers are provided in the `<pl-interactive-graph>` as `<pl-interactive-graph answers='["A","B","C"]'>`
 
 
 ## Description
@@ -34,7 +34,7 @@ The students will be presented with a graph of your specified structure and each
 This element is not only limited to purely graph traversal questions. Some of the possible problems that could be modelled by this element are (but not limited to): Network Flow, Finite State Machines, Pathfinding Algorithms, etc.
 
 ## Example
-Different examples have been included in the questions folder. Here's an example of how you might use `pl-interactive-graph` in a question about graph traversal:
+Different examples have been included in the questions folder. They are titled `Clickable_Nodes_BFS_In_Order`, `Clickable_Nodes_Basic_Interaction`, and `Clickable_Nodes_Finite_State_Machine` Here's an example of how you might use `pl-interactive-graph` in a question about graph traversal:
 
 ```html
 <p>
