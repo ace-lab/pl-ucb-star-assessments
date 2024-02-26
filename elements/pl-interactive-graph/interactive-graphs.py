@@ -222,12 +222,17 @@ def render(element_html: str, data: pl.QuestionData) -> str:
     function clickable() {{
     window.addEventListener('DOMContentLoaded', (event) => {{
         let nodes = document.querySelectorAll('.node > ellipse');
+        let edges = document.querySelectorAll('.edge > path');
         let selectedNodes = []; // Array to store selected node labels
+        let selectedEdges = [];
         let fillColor = "{fill_color}";
         // Ensure text elements do not intercept mouse events
         let nodeTexts = document.querySelectorAll('.node > text');
         nodeTexts.forEach(text => {{
             text.style.pointerEvents = 'none';
+        }});
+        edges.forEach(edge => {{
+        edge.setAttribute('stroke-width', '5'); // Set stroke-width to 6 for all edges
         }});
 
         nodes.forEach(node => {{
@@ -260,6 +265,26 @@ def render(element_html: str, data: pl.QuestionData) -> str:
                 document.getElementById("selectedNodes").value = JSON.stringify(selectedNodes);
                 updateNodeListDisplay(selectedNodes);
 
+            }});
+        }});
+        edges.forEach(edge => {{
+            edge.addEventListener('click', function(event) {{
+                event.stopPropagation();
+                let edgeId = edge.parentNode.getAttribute("id");
+
+                if (!selectedEdges.includes(edgeId)) {{
+                    edge.setAttribute('stroke', fillColor); // Use stroke for edge selection visual
+                    edge.setAttribute('stroke-width', "5")
+                    selectedEdges.push(edgeId);
+                }} else {{
+                    edge.setAttribute('stroke', 'black'); // Reset to default or specify non-selected stroke color
+                    const index = selectedEdges.indexOf(edgeId);
+                    if (index > -1) {{
+                        selectedEdges.splice(index, 1);
+                    }}
+                }}
+
+                document.getElementById("selectedEdges").value = JSON.stringify(selectedEdges);
             }});
         }});
     }});
