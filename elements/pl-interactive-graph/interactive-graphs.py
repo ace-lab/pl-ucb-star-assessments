@@ -143,6 +143,7 @@ def prepare(element_html: str, data: pl.QuestionData) -> None:
         "preserve-ordering",
         "answers",
         "partial-credit",
+        "fill_color",
         "directed",
         "engine",
         "params-name-matrix",
@@ -171,6 +172,7 @@ def render(element_html: str, data: pl.QuestionData) -> str:
         "networkx": graphviz_from_networkx,
     }
 
+    #load color
     # Load all extensions
     extensions = pl.load_all_extensions(data)
     for extension in extensions.values():
@@ -180,6 +182,7 @@ def render(element_html: str, data: pl.QuestionData) -> str:
     element = lxml.html.fragment_fromstring(element_html)
     engine = pl.get_string_attrib(element, "engine", ENGINE_DEFAULT)
     log_warnings = pl.get_boolean_attrib(element, "log-warnings", LOG_WARNINGS_DEFAULT)
+    fill_color = pl.get_string_attrib(element, "fill_color", "red")
 
     # Legacy input with passthrough
     input_param_matrix = pl.get_string_attrib(
@@ -214,24 +217,24 @@ def render(element_html: str, data: pl.QuestionData) -> str:
         svg = translated_dotcode.draw(format="svg", prog=engine).decode(
             "utf-8", "strict"
         )
-
-    javascript_function =  """
+    javascript_function =  f"""
     <script> 
-    function clickable() {
-    window.addEventListener('DOMContentLoaded', (event) => {
+    function clickable() {{
+    window.addEventListener('DOMContentLoaded', (event) => {{
         let nodes = document.querySelectorAll('.node > ellipse');
         let selectedNodes = []; // Array to store selected node labels
+        let fillColor = "{fill_color}";
         // Ensure text elements do not intercept mouse events
         let nodeTexts = document.querySelectorAll('.node > text');
-        nodeTexts.forEach(text => {
+        nodeTexts.forEach(text => {{
             text.style.pointerEvents = 'none';
-        });
+        }});
 
-        nodes.forEach(node => {
+        nodes.forEach(node => {{
             // Set a transparent fill for each ellipse
             node.setAttribute('fill', 'rgba(0,0,0,0)');
 
-            node.addEventListener('click', function(event) {
+            node.addEventListener('click', function(event) {{
                 event.stopPropagation();
 
                 // Get the ID of the node, which should ideally be its label/name
@@ -242,36 +245,36 @@ def render(element_html: str, data: pl.QuestionData) -> str:
                 // Toggle node stroke color
 
                 //instead of red, do select-color
-                if (node.getAttribute('fill') !== 'red') {
-                    node.setAttribute('fill', 'red');
+                if (node.getAttribute('fill') !== fillColor) {{
+                    node.setAttribute('fill', fillColor);
                     selectedNodes.push(nodeLabel); // Add to selected nodes, using the text label
-                } else {
+                }} else {{
                     node.setAttribute('fill', 'rgba(0,0,0,0)'); // changed to transparent instead of white
                     const index = selectedNodes.indexOf(nodeLabel); // Use nodeLabel instead of nodeId
-                    if (index > -1) {
+                    if (index > -1) {{
                         selectedNodes.splice(index, 1)// Remove from selected nodes
-                    }
-                }
+                    }}
+                }}
 
                 // Update the hidden input with the current list of selected nodes
                 document.getElementById("selectedNodes").value = JSON.stringify(selectedNodes);
                 updateNodeListDisplay(selectedNodes);
 
-            });
-        });
-    });
+            }});
+        }});
+    }});
 
-    function updateNodeListDisplay(selectedNodes) {
+    function updateNodeListDisplay(selectedNodes) {{
     // Sort the array if you want the list to be in order of selection
     // selectedNodes.sort();
 
     let listHTML = selectedNodes.map((nodeLabel) => 
-        `<li>${nodeLabel}</li>`
+        `<li>${{nodeLabel}}</li>`
     ).join('');
     //if not preserve ordering, consider removing numbers from the side
-    document.getElementById("selectedNodeList").innerHTML = `<ol>${listHTML}</ol>`;
-    }
-}
+    document.getElementById("selectedNodeList").innerHTML = `<ol>${{listHTML}}</ol>`;
+    }}
+}}
     clickable();
     </script>
     <input type="hidden" id="selectedNodes" name="selectedNodes" value="">
