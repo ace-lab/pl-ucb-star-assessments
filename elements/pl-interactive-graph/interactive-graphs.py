@@ -144,6 +144,8 @@ def prepare(element_html: str, data: pl.QuestionData) -> None:
         "answers",
         "partial-credit",
         "fill_color",
+        "select_nodes",
+        "select_edges",
         "directed",
         "engine",
         "params-name-matrix",
@@ -183,6 +185,9 @@ def render(element_html: str, data: pl.QuestionData) -> str:
     engine = pl.get_string_attrib(element, "engine", ENGINE_DEFAULT)
     log_warnings = pl.get_boolean_attrib(element, "log-warnings", LOG_WARNINGS_DEFAULT)
     fill_color = pl.get_string_attrib(element, "fill_color", "red")
+    select_nodes = pl.get_string_attrib(element, "select_nodes", "True")
+    select_edges = pl.get_string_attrib(element, "select_edges", True)
+
 
     # Legacy input with passthrough
     input_param_matrix = pl.get_string_attrib(
@@ -217,8 +222,8 @@ def render(element_html: str, data: pl.QuestionData) -> str:
         svg = translated_dotcode.draw(format="svg", prog=engine).decode(
             "utf-8", "strict"
         )
-    javascript_function =  f"""
-    <script> 
+    javascript_function = f"""
+    <script>
     function clickable() {{
     window.addEventListener('DOMContentLoaded', (event) => {{
         let nodes = document.querySelectorAll('.node > ellipse');
@@ -226,6 +231,8 @@ def render(element_html: str, data: pl.QuestionData) -> str:
         let selectedNodes = []; // Array to store selected node labels
         let selectedEdges = [];
         let fillColor = "{fill_color}";
+        let selectNodes = "{select_nodes}"
+        let selectEdges = "{select_edges}"
         // Ensure text elements do not intercept mouse events
         let nodeTexts = document.querySelectorAll('.node > text');
         nodeTexts.forEach(text => {{
@@ -235,79 +242,93 @@ def render(element_html: str, data: pl.QuestionData) -> str:
         edge.setAttribute('stroke-width', '5'); // Set stroke-width to 6 for all edges
         }});
 
-        nodes.forEach(node => {{
-            // Set a transparent fill for each ellipse
-            node.setAttribute('fill', 'rgba(0,0,0,0)');
+        if (selectNodes == "True") {{
+            nodes.forEach(node => {{
+                // Set a transparent fill for each ellipse
+                node.setAttribute('fill', 'rgba(0,0,0,0)');
 
-            node.addEventListener('click', function(event) {{
-                event.stopPropagation();
+                node.addEventListener('click', function(event) {{
+                    event.stopPropagation();
 
-                // Get the ID of the node, which should ideally be its label/name
-                // and get the text content of the sibling <text> node
-                let nodeId = node.parentNode.getAttribute("id"); // Get the ID of the node
-                let nodeLabel = node.parentNode.querySelector("text").textContent; // Get the text content of the node
+                    // Get the ID of the node, which should ideally be its label/name
+                    // and get the text content of the sibling <text> node
+                    let nodeId = node.parentNode.getAttribute("id"); // Get the ID of the node
+                    let nodeLabel = node.parentNode.querySelector("text").textContent; // Get the text content of the node
 
-                // Toggle node stroke color
+                    // Toggle node stroke color
 
-                //instead of red, do select-color
-                if (node.getAttribute('fill') !== fillColor) {{
-                    node.setAttribute('fill', fillColor);
-                    selectedNodes.push(nodeLabel); // Add to selected nodes, using the text label
-                }} else {{
-                    node.setAttribute('fill', 'rgba(0,0,0,0)'); // changed to transparent instead of white
-                    const index = selectedNodes.indexOf(nodeLabel); // Use nodeLabel instead of nodeId
-                    if (index > -1) {{
-                        selectedNodes.splice(index, 1)// Remove from selected nodes
+                    //instead of red, do select-color
+                    if (node.getAttribute('fill') !== fillColor) {{
+                        node.setAttribute('fill', fillColor);
+                        selectedNodes.push(nodeLabel); // Add to selected nodes, using the text label
+                    }} else {{
+                        node.setAttribute('fill', 'rgba(0,0,0,0)'); // changed to transparent instead of white
+                        const index = selectedNodes.indexOf(nodeLabel); // Use nodeLabel instead of nodeId
+                        if (index > -1) {{
+                            selectedNodes.splice(index, 1)// Remove from selected nodes
+                        }}
                     }}
-                }}
 
-                // Update the hidden input with the current list of selected nodes
-                document.getElementById("selectedNodes").value = JSON.stringify(selectedNodes);
-                updateNodeListDisplay(selectedNodes);
+                    // Update the hidden input with the current list of selected nodes
+                    document.getElementById("selectedNodes").value = JSON.stringify(selectedNodes);
+                    updateNodeListDisplay(selectedNodes);
 
-            }});
-        }});
-        edges.forEach(edge => {{
-            edge.addEventListener('click', function(event) {{
-                event.stopPropagation();
-                let edgeId = edge.parentNode.getAttribute("id");
+                }});
+            }})
+            }};
+            if (selectEdges == "True") {{
+                edges.forEach(edge => {{
+                    edge.addEventListener('click', function(event) {{
+                        event.stopPropagation();
+                        // Assuming each edge element or its parent has data attributes or an ID format from which you can extract source and target
+                        let edgeTitle = edge.parentNode.querySelector('title').textContent;
 
-                if (!selectedEdges.includes(edgeId)) {{
-                    edge.setAttribute('stroke', fillColor); // Use stroke for edge selection visual
-                    edge.setAttribute('stroke-width', "5")
-                    selectedEdges.push(edgeId);
-                }} else {{
-                    edge.setAttribute('stroke', 'black'); // Reset to default or specify non-selected stroke color
-                    const index = selectedEdges.indexOf(edgeId);
-                    if (index > -1) {{
-                        selectedEdges.splice(index, 1);
-                    }}
-                }}
 
-                document.getElementById("selectedEdges").value = JSON.stringify(selectedEdges);
-            }});
-        }});
+                        // If your edges don't already have source and target information in attributes, you'll need to adjust this approach accordingly
+
+                        if (!selectedEdges.includes(edgeTitle)) {{
+                            edge.setAttribute('stroke', fillColor); // Use stroke for edge selection visual
+                            edge.setAttribute('stroke-width', "5");
+                            selectedEdges.push(edgeTitle);
+                        }} else {{
+                            edge.setAttribute('stroke', 'black'); // Reset to default or specify non-selected stroke color
+                            const index = selectedEdges.indexOf(edgeTitle);
+                            if (index > -1) {{
+                                selectedEdges.splice(index, 1);
+                            }}
+                        }}
+
+                        document.getElementById("selectedEdges").value = JSON.stringify(selectedEdges);
+                        updateEdgeListDisplay(selectedEdges); // Format for display
+                    }});
+                }})
+            }};
     }});
 
     function updateNodeListDisplay(selectedNodes) {{
-    // Sort the array if you want the list to be in order of selection
-    // selectedNodes.sort();
-
     let listHTML = selectedNodes.map((nodeLabel) => 
         `<li>${{nodeLabel}}</li>`
     ).join('');
-    //if not preserve ordering, consider removing numbers from the side
     document.getElementById("selectedNodeList").innerHTML = `<ol>${{listHTML}}</ol>`;
     }}
+
+    function updateEdgeListDisplay(selectedEdges) {{
+    let listHTML = selectedEdges.map(edgeTitle => 
+        `<li>${{edgeTitle}}</li>`
+    ).join('');
+
+    document.getElementById("selectedEdgeList").innerHTML = `<ol>${{listHTML}}</ol>`; // Ensure you have a corresponding div for edges
 }}
+    }}
     clickable();
     </script>
     <input type="hidden" id="selectedNodes" name="selectedNodes" value="">
+    <input type="hidden" id="selectedEdges" name="selectedEdges" value="">
     <div id="selectedNodeList"></div>
+    <div id="selectedEdgeList"></div>
+
     """
-
     return f'<div class="pl-graph">{svg}</div>{javascript_function}'
-
 
 def grade(element_html, data):
     if len(data["submitted_answers"]["selectedNodes"]) == 0:
