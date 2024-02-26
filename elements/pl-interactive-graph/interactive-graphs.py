@@ -143,7 +143,8 @@ def prepare(element_html: str, data: pl.QuestionData) -> None:
         "preserve-ordering",
         "answers",
         "partial-credit",
-        "fill_color",
+        "node_fill_color",
+        "edge_fill_color",
         "select_nodes",
         "select_edges",
         "directed",
@@ -184,7 +185,9 @@ def render(element_html: str, data: pl.QuestionData) -> str:
     element = lxml.html.fragment_fromstring(element_html)
     engine = pl.get_string_attrib(element, "engine", ENGINE_DEFAULT)
     log_warnings = pl.get_boolean_attrib(element, "log-warnings", LOG_WARNINGS_DEFAULT)
-    fill_color = pl.get_string_attrib(element, "fill_color", "red")
+    node_fill_color = pl.get_string_attrib(element, "node_fill_color", "red")
+    edge_fill_color = pl.get_string_attrib(element, "edge_fill_color", "red")
+
     select_nodes = pl.get_string_attrib(element, "select_nodes", "True")
     select_edges = pl.get_string_attrib(element, "select_edges", True)
 
@@ -223,6 +226,10 @@ def render(element_html: str, data: pl.QuestionData) -> str:
             "utf-8", "strict"
         )
     javascript_function = f"""
+    <input type="hidden" id="selectedNodes" name="selectedNodes" value="">
+    <input type="hidden" id="selectedEdges" name="selectedEdges" value="">
+    <div id="selectedNodeList"></div>
+    <div id="selectedEdgeList"></div>
     <script>
     function clickable() {{
     window.addEventListener('DOMContentLoaded', (event) => {{
@@ -230,7 +237,9 @@ def render(element_html: str, data: pl.QuestionData) -> str:
         let edges = document.querySelectorAll('.edge > path');
         let selectedNodes = []; // Array to store selected node labels
         let selectedEdges = [];
-        let fillColor = "{fill_color}";
+        let nodeFillColor = "{node_fill_color}";
+        let edgeFillColor = "{edge_fill_color}";
+
         let selectNodes = "{select_nodes}"
         let selectEdges = "{select_edges}"
         // Ensure text elements do not intercept mouse events
@@ -238,11 +247,10 @@ def render(element_html: str, data: pl.QuestionData) -> str:
         nodeTexts.forEach(text => {{
             text.style.pointerEvents = 'none';
         }});
-        edges.forEach(edge => {{
-        edge.setAttribute('stroke-width', '5'); // Set stroke-width to 6 for all edges
-        }});
+
 
         if (selectNodes == "True") {{
+            document.getElementById("selectedNodeList").style.visibility= "visible";
             nodes.forEach(node => {{
                 // Set a transparent fill for each ellipse
                 node.setAttribute('fill', 'rgba(0,0,0,0)');
@@ -258,8 +266,8 @@ def render(element_html: str, data: pl.QuestionData) -> str:
                     // Toggle node stroke color
 
                     //instead of red, do select-color
-                    if (node.getAttribute('fill') !== fillColor) {{
-                        node.setAttribute('fill', fillColor);
+                    if (node.getAttribute('fill') !== nodeFillColor) {{
+                        node.setAttribute('fill', nodeFillColor);
                         selectedNodes.push(nodeLabel); // Add to selected nodes, using the text label
                     }} else {{
                         node.setAttribute('fill', 'rgba(0,0,0,0)'); // changed to transparent instead of white
@@ -277,6 +285,11 @@ def render(element_html: str, data: pl.QuestionData) -> str:
             }})
             }};
             if (selectEdges == "True") {{
+                    document.getElementById("selectedEdgeList").style.visibility= "visible";
+
+                    edges.forEach(edge => {{
+                        edge.setAttribute('stroke-width', '5'); // Set stroke-width to 6 for all edges
+                        }});
                 edges.forEach(edge => {{
                     edge.addEventListener('click', function(event) {{
                         event.stopPropagation();
@@ -287,7 +300,7 @@ def render(element_html: str, data: pl.QuestionData) -> str:
                         // If your edges don't already have source and target information in attributes, you'll need to adjust this approach accordingly
 
                         if (!selectedEdges.includes(edgeTitle)) {{
-                            edge.setAttribute('stroke', fillColor); // Use stroke for edge selection visual
+                            edge.setAttribute('stroke', edgeFillColor); // Use stroke for edge selection visual
                             edge.setAttribute('stroke-width', "5");
                             selectedEdges.push(edgeTitle);
                         }} else {{
@@ -303,6 +316,7 @@ def render(element_html: str, data: pl.QuestionData) -> str:
                     }});
                 }})
             }};
+
     }});
 
     function updateNodeListDisplay(selectedNodes) {{
@@ -322,11 +336,6 @@ def render(element_html: str, data: pl.QuestionData) -> str:
     }}
     clickable();
     </script>
-    <input type="hidden" id="selectedNodes" name="selectedNodes" value="">
-    <input type="hidden" id="selectedEdges" name="selectedEdges" value="">
-    <div id="selectedNodeList"></div>
-    <div id="selectedEdgeList"></div>
-
     """
     return f'<div class="pl-graph">{svg}</div>{javascript_function}'
 

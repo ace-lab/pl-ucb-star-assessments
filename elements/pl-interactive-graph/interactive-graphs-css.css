@@ -19,6 +19,7 @@
   border-radius: 5px;
   margin-bottom: 1rem; /* Space before the graph */
   order: -1; /* Makes the list come before the graph */
+  visibility: hidden;
 }
 #selectedEdgeList {
   width: 100%; /* List takes full width */
@@ -28,4 +29,6 @@
   border-radius: 5px;
   margin-bottom: 1rem; /* Space before the graph */
   order: -1; /* Makes the list come before the graph */
+  visibility: hidden;
+
 }
