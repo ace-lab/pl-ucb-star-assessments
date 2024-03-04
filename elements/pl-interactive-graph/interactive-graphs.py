@@ -1,8 +1,9 @@
 import warnings
-
+import random
 import lxml.html
 import networkx as nx
 import numpy as np
+import string
 import prairielearn as pl
 import pygraphviz
 
@@ -35,19 +36,6 @@ def graphviz_from_networkx(
     G = nx.nx_agraph.to_agraph(networkx_graph)
 
     return G.string()
-
-def generate_tree(n):
-    """Generate a directed tree with n nodes and root 'A'"""
-    tree = nx.random_tree(n)
-    edges = nx.bfs_edges(tree, source=0)
-    directed_tree = nx.DiGraph(edges)
-    return directed_tree
-
-def generate_graph(n, m):
-    directed = random.choice([True, False])
-    graph = nx.gnm_random_graph(n, m, directed=directed)
-    return graph
-
 
 def graphviz_from_adj_matrix(
     element: lxml.html.HtmlElement, data: pl.QuestionData
@@ -137,6 +125,29 @@ def graphviz_from_adj_matrix(
 
     return G.string()
 
+def generate_graph(min_nodes, max_nodes, min_edges, max_edges, directed=False, weighted=False, tree=False ):
+    n = random.randint(min_nodes, max_nodes)  
+    if min_edges == 0:
+        min_edges = n-1
+    if max_edges == 0:
+        max_edges = round(n*1.5)
+    if tree:
+        G = nx.random_tree(n, create_using=nx.DiGraph() if directed else nx.Graph())
+        if directed:
+            G = nx.DiGraph([(u, v) for u, v in G.edges()])
+    else:
+        # Generate a non-tree graph
+        m = random.randint(min_edges, max_edges if not directed else n*(n-1) // 2 ) 
+        G = nx.gnm_random_graph(n, m, directed=directed)
+    if weighted==True:
+        for (u, v) in G.edges():
+            G.edges[u, v]['weight'] = random.randint(1, 10) 
+
+    ascii_labels = list(string.ascii_letters[:n])  # Get the first 'n' ASCII letters
+    mapping = {i: ascii_labels[i] for i in range(n)}  # Create a mapping from numeric to ASCII labels
+    G = nx.relabel_nodes(G, mapping)
+
+    return G
 
 def prepare(element_html: str, data: pl.QuestionData) -> None:
     optional_attribs = [
@@ -147,8 +158,16 @@ def prepare(element_html: str, data: pl.QuestionData) -> None:
         "edge_fill_color",
         "select_nodes",
         "select_edges",
-        "directed",
+        "random_graph",
+        "directed_random",
+        "min_nodes",
+        "max_nodes",
+        "min_edges",
+        "max_edges",
+        "weighted",
+        "tree",
         "engine",
+        "directed",
         "params-name-matrix",
         "params-name",
         "weights",
@@ -170,16 +189,6 @@ def prepare(element_html: str, data: pl.QuestionData) -> None:
     pl.check_attribs(element, required_attribs=[], optional_attribs=optional_attribs)
 
 def render(element_html: str, data: pl.QuestionData) -> str:
-    matrix_backends = {
-        "adjacency-matrix": graphviz_from_adj_matrix,
-        "networkx": graphviz_from_networkx,
-    }
-
-    #load color
-    # Load all extensions
-    extensions = pl.load_all_extensions(data)
-    for extension in extensions.values():
-        matrix_backends.update(extension.backends)
 
     # Get attribs
     element = lxml.html.fragment_fromstring(element_html)
@@ -190,31 +199,63 @@ def render(element_html: str, data: pl.QuestionData) -> str:
 
     select_nodes = pl.get_string_attrib(element, "select_nodes", "True")
     select_edges = pl.get_string_attrib(element, "select_edges", True)
+    random_graph = pl.get_string_attrib(element, "random_graph", False)
 
+    # If random_graph is true, generate a random graph instead of using existing functions
+    if random_graph=="True":
+        # Example parameters - modify these as needed based on actual attributes or inputs
+        min_nodes = pl.get_integer_attrib(element, "min_nodes", 5)
+        max_nodes = pl.get_integer_attrib(element, "max_nodes", 10)
+        min_edges = pl.get_integer_attrib(element, "min_edges", 0)
+        max_edges = pl.get_integer_attrib(element, "max_nodes", 0)
+        directed_random = pl.get_boolean_attrib(element, "directed_random", False)
+        weighted = pl.get_boolean_attrib(element, "weighted", False)
+        tree = pl.get_boolean_attrib(element, "tree", False)
 
-    # Legacy input with passthrough
-    input_param_matrix = pl.get_string_attrib(
-        element, "params-name-matrix", PARAMS_NAME_DEFAULT
-    )
-    input_param_name = pl.get_string_attrib(element, "params-name", input_param_matrix)
+        networkx_graph = generate_graph(min_nodes, max_nodes, min_edges, max_edges, directed_random, weighted, tree)
+        agraph = nx.nx_agraph.to_agraph(networkx_graph)
 
-    input_type = pl.get_string_attrib(element, "params-type", PARAMS_TYPE_DEFAULT)
+        # Explicitly set edge labels to weights (if not already done automatically)
+        if weighted:
+            for edge in agraph.edges():
+                u, v = edge
+                edge.attr['label'] = networkx_graph[u][v]['weight']
 
-    if len(str(element.text)) == 0 and input_param_name is None:
-        raise ValueError(
-            "No graph source given! Must either define graph in HTML or provide source in params."
-        )
-
-    if input_param_name is not None:
-        if input_type in matrix_backends:
-            graphviz_data = matrix_backends[input_type](element, data)
-        else:
-            raise ValueError(f'Unknown graph type "{input_type}".')
+        graphviz_data = agraph.string()
     else:
-        # Read the contents of this element as the data to render
-        # we dump the string to json to ensure that newlines are
-        # properly encoded
-        graphviz_data = element.text
+        # Original logic to choose between networkx and adjacency matrix based on input_type
+        matrix_backends = {
+            "adjacency-matrix": graphviz_from_adj_matrix,
+            "networkx": graphviz_from_networkx,
+        }
+        #load color
+        # Load all extensions
+        extensions = pl.load_all_extensions(data)
+        for extension in extensions.values():
+            matrix_backends.update(extension.backends)
+        # Legacy input with passthrough
+        input_param_matrix = pl.get_string_attrib(
+            element, "params-name-matrix", PARAMS_NAME_DEFAULT
+        )
+        input_param_name = pl.get_string_attrib(element, "params-name", input_param_matrix)
+
+        input_type = pl.get_string_attrib(element, "params-type", PARAMS_TYPE_DEFAULT)
+
+        if len(str(element.text)) == 0 and input_param_name is None:
+            raise ValueError(
+                "No graph source given! Must either define graph in HTML or provide source in params."
+            )
+
+        if input_param_name is not None:
+            if input_type in matrix_backends:
+                graphviz_data = matrix_backends[input_type](element, data)
+            else:
+                raise ValueError(f'Unknown graph type "{input_type}".')
+        else:
+            # Read the contents of this element as the data to render
+            # we dump the string to json to ensure that newlines are
+            # properly encoded
+            graphviz_data = element.text
 
     translated_dotcode = pygraphviz.AGraph(string=graphviz_data)
 
@@ -288,20 +329,16 @@ def render(element_html: str, data: pl.QuestionData) -> str:
                     document.getElementById("selectedEdgeList").style.visibility= "visible";
 
                     edges.forEach(edge => {{
-                        edge.setAttribute('stroke-width', '5'); // Set stroke-width to 6 for all edges
+                        edge.setAttribute('stroke-width', '3'); 
                         }});
                 edges.forEach(edge => {{
                     edge.addEventListener('click', function(event) {{
                         event.stopPropagation();
-                        // Assuming each edge element or its parent has data attributes or an ID format from which you can extract source and target
                         let edgeTitle = edge.parentNode.querySelector('title').textContent;
-
-
-                        // If your edges don't already have source and target information in attributes, you'll need to adjust this approach accordingly
 
                         if (!selectedEdges.includes(edgeTitle)) {{
                             edge.setAttribute('stroke', edgeFillColor); // Use stroke for edge selection visual
-                            edge.setAttribute('stroke-width', "5");
+                            edge.setAttribute('stroke-width', "3");
                             selectedEdges.push(edgeTitle);
                         }} else {{
                             edge.setAttribute('stroke', 'black'); // Reset to default or specify non-selected stroke color
