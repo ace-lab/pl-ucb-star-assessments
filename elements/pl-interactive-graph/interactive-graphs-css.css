@@ -32,3 +32,7 @@
   visibility: hidden;
 
 }
+
+.edge text {
+  dy: 200px; /* Adjust this value as needed to increase spacing */
+}

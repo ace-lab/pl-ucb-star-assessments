@@ -286,13 +286,15 @@ def render(element_html: str, data: pl.QuestionData) -> str:
         nodeTexts.forEach(text => {{
             text.style.pointerEvents = 'none';
         }});
-        let edgeLabels = document.querySelectorAll('.edge > text');
-        edgeLabels.forEach(label => {{
-            //check if label (weight) exists and adjust its position
-            let currentX = parseFloat(label.getAttribute('x'));
-            let adjustment = 6; 
-            label.setAttribute('x', currentX + adjustment);
-        }});
+        
+        // Move edge labels to the right by 5 units
+        document.querySelectorAll('.edge text[text-anchor="middle"]').forEach(function(text) {{
+            var currentX = parseFloat(text.getAttribute('x'));
+            var newX = currentX + 5;
+            text.setAttribute('x', newX.toString());
+         }});
+
+
 
         if (selectNodes == "True") {{
             document.getElementById("selectedNodeList").style.visibility= "visible";
