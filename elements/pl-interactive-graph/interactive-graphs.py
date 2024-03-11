@@ -201,9 +201,8 @@ def render(element_html: str, data: pl.QuestionData) -> str:
     select_edges = pl.get_string_attrib(element, "select_edges", True)
     random_graph = pl.get_string_attrib(element, "random_graph", False)
 
-    # If random_graph is true, generate a random graph instead of using existing functions
+    #if random_graph is true, generate a random graph instead of using existing functions
     if random_graph=="True":
-        # Example parameters - modify these as needed based on actual attributes or inputs
         min_nodes = pl.get_integer_attrib(element, "min_nodes", 5)
         max_nodes = pl.get_integer_attrib(element, "max_nodes", 10)
         min_edges = pl.get_integer_attrib(element, "min_edges", 0)
@@ -215,7 +214,6 @@ def render(element_html: str, data: pl.QuestionData) -> str:
         networkx_graph = generate_graph(min_nodes, max_nodes, min_edges, max_edges, directed_random, weighted, tree)
         agraph = nx.nx_agraph.to_agraph(networkx_graph)
 
-        # Explicitly set edge labels to weights (if not already done automatically)
         if weighted:
             for edge in agraph.edges():
                 u, v = edge
@@ -288,7 +286,13 @@ def render(element_html: str, data: pl.QuestionData) -> str:
         nodeTexts.forEach(text => {{
             text.style.pointerEvents = 'none';
         }});
-
+        let edgeLabels = document.querySelectorAll('.edge > text');
+        edgeLabels.forEach(label => {{
+            //check if label (weight) exists and adjust its position
+            let currentX = parseFloat(label.getAttribute('x'));
+            let adjustment = 6; 
+            label.setAttribute('x', currentX + adjustment);
+        }});
 
         if (selectNodes == "True") {{
             document.getElementById("selectedNodeList").style.visibility= "visible";
@@ -329,7 +333,7 @@ def render(element_html: str, data: pl.QuestionData) -> str:
                     document.getElementById("selectedEdgeList").style.visibility= "visible";
 
                     edges.forEach(edge => {{
-                        edge.setAttribute('stroke-width', '3'); 
+                        edge.setAttribute('stroke-width', '5'); 
                         }});
                 edges.forEach(edge => {{
                     edge.addEventListener('click', function(event) {{
@@ -338,7 +342,7 @@ def render(element_html: str, data: pl.QuestionData) -> str:
 
                         if (!selectedEdges.includes(edgeTitle)) {{
                             edge.setAttribute('stroke', edgeFillColor); // Use stroke for edge selection visual
-                            edge.setAttribute('stroke-width', "3");
+                            edge.setAttribute('stroke-width', "5");
                             selectedEdges.push(edgeTitle);
                         }} else {{
                             edge.setAttribute('stroke', 'black'); // Reset to default or specify non-selected stroke color
