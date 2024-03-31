@@ -257,11 +257,13 @@ def render(element_html: str, data: pl.QuestionData) -> str:
         split = 2
    # print(graphviz_data)
     translated_dotcode = pygraphviz.AGraph(string=graphviz_data)
+    
    # print(graphviz_data.split(" "))
-    translated_dotcode_string=translated_dotcode.to_string()
-    stored_graph_data = translated_dotcode.string.split(" ")[:split]
-    graph_data = translated_dotcode_string.split(" ")[split:]
-    graph_data = "".join(graph_data)
+    translated_dotcode_string=translated_dotcode.string()
+  
+    #stored_graph_data = translated_dotcode.string.split(" ")[:split]
+    #graph_data = translated_dotcode_string.split(" ")[split:]
+    graph_data = translated_dotcode_string
     with warnings.catch_warnings():
         # Only apply ignore filter if we enable hiding warnings
         if not log_warnings:
@@ -269,10 +271,9 @@ def render(element_html: str, data: pl.QuestionData) -> str:
         svg = translated_dotcode.draw(format="svg", prog=engine).decode(
             "utf-8", "strict"
         )
-    print(graph_data)
+    #print(graph_data)
     javascript_function = f"""
     <input type="hidden" id="random-graph" name="random-graph" value="{graph_data}">
-        <input type="hidden" id="random-graph-metadata" name="random-graph-metadata" value="{stored_graph_data}">
     <input type="hidden" id="selectedNodes" name="selectedNodes" value="">
     <input type="hidden" id="selectedEdges" name="selectedEdges" value="">
     <div id="selectedNodeList"></div>
@@ -409,14 +410,14 @@ def grade(element_html, data):
     partial_credit = pl.from_json(element.get("partial-credit"))
 
 
-# Example usage:
-# Create an AGraph
-    A = pygraphviz.AGraph()
-    t = A.from_string(random_graph)
+
+    graph = pygraphviz.AGraph(string=random_graph)
+
+    print(graph.to_string())
 
     # Perform DFS starting from node '1' (node names are strings in AGraph)
-    dfs_order = dfs_agraph(t, 'a')
-    #print(dfs_order)
+    dfs_order = dfs_agraph(graph, 'a')
+    print(dfs_order)
 
     if preserve_ordering != "True":
         for i in range(len(user_selected_nodes)):
