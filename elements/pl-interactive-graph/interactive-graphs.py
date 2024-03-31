@@ -255,14 +255,17 @@ def render(element_html: str, data: pl.QuestionData) -> str:
             # properly encoded
             graphviz_data = element.text
         split = 2
-   # print(graphviz_data)
+ 
     translated_dotcode = pygraphviz.AGraph(string=graphviz_data)
-    
-   # print(graphviz_data.split(" "))
-    translated_dotcode_string=translated_dotcode.string()
+
+
+    translated_dotcode_string=translated_dotcode.string().replace('\"\"', "G")
+
+    #print(translated_dotcode_string)
   
     #stored_graph_data = translated_dotcode.string.split(" ")[:split]
     #graph_data = translated_dotcode_string.split(" ")[split:]
+
     graph_data = translated_dotcode_string
     with warnings.catch_warnings():
         # Only apply ignore filter if we enable hiding warnings
@@ -404,16 +407,16 @@ def grade(element_html, data):
     score = 0
     element = lxml.html.fragment_fromstring(element_html)
     random_graph = data["submitted_answers"]["random-graph"]
-    #print(random_graph)
+
     correct_answer = eval(pl.from_json(element.get("answers", "[]")))
     preserve_ordering = pl.from_json(element.get("preserve-ordering"))
     partial_credit = pl.from_json(element.get("partial-credit"))
 
 
-
+    #print(random_graph)
     graph = pygraphviz.AGraph(string=random_graph)
 
-    print(graph.to_string())
+
 
     # Perform DFS starting from node '1' (node names are strings in AGraph)
     dfs_order = dfs_agraph(graph, 'a')
