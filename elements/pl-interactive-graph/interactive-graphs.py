@@ -213,13 +213,13 @@ def render(element_html: str, data: pl.QuestionData) -> str:
 
         networkx_graph = generate_graph(min_nodes, max_nodes, min_edges, max_edges, directed_random, weighted, tree)
         agraph = nx.nx_agraph.to_agraph(networkx_graph)
-
         if weighted:
             for edge in agraph.edges():
                 u, v = edge
                 edge.attr['label'] = networkx_graph[u][v]['weight']
 
-        graphviz_data = agraph.string()
+        graphviz_data = agraph.to_string()
+        split = 3
     else:
         # Original logic to choose between networkx and adjacency matrix based on input_type
         matrix_backends = {
@@ -254,9 +254,14 @@ def render(element_html: str, data: pl.QuestionData) -> str:
             # we dump the string to json to ensure that newlines are
             # properly encoded
             graphviz_data = element.text
-
+        split = 2
+   # print(graphviz_data)
     translated_dotcode = pygraphviz.AGraph(string=graphviz_data)
-
+   # print(graphviz_data.split(" "))
+    translated_dotcode_string=translated_dotcode.to_string()
+    stored_graph_data = translated_dotcode.string.split(" ")[:split]
+    graph_data = translated_dotcode_string.split(" ")[split:]
+    graph_data = "".join(graph_data)
     with warnings.catch_warnings():
         # Only apply ignore filter if we enable hiding warnings
         if not log_warnings:
@@ -264,7 +269,10 @@ def render(element_html: str, data: pl.QuestionData) -> str:
         svg = translated_dotcode.draw(format="svg", prog=engine).decode(
             "utf-8", "strict"
         )
+    print(graph_data)
     javascript_function = f"""
+    <input type="hidden" id="random-graph" name="random-graph" value="{graph_data}">
+        <input type="hidden" id="random-graph-metadata" name="random-graph-metadata" value="{stored_graph_data}">
     <input type="hidden" id="selectedNodes" name="selectedNodes" value="">
     <input type="hidden" id="selectedEdges" name="selectedEdges" value="">
     <div id="selectedNodeList"></div>
@@ -394,10 +402,22 @@ def grade(element_html, data):
     # Use 'submitted_answers' instead of data["submitted_answers"]
     score = 0
     element = lxml.html.fragment_fromstring(element_html)
-
+    random_graph = data["submitted_answers"]["random-graph"]
+    #print(random_graph)
     correct_answer = eval(pl.from_json(element.get("answers", "[]")))
     preserve_ordering = pl.from_json(element.get("preserve-ordering"))
     partial_credit = pl.from_json(element.get("partial-credit"))
+
+
+# Example usage:
+# Create an AGraph
+    A = pygraphviz.AGraph()
+    t = A.from_string(random_graph)
+
+    # Perform DFS starting from node '1' (node names are strings in AGraph)
+    dfs_order = dfs_agraph(t, 'a')
+    #print(dfs_order)
+
     if preserve_ordering != "True":
         for i in range(len(user_selected_nodes)):
             if user_selected_nodes[i] in correct_answer:
@@ -421,3 +441,19 @@ def grade(element_html, data):
 
 
     return data
+
+def dfs_agraph(agraph, start):
+    visited = set()  # Set of visited nodes
+    stack = [start]  # Stack for DFS
+    order = []  # Order of visited nodes
+
+    while stack:
+        node = stack.pop()
+        if node not in visited:
+            visited.add(node)
+            order.append(node)
+            # Get successors of the node in reverse order to maintain the correct order when popped from stack
+            stack.extend(reversed([n for n in agraph.successors(node) if n not in visited]))
+
+    return order
+
