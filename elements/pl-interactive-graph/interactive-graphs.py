@@ -4,8 +4,10 @@ import lxml.html
 import networkx as nx
 import numpy as np
 import string
+import heapq
 import prairielearn as pl
 import pygraphviz
+from collections import deque
 
 
 #Default pl-interactive-graph
@@ -420,7 +422,10 @@ def grade(element_html, data):
 
     # Perform DFS starting from node '1' (node names are strings in AGraph)
     dfs_order = dfs_agraph(graph, 'a')
-    print(dfs_order)
+    #print(dfs_order)
+    dfs_order = bfs_agraph(graph, 'a')
+
+    print(dijkstra_agraph(graph, 'a'))
 
     if preserve_ordering != "True":
         for i in range(len(user_selected_nodes)):
@@ -460,4 +465,76 @@ def dfs_agraph(agraph, start):
             stack.extend(reversed([n for n in agraph.successors(node) if n not in visited]))
 
     return order
+
+
+def bfs_agraph(agraph, start_node):
+    """
+    Perform Breadth-First Search (BFS) starting from start_node.
+
+    Parameters:
+    - agraph (pgv.AGraph): The graph on which to perform BFS.
+    - start_node (str): The starting node for BFS.
+
+    Returns:
+    list: A list of nodes in the order they were visited.
+    """
+    visited = set([start_node])  # Set of visited nodes
+    queue = deque([start_node])  # Queue for BFS
+    order = []  # Order of visited nodes
+
+    while queue:
+        # Dequeue a node from queue
+        current_node = queue.popleft()
+        order.append(current_node)
+
+        # Visit all the unvisited neighbors
+        for neighbor in agraph.successors(current_node):
+            if neighbor not in visited:
+                visited.add(neighbor)
+                queue.append(neighbor)
+    
+    return order
+
+
+    
+def dijkstra_agraph(agraph, start_node):
+    """
+    Perform Dijkstra's algorithm to find the shortest paths from start_node to all other nodes in the graph.
+    
+    Parameters:
+    - agraph (pgv.AGraph): The graph on which to perform Dijkstra's algorithm.
+    - start_node (str): The starting node for the algorithm.
+    
+    Returns:
+    dict: A dictionary mapping each node to its shortest distance from the start_node.
+    """
+    # Initialize distances from start_node to infinity, except for start_node itself which is 0
+    distances = {node: float('inf') for node in agraph.nodes()}
+    distances[start_node] = 0
+
+    # Priority queue to select the node with the smallest distance
+    pq = [(0, start_node)]
+    
+    while pq:
+        # Pop the node with the smallest distance
+        current_distance, current_node = heapq.heappop(pq)
+        
+        # If the popped node has a distance greater than the current recorded distance, skip it
+        if current_distance > distances[current_node]:
+            continue
+        
+        # Explore the neighbors of the current node
+        for neighbor in agraph.successors(current_node):
+            edge = agraph.get_edge(current_node, neighbor)
+            weight = float(edge.attr.get('weight', 1))  # Default weight is 1 if not specified
+            
+            # Calculate new distance to the neighboring node
+            distance = current_distance + weight
+            
+            # If the new distance is shorter, update the path and distances
+            if distance < distances[neighbor]:
+                distances[neighbor] = distance
+                heapq.heappush(pq, (distance, neighbor))
+    
+    return distances
 
