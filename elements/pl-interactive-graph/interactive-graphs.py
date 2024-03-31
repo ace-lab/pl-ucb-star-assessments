@@ -400,6 +400,7 @@ def grade(element_html, data):
         }
         return data
     user_selected_nodes = eval(data["submitted_answers"]["selectedNodes"])
+    user_selected_edges = eval(data["submitted_answers"]["selectedEdges"])
     # Use 'submitted_answers' instead of data["submitted_answers"]
     score = 0
     element = lxml.html.fragment_fromstring(element_html)
@@ -522,4 +523,58 @@ def dijkstra_agraph(agraph, start_node):
                 heapq.heappush(pq, (distance, neighbor))
     
     return distances
+
+def find(parent, i):
+    if parent[i] == i:
+        return i
+    return find(parent, parent[i])
+
+def union(parent, rank, x, y):
+    xroot = find(parent, x)
+    yroot = find(parent, y)
+    if rank[xroot] < rank[yroot]:
+        parent[xroot] = yroot
+    elif rank[xroot] > rank[yroot]:
+        parent[yroot] = xroot
+    else:
+        parent[yroot] = xroot
+        rank[xroot] += 1
+
+def kruskals_agraph(agraph):
+    """Performs Kruskal's algorithm on an AGraph object."""
+    # Initialize result
+    result = []  # This will store the resultant MST
+
+    i, e = 0, 0  # Variables to store number of edges processed and added to MST
+
+    # Step 1: Sort all the edges in non-decreasing order of their weight
+    edges = [(float(edge.attr['weight']), edge) for edge in agraph.edges()]
+    edges.sort(key=lambda x: x[0])
+
+    parent = {}
+    rank = {}
+
+    # Create V sets with single elements
+    for node in agraph.nodes():
+        parent[node] = node
+        rank[node] = 0
+
+    # Number of edges to be taken is equal to V-1
+    while e < len(agraph.nodes()) - 1:
+        # Step 2: Pick the smallest edge and increment the index for next iteration
+        _, edge = edges[i]
+        i += 1
+        x = find(parent, edge[0])
+        y = find(parent, edge[1])
+
+        # If including this edge does not cause a cycle, include it in result
+        # and increment the index of the result for the next edge
+        if x != y:
+            e += 1
+            result.append(edge)
+            union(parent, rank, x, y)
+
+    # Format the result to match the specified format
+    formatted_result = [f"{edge[0]}--{edge[1]}" for edge in result]
+    return formatted_result
 
