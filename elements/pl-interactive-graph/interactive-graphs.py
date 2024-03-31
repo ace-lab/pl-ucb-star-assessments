@@ -156,16 +156,16 @@ def prepare(element_html: str, data: pl.QuestionData) -> None:
         "preserve-ordering",
         "answers",
         "partial-credit",
-        "node_fill_color",
-        "edge_fill_color",
-        "select_nodes",
-        "select_edges",
-        "random_graph",
-        "directed_random",
-        "min_nodes",
-        "max_nodes",
-        "min_edges",
-        "max_edges",
+        "node-fill-color",
+        "edge-fill-color",
+        "select-nodes",
+        "select-edges",
+        "random-graph",
+        "directed-random",
+        "min-nodes",
+        "max-nodes",
+        "min-edges",
+        "max-edges",
         "weighted",
         "tree",
         "engine",
@@ -196,20 +196,20 @@ def render(element_html: str, data: pl.QuestionData) -> str:
     element = lxml.html.fragment_fromstring(element_html)
     engine = pl.get_string_attrib(element, "engine", ENGINE_DEFAULT)
     log_warnings = pl.get_boolean_attrib(element, "log-warnings", LOG_WARNINGS_DEFAULT)
-    node_fill_color = pl.get_string_attrib(element, "node_fill_color", "red")
-    edge_fill_color = pl.get_string_attrib(element, "edge_fill_color", "red")
+    node_fill_color = pl.get_string_attrib(element, "node-fill-color", "red")
+    edge_fill_color = pl.get_string_attrib(element, "edge-fill-color", "red")
 
-    select_nodes = pl.get_string_attrib(element, "select_nodes", "True")
-    select_edges = pl.get_string_attrib(element, "select_edges", True)
-    random_graph = pl.get_string_attrib(element, "random_graph", False)
+    select_nodes = pl.get_string_attrib(element, "select-nodes", "True")
+    select_edges = pl.get_string_attrib(element, "select-edges", True)
+    random_graph = pl.get_string_attrib(element, "random-graph", False)
 
     #if random_graph is true, generate a random graph instead of using existing functions
     if random_graph=="True":
-        min_nodes = pl.get_integer_attrib(element, "min_nodes", 5)
-        max_nodes = pl.get_integer_attrib(element, "max_nodes", 10)
-        min_edges = pl.get_integer_attrib(element, "min_edges", 0)
-        max_edges = pl.get_integer_attrib(element, "max_nodes", 0)
-        directed_random = pl.get_boolean_attrib(element, "directed_random", False)
+        min_nodes = pl.get_integer_attrib(element, "min-nodes", 5)
+        max_nodes = pl.get_integer_attrib(element, "max-nodes", 10)
+        min_edges = pl.get_integer_attrib(element, "min-edges", 0)
+        max_edges = pl.get_integer_attrib(element, "max-nodes", 0)
+        directed_random = pl.get_boolean_attrib(element, "directed-random", False)
         weighted = pl.get_boolean_attrib(element, "weighted", False)
         tree = pl.get_boolean_attrib(element, "tree", False)
 
@@ -221,7 +221,6 @@ def render(element_html: str, data: pl.QuestionData) -> str:
                 edge.attr['label'] = networkx_graph[u][v]['weight']
 
         graphviz_data = agraph.to_string()
-        split = 3
     else:
         # Original logic to choose between networkx and adjacency matrix based on input_type
         matrix_backends = {
@@ -255,12 +254,8 @@ def render(element_html: str, data: pl.QuestionData) -> str:
             # Read the contents of this element as the data to render
             # we dump the string to json to ensure that newlines are
             # properly encoded
-            graphviz_data = element.text
-        split = 2
- 
+            graphviz_data = element.text 
     translated_dotcode = pygraphviz.AGraph(string=graphviz_data)
-
-
     translated_dotcode_string=translated_dotcode.string().replace('\"\"', "G")
 
     #print(translated_dotcode_string)
@@ -414,19 +409,9 @@ def grade(element_html, data):
     preserve_ordering = pl.from_json(element.get("preserve-ordering"))
     partial_credit = pl.from_json(element.get("partial-credit"))
 
-
-    #print(random_graph)
     graph = pygraphviz.AGraph(string=random_graph)
 
-
-
-    # Perform DFS starting from node '1' (node names are strings in AGraph)
-    dfs_order = dfs_agraph(graph, 'a')
-    #print(dfs_order)
-    dfs_order = bfs_agraph(graph, 'a')
-
-    print(dijkstra_agraph(graph, 'a'))
-
+    correct_answer = bfs_agraph(graph, 'a')
     if preserve_ordering != "True":
         for i in range(len(user_selected_nodes)):
             if user_selected_nodes[i] in correct_answer:
