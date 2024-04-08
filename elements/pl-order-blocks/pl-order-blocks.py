@@ -230,6 +230,7 @@ def prepare(element_html: str, data: pl.QuestionData) -> None:
         group_info: GroupInfo,
     ):
         if grading_method is GradingMethodType.SORTING:
+            print("HI We made it to prepare tag function for sorting")
             #Going to be bad coding practice but I just want a working product :-)
             if html_tags.tag != "pl-answer" or html_tags.tag != "pl-order-sub-blocks":
                 raise Exception(
