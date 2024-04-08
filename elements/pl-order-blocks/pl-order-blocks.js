@@ -131,7 +131,11 @@ window.PLOrderBlocks = function (uuid, options) {
     ).join(', ');
   }
 
-  let sortables = optionsElementId + ', ' + dropzoneElementId;
+  let sortables = '';
+  for (let i = 1; i < 4; i++) {
+    sortables += optionsElementId + '-' + '' + i + ', ';
+  }
+  sortables += dropzoneElementId;
   $(sortables).sortable({
     items: '.pl-order-block:not(.nodrag)',
     // We add `a` to the default list of tags to account for help

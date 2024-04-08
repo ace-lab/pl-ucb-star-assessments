@@ -1,0 +1,176 @@
+<script>
+$(function() {
+    var UUID = "e49eaebe-076e-422a-855a-1580ff06e641";
+
+    new window.PLOrderBlocks(UUID, {
+        maxIndent: 4,
+        inline: false,
+        enableIndentation: false,
+    });
+});
+</script>
+
+
+    <div class="d-flex flex-wrap">
+        <div class="pl-order-blocks-container pl-order-blocks-container pl-order-blocks-right ">
+            <div class="card-header pl-order-blocks-header list-group-item-primary">input</div>
+            <ul id="order-blocks-options-e49eaebe-076e-422a-855a-1580ff06e641-1" name="sorting" class="card-body list-group pl-order-blocks-connected-sortable">
+                    <li class="list-group-item shadow pl-order-block ui-sortable-handle"
+                        uuid="d8bfad1b-30bc-4c47-97f6-9c5611c6f96d"
+                        string="2"
+                        >2
+                    </li>
+                    <li class="list-group-item shadow pl-order-block ui-sortable-handle"
+                        uuid="f08f53f4-4d7f-4544-b9ea-b696e29c1855"
+                        string="3"
+                        >3
+                    </li>
+                    <li class="list-group-item shadow pl-order-block ui-sortable-handle"
+                        uuid="cf06dc4a-8a1c-441b-8ebc-349430e3f1e7"
+                        string="1"
+                        >1
+                    </li>
+            </ul>
+        </div>
+
+        <div class="pl-order-blocks-container pl-order-blocks-container pl-order-blocks-right ">
+            <div class="card-header pl-order-blocks-header list-group-item-primary">iteration 1</div>
+            <ul id="order-blocks-options-e49eaebe-076e-422a-855a-1580ff06e641-2" name="sorting" class="card-body list-group pl-order-blocks-connected-sortable">
+                    <li class="list-group-item shadow pl-order-block ui-sortable-handle"
+                        uuid="ea435151-94e4-46b5-8aab-c9e2d6c33555"
+                        string="2"
+                        >2
+                    </li>
+                    <li class="list-group-item shadow pl-order-block ui-sortable-handle"
+                        uuid="d4fde787-3bbb-47ba-bd68-903d73949c2e"
+                        string="3"
+                        >3
+                    </li>
+                    <li class="list-group-item shadow pl-order-block ui-sortable-handle"
+                        uuid="eacf3754-f0bb-47c7-8883-47944b6a57d1"
+                        string="1"
+                        >1
+                    </li>
+            </ul>
+        </div>
+
+        <div class="pl-order-blocks-container pl-order-blocks-container pl-order-blocks-right ">
+            <div class="card-header pl-order-blocks-header list-group-item-primary">iteration 1</div>
+            <ul id="order-blocks-options-e49eaebe-076e-422a-855a-1580ff06e641-3" name="sorting" class="card-body list-group pl-order-blocks-connected-sortable">
+                    <li class="list-group-item shadow pl-order-block ui-sortable-handle"
+                        uuid="bae72e8c-fdfc-42ee-be1c-dc1c916bda73"
+                        string="2"
+                        >2
+                    </li>
+                    <li class="list-group-item shadow pl-order-block ui-sortable-handle"
+                        uuid="a7ccfa72-3e12-489d-a2ff-baa8d16e9d46"
+                        string="3"
+                        >3
+                    </li>
+                    <li class="list-group-item shadow pl-order-block ui-sortable-handle"
+                        uuid="d8776d57-d202-4320-ab6c-e8b3cea31e6d"
+                        string="1"
+                        >1
+                    </li>
+            </ul>
+        </div>
+
+    </div>
+    <input id="e49eaebe-076e-422a-855a-1580ff06e641-input" type="hidden" name="sorting-input" value=""/>
+
+
+{{#submission}}
+    {{^parse-error}}
+    <div class="pl-order-blocks-answer-container {{block_layout}} {{dropzone_layout}}">
+        <div class="card-header">
+            Your answer:
+        {{#correct}}
+            <span class="badge badge-success"><i class="fa fa-check" aria-hidden="true"></i> 100%</span>
+        {{/correct}}
+        {{#partially_correct}}
+            <span class="badge badge-warning"><i class="fa fa-times" aria-hidden="true"></i> {{partially_correct}}%</span>
+        {{/partially_correct}}
+        {{#incorrect}}
+            <span class="badge badge-danger"><i class="fa fa-times" aria-hidden="true"></i> 0%</span>
+        {{/incorrect}}
+        </div>
+        <ul class="card-body list-group list-unstyled">
+            {{#student_submission}}
+                {{#distractor_feedback}}
+                <li class="pl-order-blocks-pairing-indicator list-group-item-warning">
+                    <ul class="list-unstyled">
+                        <li>
+                            <div class="pl-order-blocks-correctness-badge-container">
+                                {{#allow_feedback_badges}}
+                                <span class="pl-order-blocks-correctness-badge badge {{badge_type}}"><i class="fa {{icon}}" aria-hidden="true"></i></span>
+                                {{/allow_feedback_badges}}
+                                <div class="{{block_formatting}} pl-order-block" style="margin-left: {{indent}}px;flex-grow:1;">{{{inner_html}}}</div>
+                            </div>
+                        </li>
+                    </ul>
+                    <div>
+                        <span class="pl-order-blocks-feedback-icon"><i class="fa fa-question-circle" aria-hidden="true"></i></span>
+                        {{distractor_feedback}}
+                    </div>
+                </li>
+                {{/distractor_feedback}}
+                {{^distractor_feedback}}
+                <li>
+                    <div class="pl-order-blocks-correctness-badge-container">
+                        {{#allow_feedback_badges}}
+                        <span class="pl-order-blocks-correctness-badge badge {{badge_type}}"><i class="fa {{icon}}" aria-hidden="true"></i></span>
+                        {{/allow_feedback_badges}}
+                        <div class="{{block_formatting}} pl-order-block" style="margin-left: {{indent}}px;flex-grow:1;">{{{inner_html}}}</div>
+                    </div>
+                </li>
+                {{/distractor_feedback}}
+            {{/student_submission}}
+        </ul>
+    </div>
+    <p>{{{feedback}}}</p>
+    {{/parse-error}}
+
+    {{#parse-error}}
+        <strong>Your answer: </strong>
+        <div id="pl-order-blocks" class="d-inline-block">
+            <span class="badge text-danger badge-invalid"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Invalid</span>
+            <a role="button" class="btn btn-sm btn-secondary small border" data-placement="auto" data-trigger="focus" data-toggle="popover" data-html="true" style="margin-left: 5px" title="Format Error" tabindex="0" data-content="{{parse-error}}"> Why <i class="fa fa-question-circle" aria-hidden="true"></i></a>
+        </div>
+    {{/parse-error}}
+{{/submission}}
+
+{{#true_answer}}
+    <div class="pl-order-blocks-answer-container {{block_layout}} {{dropzone_layout}}">
+        <div class="card-header list-group-item-success">Correct answer ({{ordering_message}}{{indentation_message}}):</div>
+        <ul class="card-body list-group">
+        {{#question_solution}}
+            <li class="{{block_formatting}} pl-order-block" style="margin-left: {{indent}}px">{{{inner_html}}}</li>
+        {{/question_solution}}
+        </ul>
+    </div>
+
+    {{#show_distractors}}
+    <br><br>
+    <div class="pl-order-blocks-answer-container  {{block_layout}} {{dropzone_layout}}">
+        <div class="card-header list-group-item-danger">Incorrect Blocks (these blocks should not be included in your solution):</div>
+        <ul class="card-body list-group list-unstyled">
+        {{#distractors}}
+            {{#distractor_feedback}}
+            <li class="pl-order-blocks-pairing-indicator list-group-item-warning">
+                <ul class="p-0">
+                    <li class="{{block_formatting}} pl-order-block">{{{inner_html}}}</li>
+                </ul>
+                <div>
+                    <span class="pl-order-blocks-feedback-icon"><i class="fa fa-question-circle" aria-hidden="true"></i></span>
+                    {{distractor_feedback}}
+                </div>
+            </li>
+            {{/distractor_feedback}}
+            {{^distractor_feedback}}
+                <li class="{{block_formatting}} pl-order-block">{{{inner_html}}}</li>
+            {{/distractor_feedback}}
+        {{/distractors}}
+        </ul>
+    </div>
+    {{/show_distractors}}
+{{/true_answer}}
