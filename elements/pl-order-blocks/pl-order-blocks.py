@@ -629,8 +629,7 @@ def get_distractors(
 
 
 def render(element_html: str, data: pl.QuestionData) -> str:
-    #gets the element, answerName, format, and inline
-    element = lxml.html.fragment_fromstring(element_html)
+     element = lxml.html.fragment_fromstring(element_html)
     answer_name = pl.get_string_attrib(element, "answers-name")
     format = pl.get_enum_attrib(element, "format", FormatType, FormatType.DEFAULT)
     inline = pl.get_boolean_attrib(element, "inline", INLINE_DEFAULT)
@@ -649,6 +648,7 @@ def render(element_html: str, data: pl.QuestionData) -> str:
 
     if data["panel"] == "question":
         editable = data["editable"]
+
         answer_name = pl.get_string_attrib(element, "answers-name")
         source_header = pl.get_string_attrib(
             element, "source-header", SOURCE_HEADER_DEFAULT
@@ -720,16 +720,8 @@ def render(element_html: str, data: pl.QuestionData) -> str:
             "block_layout": "pl-order-blocks-horizontal" if inline else "",
         }
 
-        html = ""
-
-        # if grading_method is not GradingMethodType.SORTING:
-        with open("pl-order-blocks-sorted-1.mustache", "r", encoding="utf-8") as f:
+        with open("pl-order-blocks.mustache", "r", encoding="utf-8") as f:
             html = chevron.render(f, html_params)
-        # else:
-        #     with open("pl-order-blocks.mustache", "r", encoding="utf-8") as f:
-        #         html = chevron.render(f, html_params)
-            
-
         return html
 
     elif data["panel"] == "submission":
