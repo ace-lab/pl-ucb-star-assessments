@@ -210,6 +210,7 @@ def render(element_html: str, data: pl.QuestionData) -> str:
         min_edges = pl.get_integer_attrib(element, "min-edges", 0)
         max_edges = pl.get_integer_attrib(element, "max-nodes", 0)
         directed_random = pl.get_boolean_attrib(element, "directed-random", False)
+     
         weighted = pl.get_boolean_attrib(element, "weighted", False)
         tree = pl.get_boolean_attrib(element, "tree", False)
 
@@ -392,18 +393,40 @@ def render(element_html: str, data: pl.QuestionData) -> str:
     return f'<div class="pl-graph">{svg}</div>{javascript_function}'
 
 def grade(element_html, data):
-    if len(data["submitted_answers"]["selectedNodes"]) == 0:
+
+    element = lxml.html.fragment_fromstring(element_html)
+    
+    if len(data["submitted_answers"]["selectedNodes"]) < 3:
         data["partial_scores"]["score"] = {
         "score": 0,
         "weight": 1,
         "feedback": "no nodes selected",
         }
         return data
+    
+
+    #select_edges = pl.get_string_attrib(element_html, "select-edges", True)
+    select_edges = pl.from_json(element.get("select-edges"))
+    #print(select_edges)
+
+    if select_edges:
+        if len(data["submitted_answers"]["selectedEdges"]) < 3:
+            data["partial_scores"]["score"] = {
+            "score": 0,
+            "weight": 1,
+            "feedback": "no edges selected",
+        }
+        return data
+    
+    
+
+    print(data["submitted_answers"]["selectedNodes"])
+    print(data["submitted_answers"]["selectedEdges"])
     user_selected_nodes = eval(data["submitted_answers"]["selectedNodes"])
     user_selected_edges = eval(data["submitted_answers"]["selectedEdges"])
     # Use 'submitted_answers' instead of data["submitted_answers"]
     score = 0
-    element = lxml.html.fragment_fromstring(element_html)
+    
     random_graph = data["submitted_answers"]["random-graph"]
 
     correct_answer = eval(pl.from_json(element.get("answers", "[]")))
