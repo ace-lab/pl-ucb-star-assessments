@@ -8,7 +8,7 @@
     "allowAccess": [],
     "zones": [{
         "questions": [
-            {"id": "CS61B/SortingQuestion", "points": 1}
+            {"id": "CS61B/Sorting_Question", "points": 1}
         ]
     }]
 }
