@@ -171,7 +171,7 @@ def solve_problem(
         solution = solve_dag(depends_graph, group_belonging)
         return sorted(answers_list, key=lambda x: solution.index(x["tag"]))
     elif grading_method is GradingMethodType.SORTING:
-
+        return answers_list
     else:
         assert_never(grading_method)
 
