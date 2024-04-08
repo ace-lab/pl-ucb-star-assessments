@@ -20,6 +20,14 @@
                 {
                     "id": "pl-interactive-graph-examples/Clickable_Nodes_Finite_State_Machine",
                     "autoPoints": 1
+                },
+                {
+                    "id": "pl-interactive-graph-examples/Clickable_Nodes_Dijkstras",
+                    "autoPoints": 1
+                },
+                {
+                    "id": "pl-interactive-graph-examples/Clickable_Nodes_Kruskals",
+                    "autoPoints": 1
                 }
             ]
         }

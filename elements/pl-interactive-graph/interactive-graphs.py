@@ -395,7 +395,7 @@ def render(element_html: str, data: pl.QuestionData) -> str:
 def grade(element_html, data):
 
     element = lxml.html.fragment_fromstring(element_html)
-    
+
     if len(data["submitted_answers"]["selectedNodes"]) < 3:
         data["partial_scores"]["score"] = {
         "score": 0,
@@ -419,11 +419,10 @@ def grade(element_html, data):
         return data
     
     
-
-    print(data["submitted_answers"]["selectedNodes"])
-    print(data["submitted_answers"]["selectedEdges"])
     user_selected_nodes = eval(data["submitted_answers"]["selectedNodes"])
-    user_selected_edges = eval(data["submitted_answers"]["selectedEdges"])
+    if select_edges:
+        user_selected_edges = eval(data["submitted_answers"]["selectedEdges"])
+
     # Use 'submitted_answers' instead of data["submitted_answers"]
     score = 0
     
@@ -435,7 +434,10 @@ def grade(element_html, data):
 
     graph = pygraphviz.AGraph(string=random_graph)
 
-    correct_answer = bfs_agraph(graph, 'a')
+    correct_answer = dijkstra_agraph(graph, 'A')
+
+
+    #print("user" + str(user_selected_nodes) + "answer" + str(correct_answer))
     if preserve_ordering != "True":
         for i in range(len(user_selected_nodes)):
             if user_selected_nodes[i] in correct_answer:
@@ -456,9 +458,10 @@ def grade(element_html, data):
     "score": score,
     "weight": 1
     }
-
-
     return data
+
+
+
 
 def dfs_agraph(agraph, start):
     visited = set()  # Set of visited nodes
@@ -508,14 +511,15 @@ def bfs_agraph(agraph, start_node):
     
 def dijkstra_agraph(agraph, start_node):
     """
-    Perform Dijkstra's algorithm to find the shortest paths from start_node to all other nodes in the graph.
+    Perform Dijkstra's algorithm to find the shortest paths from start_node to all other nodes in the graph,
+    and return the order in which nodes are visited without duplicates.
     
     Parameters:
     - agraph (pgv.AGraph): The graph on which to perform Dijkstra's algorithm.
     - start_node (str): The starting node for the algorithm.
     
     Returns:
-    dict: A dictionary mapping each node to its shortest distance from the start_node.
+    list: A list of nodes in the order they are uniquely visited.
     """
     # Initialize distances from start_node to infinity, except for start_node itself which is 0
     distances = {node: float('inf') for node in agraph.nodes()}
@@ -524,18 +528,34 @@ def dijkstra_agraph(agraph, start_node):
     # Priority queue to select the node with the smallest distance
     pq = [(0, start_node)]
     
+    # Set and list to record the order of visited nodes
+    visited_set = set()
+    visited_order = []
+    
     while pq:
         # Pop the node with the smallest distance
         current_distance, current_node = heapq.heappop(pq)
         
-        # If the popped node has a distance greater than the current recorded distance, skip it
-        if current_distance > distances[current_node]:
+        # Skip if this node has already been visited
+        if current_node in visited_set:
             continue
+        
+        # Mark the current node as visited
+        visited_set.add(current_node)
+        visited_order.append(current_node)
         
         # Explore the neighbors of the current node
         for neighbor in agraph.successors(current_node):
             edge = agraph.get_edge(current_node, neighbor)
-            weight = float(edge.attr.get('weight', 1))  # Default weight is 1 if not specified
+            
+            try:
+                # Extract the edge's label, which contains the weight as a string
+                label = edge.attr.get('label')
+                # If the label exists and is not None, convert it to float. Otherwise, use default weight.
+                weight = float(label) if label is not None else 1.0
+            except ValueError:
+                # In case the label cannot be converted to float, use a default weight.
+                weight = 1.0
             
             # Calculate new distance to the neighboring node
             distance = current_distance + weight
@@ -543,9 +563,13 @@ def dijkstra_agraph(agraph, start_node):
             # If the new distance is shorter, update the path and distances
             if distance < distances[neighbor]:
                 distances[neighbor] = distance
+                # Use a tuple of (distance, neighbor) to maintain a min heap based on distance
                 heapq.heappush(pq, (distance, neighbor))
     
-    return distances
+    return visited_order
+
+
+
 
 def find(parent, i):
     if parent[i] == i:
