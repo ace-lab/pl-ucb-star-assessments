@@ -1,0 +1,14 @@
+{
+    "uuid": "b91573a9-d5d9-4e2e-9b24-c55dd143f169",
+    "type": "Homework",
+    "title": "Stable Matching Practice",
+    "set": "Homework",
+    "shuffleQuestions": false,
+    "number": "1",
+    "allowAccess": [],
+    "zones": [{
+        "questions": [
+            {"id": "CS61B/SortingQuestion", "points": 1}
+        ]
+    }]
+}
