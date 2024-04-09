@@ -466,6 +466,7 @@ def prepare(element_html: str, data: pl.QuestionData) -> None:
 
         index = 0
         for html_tags in element:  # iterate through the html tags inside pl-order-blocks
+            raise Exception("made it here inside element")
             if html_tags.tag is Comment:
                 continue
             elif html_tags.tag == "pl-block-group":
