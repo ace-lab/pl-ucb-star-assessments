@@ -362,7 +362,6 @@ def prepare(element_html: str, data: pl.QuestionData) -> None:
             correct_answers.append(current_correct_anwsers)
             
         else:
-            raise Exception(html_tags)
             if html_tags.tag != "pl-answer" or html_tags.tag != "pl-order-sub-blocks":
                 raise Exception(
                     "Any html tags nested inside <pl-order-blocks> must be <pl-answer> or <pl-block-group>. \
