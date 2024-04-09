@@ -493,7 +493,8 @@ def prepare(element_html: str, data: pl.QuestionData) -> None:
             else:
                 prepare_tag(html_tags, index, {"tag": None, "depends": None})
                 index += 1
-
+            print(html_tags)
+            print(correct_answers)
     if grading_method is not GradingMethodType.EXTERNAL and len(correct_answers) == 0:
         raise Exception("There are no correct answers specified for this question.")
 
