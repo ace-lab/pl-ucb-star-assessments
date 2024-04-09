@@ -149,7 +149,7 @@ def solve_problem(
 
 
 def prepare(element_html: str, data: pl.QuestionData) -> None:
-#Gets the string of the element
+    #Gets the string of the element
     element = lxml.html.fragment_fromstring(element_html)
 
     #Sets what are the required elements
