@@ -464,38 +464,37 @@ def prepare(element_html: str, data: pl.QuestionData) -> None:
             else:
                 incorrect_answers.append(answer_data_dict)
 
-        index = 0
-        for html_tags in element:  # iterate through the html tags inside pl-order-blocks
-            raise Exception("made it here inside element")
-            if html_tags.tag is Comment:
-                continue
-            elif html_tags.tag == "pl-block-group":
-                if grading_method is not GradingMethodType.DAG:
-                    raise Exception(
-                        'Block groups only supported in the "dag" grading mode.'
-                    )
+    index = 0
+    for html_tags in element:  # iterate through the html tags inside pl-order-blocks
+        if html_tags.tag is Comment:
+            continue
+        elif html_tags.tag == "pl-block-group":
+            if grading_method is not GradingMethodType.DAG:
+                raise Exception(
+                    'Block groups only supported in the "dag" grading mode.'
+                )
 
-                group_tag, group_depends = get_graph_info(html_tags)
-                if group_tag in used_tags:
-                    raise Exception(
-                        f'Tag "{group_tag}" used in multiple places. The tag attribute for each <pl-answer> and <pl-block-group> must be unique.'
-                    )
-                else:
-                    used_tags.add(group_tag)
-
-                for grouped_tag in html_tags:
-                    if html_tags.tag is Comment:
-                        continue
-                    else:
-                        prepare_tag(
-                            grouped_tag, index, {"tag": group_tag, "depends": group_depends}
-                        )
-                        index += 1
-            elif html_tags.tag == "pl-order-sub-blocks":
-                prepare_tag(html_tags, index, {"tag": None, "depends": None})
+            group_tag, group_depends = get_graph_info(html_tags)
+            if group_tag in used_tags:
+                raise Exception(
+                    f'Tag "{group_tag}" used in multiple places. The tag attribute for each <pl-answer> and <pl-block-group> must be unique.'
+                )
             else:
-                prepare_tag(html_tags, index, {"tag": None, "depends": None})
-                index += 1
+                used_tags.add(group_tag)
+
+            for grouped_tag in html_tags:
+                if html_tags.tag is Comment:
+                    continue
+                else:
+                    prepare_tag(
+                        grouped_tag, index, {"tag": group_tag, "depends": group_depends}
+                    )
+                    index += 1
+        elif html_tags.tag == "pl-order-sub-blocks":
+            prepare_tag(html_tags, index, {"tag": None, "depends": None})
+        else:
+            prepare_tag(html_tags, index, {"tag": None, "depends": None})
+            index += 1
     if grading_method is not GradingMethodType.EXTERNAL and len(correct_answers) == 0:
         raise Exception("There are no correct answers specified for this question.")
 
