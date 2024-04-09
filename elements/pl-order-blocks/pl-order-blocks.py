@@ -205,7 +205,7 @@ def prepare(element_html: str, data: pl.QuestionData) -> None:
     if (
         grading_method is not GradingMethodType.DAG
         and grading_method is not GradingMethodType.RANKING
-        and grading_method is not grading_method.SORTING
+        and grading_method is not GradingMethodType.SORTING
         and feedback_type is not FeedbackType.NONE
     ):
         raise Exception(
