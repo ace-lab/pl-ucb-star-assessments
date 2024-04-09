@@ -618,29 +618,8 @@ def render(element_html: str, data: pl.QuestionData) -> str:
 
     if data["panel"] == "question":
         editable = data["editable"]
-
         answer_name = pl.get_string_attrib(element, "answers-name")
-        source_header = pl.get_string_attrib(
-            element, "source-header", SOURCE_HEADER_DEFAULT
-        )
-        solution_header = pl.get_string_attrib(
-            element, "solution-header", SOLUTION_HEADER_DEFAULT
-        )
-
-        all_blocks = data["params"][answer_name]
-        student_previous_submission = data["submitted_answers"].get(answer_name, [])
-        submitted_block_ids = {block["uuid"] for block in student_previous_submission}
-        source_blocks = [
-            block for block in all_blocks if block["uuid"] not in submitted_block_ids
-        ]
-
-        for option in student_previous_submission:
-            submission_indent = option.get("indent", None)
-
-            if submission_indent is not None:
-                submission_indent = int(submission_indent) * TAB_SIZE_PX
-            option["indent"] = submission_indent
-
+        student_previous_submission = data["submitted_answers"].get(answer_name, [])    
         check_indentation = pl.get_boolean_attrib(
             element, "indentation", INDENTION_DEFAULT
         )
@@ -668,31 +647,52 @@ def render(element_html: str, data: pl.QuestionData) -> str:
             help_text += "<br><b>Your answer should be indented. </b> Indent your tiles by dragging them horizontally in the answer area."
 
         uuid = pl.get_uuid()
-        html_params = {
-            "question": True,
-            "answer_name": answer_name,
-            "source-header": source_header,
-            "solution-header": solution_header,
-            "options": source_blocks,
-            "submission_dict": student_previous_submission,
-            "dropzone_layout": (
-                "pl-order-blocks-bottom"
-                if dropzone_layout is SolutionPlacementType.BOTTOM
-                else "pl-order-blocks-right"
-            ),
-            "inline": str(inline).lower(),
-            "check_indentation": "true" if check_indentation else "false",
-            "help_text": help_text,
-            "max_indent": max_indent,
-            "uuid": uuid,
-            "block_formatting": block_formatting,
-            "editable": editable,
-            "block_layout": "pl-order-blocks-horizontal" if inline else "",
-        }
+        if grading_method is not GradingMethodType.SORTING:
+            source_header = pl.get_string_attrib(
+                element, "source-header", SOURCE_HEADER_DEFAULT
+            )
+            solution_header = pl.get_string_attrib(
+                element, "solution-header", SOLUTION_HEADER_DEFAULT
+            )
 
-        with open("pl-order-blocks.mustache", "r", encoding="utf-8") as f:
-            html = chevron.render(f, html_params)
-        return html
+            all_blocks = data["params"][answer_name]
+            submitted_block_ids = {block["uuid"] for block in student_previous_submission}
+            source_blocks = [
+                block for block in all_blocks if block["uuid"] not in submitted_block_ids
+            ]
+
+            for option in student_previous_submission:
+                submission_indent = option.get("indent", None)
+
+                if submission_indent is not None:
+                    submission_indent = int(submission_indent) * TAB_SIZE_PX
+                option["indent"] = submission_indent
+
+            html_params = {
+                "question": True,
+                "answer_name": answer_name,
+                "source-header": source_header,
+                "solution-header": solution_header,
+                "options": source_blocks,
+                "submission_dict": student_previous_submission,
+                "dropzone_layout": (
+                    "pl-order-blocks-bottom"
+                    if dropzone_layout is SolutionPlacementType.BOTTOM
+                    else "pl-order-blocks-right"
+                ),
+                "inline": str(inline).lower(),
+                "check_indentation": "true" if check_indentation else "false",
+                "help_text": help_text,
+                "max_indent": max_indent,
+                "uuid": uuid,
+                "block_formatting": block_formatting,
+                "editable": editable,
+                "block_layout": "pl-order-blocks-horizontal" if inline else "",
+            }
+
+            with open("pl-order-blocks.mustache", "r", encoding="utf-8") as f:
+                html = chevron.render(f, html_params)
+            return html
 
     elif data["panel"] == "submission":
         if grading_method is GradingMethodType.EXTERNAL:
