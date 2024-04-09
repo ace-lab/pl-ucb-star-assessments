@@ -446,7 +446,7 @@ def get_distractors(
 
 
 def render(element_html: str, data: pl.QuestionData) -> str:
-     element = lxml.html.fragment_fromstring(element_html)
+    element = lxml.html.fragment_fromstring(element_html)
     answer_name = pl.get_string_attrib(element, "answers-name")
     format = pl.get_enum_attrib(element, "format", FormatType, FormatType.DEFAULT)
     inline = pl.get_boolean_attrib(element, "inline", INLINE_DEFAULT)
