@@ -459,7 +459,6 @@ def prepare(element_html: str, data: pl.QuestionData) -> None:
                 "uuid": pl.get_uuid(),
             }
             if is_correct:
-                raise Exception("bitch you should be working")
                 correct_answers.append(answer_data_dict)
             else:
                 incorrect_answers.append(answer_data_dict)
