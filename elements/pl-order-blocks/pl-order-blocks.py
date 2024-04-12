@@ -693,6 +693,60 @@ def render(element_html: str, data: pl.QuestionData) -> str:
             with open("pl-order-blocks.mustache", "r", encoding="utf-8") as f:
                 html = chevron.render(f, html_params)
             return html
+        else:
+            all_blocks = data["params"][answer_name]
+            submitted_block_ids = {block["uuid"] for block in student_previous_submission}
+            
+            subblocks = []
+            i = 0
+            for subblock in all_blocks:
+                curr_subblock = {}
+                curroptions = [] 
+                for block in subblock:
+                    curroptions.append(block)
+                source_header = "iteration " + str(i)
+                curr_subblock["options"] = curroptions
+                curr_subblock["source-header"] = source_header
+                curr_subblock["uuid"] = str(uuid) + '-' + str(i)
+                curr_subblock["anwser_name"] = anwser_name + '-' + str(i)
+                subblock.append(curr_subblock)
+                i += 1
+
+            for option in student_previous_submission:
+                submission_indent = option.get("indent", None)
+
+                if submission_indent is not None:
+                    submission_indent = int(submission_indent) * TAB_SIZE_PX
+                option["indent"] = submission_indent
+
+            html_params = {
+                "question": True,
+                "answer_name": answer_name,
+                #"source-header": source_header,
+                #"solution-header": solution_header,
+                #"options": source_blocks,
+                "subblocks" : subblocks
+                "submission_dict": student_previous_submission,
+                "dropzone_layout": (
+                    "pl-order-blocks-bottom"
+                    if dropzone_layout is SolutionPlacementType.BOTTOM
+                    else "pl-order-blocks-right"
+                ),
+                "inline": str(inline).lower(),
+                "check_indentation": "true" if check_indentation else "false",
+                "help_text": help_text,
+                "max_indent": max_indent,
+                "uuid": uuid,
+                "block_formatting": block_formatting,
+                "editable": editable,
+                "block_layout": "pl-order-blocks-horizontal" if inline else "",
+            }
+
+            with open("pl-order-blocks.mustache", "r", encoding="utf-8") as f:
+                html = chevron.render(f, html_params)
+            return html
+            
+            
 
     elif data["panel"] == "submission":
         if grading_method is GradingMethodType.EXTERNAL:
