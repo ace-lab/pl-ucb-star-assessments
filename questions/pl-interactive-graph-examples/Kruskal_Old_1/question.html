@@ -1,0 +1,21 @@
+<p>
+Enter the edges in the order they are selected, according to the Kruskal's MST algorithm. For example, if the edges selected are AB and CD you would enter "A--B, C--D". Break ties alphabetically (Edge with alphabetically first letter wins). Press "Save & Grade" to submit your answer.</p>
+<pl-question-panel>
+    
+  <pl-graph>graph G {
+    A -- B [label="4"];
+    A -- D [label="1"];
+    B -- C [label="2"];
+    B -- E [label="5"];
+    C -- F [label="3"];
+    D -- E [label="7"];
+    D -- G [label="8"];
+    E -- H [label="6"];
+    F -- I [label="4"];
+    G -- H [label="2"];
+    H -- I [label="7"];
+}
+</pl-graph>
+</pl-question-panel>
+
+<pl-string-input answers-name="user_answer"></pl-string-input>

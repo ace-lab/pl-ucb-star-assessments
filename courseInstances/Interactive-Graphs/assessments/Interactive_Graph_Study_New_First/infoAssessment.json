@@ -1,0 +1,45 @@
+{
+    "uuid": "2ef6109f-278d-43da-8a6f-3e121f46a7e2",
+    "type": "Homework",
+    "title": "Interactive Graph Study New First",
+    "set": "Homework",
+    "number": "2",
+    "allowAccess": [],
+    "zones": [
+        {
+            "comment": "These are new questions created for the pl-interactive-graph element",
+            "questions": [
+                
+                {
+                    "id": "pl-interactive-graph-examples/Study_Q1_BFS",
+                    "autoPoints": 1
+                },
+
+                {
+                    "id": "pl-interactive-graph-examples/Study_Q2_DFS",
+                    "autoPoints": 1
+                },
+
+                {
+                    "id": "pl-interactive-graph-examples/Study_Q3_Kruskal",
+                    "autoPoints": 1
+                },
+
+                {
+                    "id": "pl-interactive-graph-examples/BFS_Old_1",
+                    "autoPoints": 1
+                },
+
+                {
+                    "id": "pl-interactive-graph-examples/DFS_Old_1",
+                    "autoPoints": 1
+                },
+
+                {
+                    "id": "pl-interactive-graph-examples/Kruskal_Old_1",
+                    "autoPoints": 1
+                }
+            ]
+        }
+    ]
+}

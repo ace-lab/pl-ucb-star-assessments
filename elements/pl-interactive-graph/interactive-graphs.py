@@ -395,72 +395,126 @@ def render(element_html: str, data: pl.QuestionData) -> str:
 def grade(element_html, data):
 
     element = lxml.html.fragment_fromstring(element_html)
+    #select_nodes = pl.from_json(element.get("select-nodes"))
 
-    if len(data["submitted_answers"]["selectedNodes"]) < 3:
-        data["partial_scores"]["score"] = {
-        "score": 0,
-        "weight": 1,
-        "feedback": "no nodes selected",
-        }
-        return data
+    select_nodes = pl.get_string_attrib(element, "select-nodes", "False")
+    select_edges = pl.get_string_attrib(element, "select-edges", "False")
+
+
+    if select_nodes == "True":
+        
+        if len(data["submitted_answers"]["selectedNodes"]) < 3:
+            data["partial_scores"]["score"] = {
+            "score": 0,
+            "weight": 1,
+            "feedback": "no nodes selected",
+            }
+
+            return data
     
 
-    #select_edges = pl.get_string_attrib(element_html, "select-edges", True)
-    select_edges = pl.from_json(element.get("select-edges"))
-    #print(select_edges)
-
-    if select_edges:
+    if select_edges == "True":
+        
         if len(data["submitted_answers"]["selectedEdges"]) < 3:
             data["partial_scores"]["score"] = {
             "score": 0,
             "weight": 1,
             "feedback": "no edges selected",
         }
-        return data
+
+            return data
+
     
-    
-    user_selected_nodes = eval(data["submitted_answers"]["selectedNodes"])
-    if select_edges:
+    if select_nodes == "True":
+        user_selected_nodes = eval(data["submitted_answers"]["selectedNodes"])
+
+
+    if select_edges == "True":
         user_selected_edges = eval(data["submitted_answers"]["selectedEdges"])
+        
+
+
 
     # Use 'submitted_answers' instead of data["submitted_answers"]
     score = 0
     
+    ######### Helper #########
     random_graph = data["submitted_answers"]["random-graph"]
+    graph = pygraphviz.AGraph(string=random_graph)
+    ##########################
 
     correct_answer = eval(pl.from_json(element.get("answers", "[]")))
     preserve_ordering = pl.from_json(element.get("preserve-ordering"))
     partial_credit = pl.from_json(element.get("partial-credit"))
 
-    graph = pygraphviz.AGraph(string=random_graph)
-
-    correct_answer = dijkstra_agraph(graph, 'A')
 
 
-    #print("user" + str(user_selected_nodes) + "answer" + str(correct_answer))
-    if preserve_ordering != "True":
-        for i in range(len(user_selected_nodes)):
-            if user_selected_nodes[i] in correct_answer:
-                score += 1
-    else:
-        for i in range(len(correct_answer)):
-            if i < len(user_selected_nodes) and correct_answer[i] == user_selected_nodes[i]:
-                score += 1
-       
-    if partial_credit != "True":
-        if score != len(correct_answer):
-            score = 0
+    if select_nodes == "True":
+        if preserve_ordering != "True":
+            for i in range(len(user_selected_nodes)):
+                if user_selected_nodes[i] in correct_answer:
+                    score += 1
         else:
-            score = 1
-    else:
-        score = score/len(correct_answer)
-    data["partial_scores"]["score"] = {
-    "score": score,
-    "weight": 1
-    }
+            for i in range(len(correct_answer)):
+                if i < len(user_selected_nodes) and correct_answer[i] == user_selected_nodes[i]:
+                    score += 1
+        
+        if partial_credit != "True":
+            if score != len(correct_answer):
+                score = 0
+            else:
+                score = 1
+        else:
+            score = score/len(correct_answer)
+        data["partial_scores"]["score"] = {
+        "score": score,
+        "weight": 1
+        }
+
+
+    if select_edges == "True":
+        if preserve_ordering != "True":
+            for i in range(len(user_selected_edges)):
+                if user_selected_edges[i] in correct_answer:
+                    score += 1
+        else:
+            for i in range(len(correct_answer)):
+                if i < len(user_selected_edges) and correct_answer[i] == user_selected_edges[i]:
+                    score += 1
+        
+        if partial_credit != "True":
+            if score != len(correct_answer):
+                score = 0
+            else:
+                score = 1
+        else:
+            score = score/len(correct_answer)
+        data["partial_scores"]["score"] = {
+        "score": score,
+        "weight": 1
+        }
+
+
     return data
 
 
+
+
+
+
+##### Always need to run this #####
+def string_to_graph(string_graph):
+    random_graph = data["submitted_answers"]["random-graph"]
+    graph = pygraphviz.AGraph(string=string_graph)
+    return graph
+
+
+
+
+
+############################################################################
+############################ Algorithms ####################################
+############################################################################
 
 
 def dfs_agraph(agraph, start):
@@ -480,16 +534,7 @@ def dfs_agraph(agraph, start):
 
 
 def bfs_agraph(agraph, start_node):
-    """
-    Perform Breadth-First Search (BFS) starting from start_node.
 
-    Parameters:
-    - agraph (pgv.AGraph): The graph on which to perform BFS.
-    - start_node (str): The starting node for BFS.
-
-    Returns:
-    list: A list of nodes in the order they were visited.
-    """
     visited = set([start_node])  # Set of visited nodes
     queue = deque([start_node])  # Queue for BFS
     order = []  # Order of visited nodes
@@ -510,17 +555,7 @@ def bfs_agraph(agraph, start_node):
 
     
 def dijkstra_agraph(agraph, start_node):
-    """
-    Perform Dijkstra's algorithm to find the shortest paths from start_node to all other nodes in the graph,
-    and return the order in which nodes are visited without duplicates.
-    
-    Parameters:
-    - agraph (pgv.AGraph): The graph on which to perform Dijkstra's algorithm.
-    - start_node (str): The starting node for the algorithm.
-    
-    Returns:
-    list: A list of nodes in the order they are uniquely visited.
-    """
+
     # Initialize distances from start_node to infinity, except for start_node itself which is 0
     distances = {node: float('inf') for node in agraph.nodes()}
     distances[start_node] = 0
@@ -601,7 +636,6 @@ def kruskals_agraph(agraph):
     parent = {}
     rank = {}
 
-    # Create V sets with single elements
     for node in agraph.nodes():
         parent[node] = node
         rank[node] = 0
