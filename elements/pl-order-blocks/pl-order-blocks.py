@@ -742,7 +742,7 @@ def render(element_html: str, data: pl.QuestionData) -> str:
                 "block_layout": "pl-order-blocks-horizontal" if inline else "",
             }
 
-            with open("pl-order-blocks.mustache", "r", encoding="utf-8") as f:
+            with open("pl-order-blocks-sorted-1.mustache", "r", encoding="utf-8") as f:
                 html = chevron.render(f, html_params)
             return html
             
