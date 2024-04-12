@@ -230,7 +230,7 @@ def prepare(element_html: str, data: pl.QuestionData) -> None:
     ):
         if grading_method is GradingMethodType.SORTING:
             #Going to be bad coding practice but I just want a working product :-)
-            if html_tags.tag != "pl-answer" or html_tags.tag != "pl-order-sub-blocks":
+            if html_tags.tag != "pl-answer" and html_tags.tag != "pl-order-sub-blocks":
                 raise Exception(
                     "Any html tags nested inside <pl-order-blocks> must be <pl-answer> or <pl-block-group>. \
                     Any html tags nested inside <pl-block-group> must be <pl-answer>"
