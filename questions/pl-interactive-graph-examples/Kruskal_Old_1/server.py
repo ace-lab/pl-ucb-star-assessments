@@ -5,7 +5,7 @@ def generate(data):
     data["params"]["dot_notation"] = "Your dot notation here"
 
 def grade(data):
-    correct_answer = {'A--D', 'B--C', 'G--H', 'C--F', 'A--B', 'F--I', 'B--E', 'E--H'}
+    correct_answer = {'D--G', 'E--H', 'B--C', 'G--H', 'H--I', 'A--B', 'C--F'}
     student_answer = data["submitted_answers"]["user_answer"]
 
     # Normalize the student's answer by removing leading/trailing whitespaces and converting to upper case

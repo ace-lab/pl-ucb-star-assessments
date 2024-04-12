@@ -5,7 +5,7 @@ def generate(data):
     data["params"]["dot_notation"] = "Your dot notation here"
 
 def grade(data):
-    correct_answer = "ABDEHICFG"
+    correct_answer = "ABDEGHCFI"
     student_answer = data["submitted_answers"]["user_answer"]
     score = 0
     for j in range(min(len(correct_answer), len(student_answer))):
