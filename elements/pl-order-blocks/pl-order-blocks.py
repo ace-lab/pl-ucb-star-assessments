@@ -541,6 +541,7 @@ def prepare(element_html: str, data: pl.QuestionData) -> None:
 
     # prep for visual pairing
     correct_tags = {}
+    incorrect_tags = {}
     if grading_method == GradingMethodType.SORTING:
         correct_tags = set((block["tag"] for block in curr_subblock if block["tag"] is not None) for curr_subblock in all_blocks)
     else:
