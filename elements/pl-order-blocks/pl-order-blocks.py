@@ -545,9 +545,9 @@ def prepare(element_html: str, data: pl.QuestionData) -> None:
         correct_tags = set((block["tag"] for block in curr_subblock if block["tag"] is not None) for curr_subblock in all_blocks)
     else:
         correct_tags = set(block["tag"] for block in all_blocks if block["tag"] is not None)
-    incorrect_tags = set(
-        block["distractor_for"] for block in all_blocks if block["distractor_for"]
-    )
+        incorrect_tags = set(
+            block["distractor_for"] for block in all_blocks if block["distractor_for"]
+        )
 
     if not incorrect_tags.issubset(correct_tags):
         raise ValueError(
