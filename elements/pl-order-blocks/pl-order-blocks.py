@@ -725,7 +725,7 @@ def render(element_html: str, data: pl.QuestionData) -> str:
                 #"source-header": source_header,
                 #"solution-header": solution_header,
                 #"options": source_blocks,
-                "subblocks" : subblocks
+                "subblocks" : subblocks,
                 "submission_dict": student_previous_submission,
                 "dropzone_layout": (
                     "pl-order-blocks-bottom"
