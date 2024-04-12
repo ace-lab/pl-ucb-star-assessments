@@ -243,7 +243,7 @@ def prepare(element_html: str, data: pl.QuestionData) -> None:
                 index: int,
                 group_info: GroupInfo,
             ):
-                if html_tags.tag != "pl-answer" or html_tags.tag != "pl-order-sub-blocks":
+                if html_tags.tag != "pl-answer":
                     raise Exception(
                         "Any html tags nested inside <pl-order-blocks> must be <pl-answer> or <pl-block-group>. \
                         Any html tags nested inside <pl-block-group> must be <pl-answer>"
