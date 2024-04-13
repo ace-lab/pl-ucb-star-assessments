@@ -530,6 +530,7 @@ def prepare(element_html: str, data: pl.QuestionData) -> None:
     )
     if grading_method == GradingMethodType.SORTING:
         random.shuffle(all_blocks[0])
+        #need to have code that copies this shuffle
     elif source_blocks_order == SourceBlocksOrderType.RANDOM:
         random.shuffle(all_blocks)
     elif source_blocks_order == SourceBlocksOrderType.ORDERED:
@@ -555,24 +556,25 @@ def prepare(element_html: str, data: pl.QuestionData) -> None:
             f"The following distractor-for tags do not have matching correct answer tags: {incorrect_tags - correct_tags}"
         )
 
-    for block in all_blocks:
-        if block["distractor_for"] is not None:
-            continue
+    if grading_method != GradingMethodType.SORTING:
+        for block in all_blocks:
+            if block["distractor_for"] is not None:
+                continue
 
-        distractors = [
-            block2
-            for block2 in all_blocks
-            if (block["tag"] == block2.get("distractor_for"))
-            and (block["tag"] is not None)
-        ]
+            distractors = [
+                block2
+                for block2 in all_blocks
+                if (block["tag"] == block2.get("distractor_for"))
+                and (block["tag"] is not None)
+            ]
 
-        if len(distractors) == 0:
-            continue
+            if len(distractors) == 0:
+                continue
 
-        distractor_bin = pl.get_uuid()
-        block["distractor_bin"] = distractor_bin
-        for distractor in distractors:
-            distractor["distractor_bin"] = distractor_bin
+            distractor_bin = pl.get_uuid()
+            block["distractor_bin"] = distractor_bin
+            for distractor in distractors:
+                distractor["distractor_bin"] = distractor_bin
 
     data["params"][answer_name] = all_blocks
     data["correct_answers"][answer_name] = correct_answers
