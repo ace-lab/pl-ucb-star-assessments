@@ -143,13 +143,13 @@ window.PLOrderBlocks = function (uuid, options) {
     cancel: 'input,textarea,button,select,option,a',
     connectWith: sortables,
     placeholder: 'ui-state-highlight',
-    // create() {
-    //   placePairingIndicators();
-    //   setAnswer();
-    //   if (enableIndentation) {
-    //     drawIndentLocationLines(dropzoneElementId);
-    //   }
-    // },
+    create() {
+      placePairingIndicators();
+      setAnswer();
+      if (enableIndentation) {
+        drawIndentLocationLines(dropzoneElementId);
+      }
+    },
     // sort(event, ui) {
     //   // update the location of the placeholder as the item is dragged
     //   let placeholder = ui.placeholder;
