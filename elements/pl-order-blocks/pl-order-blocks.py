@@ -712,7 +712,7 @@ def render(element_html: str, data: pl.QuestionData) -> str:
                 curr_subblock["source-header"] = source_header
                 curr_subblock["uuid"] = str(uuid) + '-' + str(i)
                 curr_subblock["answer_name"] = answer_name + '-' + str(i)
-                subblock.append(curr_subblock)
+                subblocks.append(curr_subblock)
                 i += 1
 
             for option in student_previous_submission:
