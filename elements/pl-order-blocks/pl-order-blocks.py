@@ -711,7 +711,7 @@ def render(element_html: str, data: pl.QuestionData) -> str:
                 curr_subblock["options"] = curroptions
                 curr_subblock["source-header"] = source_header
                 curr_subblock["uuid"] = str(uuid) + '-' + str(i)
-                curr_subblock["anwser_name"] = anwser_name + '-' + str(i)
+                curr_subblock["answer_name"] = answer_name + '-' + str(i)
                 subblock.append(curr_subblock)
                 i += 1
 
