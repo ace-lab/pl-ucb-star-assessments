@@ -132,7 +132,7 @@ window.PLOrderBlocks = function (uuid, options) {
   }
 
   let sortables = '';
-  for(let i = 0; i < 100; i++) {
+  for(let i = 1; i < 100; i++) {
     sortables += optionsElementId + '-' + i + ', ';
   }
   sortables += dropzoneElementId;
