@@ -14,14 +14,40 @@ window.PLOrderBlocks = function (uuid, options) {
   }
   sortables += dropzoneElementId;
 
+  function helper_reset(new_order, start) {
+    for (let i = start; i < 100; i++) {
+      var currElementId = optionsElementId + '-' + i;
+      var parentElement = document.getElementById(currElementId);
+      var answerObjs = $(currElementId).children();
+      var new_curr_order = [] 
+      for (curritem in new_order) {
+        for (const answerObj of answerObjs) {
+          var answerText = answerObj.getAttribute('string');
+          if (answerText == curritem) {
+            new_curr_order.append(answerObj);
+            parentElement.removeChild(answerObj);
+          }
+        }
+      }
+
+      for (new_new in new_curr_order) {
+        parentElement.appendChild(new_new);
+      }
+    }
+  }
+
   function setAnswer() {
     for(let i = 0; i < 100; i++){
       currElementId = optionsElementId + '-' + i;
       var answerObjs = $(currElementId).children();
       var studentAnswers = [];
+      var textfieldName = '#' + uuid + '-' + i + '-input';
+      var curr_answer = document.getElementById("username").value;
+      var curr_lst = [];
       for (const answerObj of answerObjs) {
         if (!$(answerObj).hasClass('info-fixed')) {
           var answerText = answerObj.getAttribute('string');
+          curr_lst.append(answerText);
           var answerUuid = answerObj.getAttribute('uuid');
           var answerDistractorBin = answerObj.getAttribute('data-distractor-bin');
           var answerIndent = null;
@@ -39,10 +65,15 @@ window.PLOrderBlocks = function (uuid, options) {
         }
       }
 
-      var textfieldName = '#' + uuid + '-' + i + '-input';
-      $(textfieldName).val(JSON.stringify(studentAnswers));
+      var new_answer = JSON.stringify(studentAnswers);
+      $(textfieldName).val(new_answer);
+      if (new_answer != curr_answer) {
+        helper_reset(curr_lst, i);
+        break;
+      }
     }
   }
+
 
   function calculateIndent(ui, parent) {
     if (!parent[0].classList.contains('dropzone') || !enableIndentation) {
