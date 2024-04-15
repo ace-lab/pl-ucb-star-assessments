@@ -8,32 +8,40 @@ window.PLOrderBlocks = function (uuid, options) {
 
   let optionsElementId = '#order-blocks-options-' + uuid;
   let dropzoneElementId = '#order-blocks-dropzone-' + uuid;
+  let sortables = '';
+  for(let i = 0; i < 100; i++) {
+    sortables += optionsElementId + '-' + i + ', ';
+  }
+  sortables += dropzoneElementId;
 
   function setAnswer() {
-    var answerObjs = $(dropzoneElementId).children();
-    var studentAnswers = [];
-    for (const answerObj of answerObjs) {
-      if (!$(answerObj).hasClass('info-fixed')) {
-        var answerText = answerObj.getAttribute('string');
-        var answerUuid = answerObj.getAttribute('uuid');
-        var answerDistractorBin = answerObj.getAttribute('data-distractor-bin');
-        var answerIndent = null;
-        if (enableIndentation) {
-          answerIndent = parseInt($(answerObj).css('marginLeft').replace('px', ''));
-          answerIndent = Math.round(answerIndent / TABWIDTH); // get how many times the answer is indented
+    for(let i = 0; i < 100; i++){
+      currElementId = optionsElementId + '-' + i;
+      var answerObjs = $(currElementId).children();
+      var studentAnswers = [];
+      for (const answerObj of answerObjs) {
+        if (!$(answerObj).hasClass('info-fixed')) {
+          var answerText = answerObj.getAttribute('string');
+          var answerUuid = answerObj.getAttribute('uuid');
+          var answerDistractorBin = answerObj.getAttribute('data-distractor-bin');
+          var answerIndent = null;
+          if (enableIndentation) {
+            answerIndent = parseInt($(answerObj).css('marginLeft').replace('px', ''));
+            answerIndent = Math.round(answerIndent / TABWIDTH); // get how many times the answer is indented
+          }
+
+          studentAnswers.push({
+            inner_html: answerText,
+            indent: answerIndent,
+            uuid: answerUuid,
+            distractor_bin: answerDistractorBin,
+          });
         }
-
-        studentAnswers.push({
-          inner_html: answerText,
-          indent: answerIndent,
-          uuid: answerUuid,
-          distractor_bin: answerDistractorBin,
-        });
       }
-    }
 
-    var textfieldName = '#' + uuid + '-input';
-    $(textfieldName).val(JSON.stringify(studentAnswers));
+      var textfieldName = '#' + uuid + '-' + i + '-input';
+      $(textfieldName).val(JSON.stringify(studentAnswers));
+    }
   }
 
   function calculateIndent(ui, parent) {
@@ -131,11 +139,6 @@ window.PLOrderBlocks = function (uuid, options) {
     ).join(', ');
   }
 
-  let sortables = '';
-  for(let i = 0; i < 100; i++) {
-    sortables += optionsElementId + '-' + i + ', ';
-  }
-  sortables += dropzoneElementId;
   $(sortables).sortable({
     items: '.pl-order-block:not(.nodrag)',
     // We add `a` to the default list of tags to account for help
