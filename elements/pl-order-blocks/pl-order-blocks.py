@@ -530,6 +530,16 @@ def prepare(element_html: str, data: pl.QuestionData) -> None:
     )
     if grading_method == GradingMethodType.SORTING:
         random.shuffle(all_blocks[0])
+        def swap(arr, i, j):
+            temp = array[i]
+            array[i] = array[j]
+            array[j] = temp
+        for i in range(1, len(all_blocks)):
+            for j in range(len(all_blocks[0])):
+                curr_elem = all_blocks[0][j]
+                for k in range(len(all_blocks[i])):
+                    if all_blocks[i][k]["inner_html"] == all_blocks[0][j]:
+                        swap(all_blocks[j], j, k)
         #need to have code that copies this shuffle
     elif source_blocks_order == SourceBlocksOrderType.RANDOM:
         random.shuffle(all_blocks)
