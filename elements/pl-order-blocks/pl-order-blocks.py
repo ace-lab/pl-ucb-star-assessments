@@ -530,9 +530,9 @@ def prepare(element_html: str, data: pl.QuestionData) -> None:
     )
     if grading_method == GradingMethodType.SORTING:
         def swap(arr, i, j):
-            temp = array[i]
-            array[i] = array[j]
-            array[j] = temp
+            temp = arr[i]
+            arr[i] = arr[j]
+            arr[j] = temp
         for i in range(1, len(all_blocks)):
             for j in range(len(all_blocks[0])):
                 curr_elem = all_blocks[0][j]["inner_html"]
