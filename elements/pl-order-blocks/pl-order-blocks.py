@@ -538,7 +538,7 @@ def prepare(element_html: str, data: pl.QuestionData) -> None:
                 curr_elem = all_blocks[0][j]
                 for k in range(len(all_blocks[i])):
                     if all_blocks[i][k]["inner_html"] == all_blocks[0][j]["inner_html"]:
-                        swap(all_blocks[j], j, k)
+                        swap(all_blocks[i], j, k)
         #need to have code that copies this shuffle
     elif source_blocks_order == SourceBlocksOrderType.RANDOM:
         random.shuffle(all_blocks)
