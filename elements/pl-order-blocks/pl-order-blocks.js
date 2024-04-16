@@ -20,7 +20,7 @@ window.PLOrderBlocks = function (uuid, options) {
       var parentElement = document.getElementById(currElementId);
       var answerObjs = $(currElementId).children();
       var new_curr_order = [] 
-      for (curritem in new_order) {
+      for (curritem of new_order) {
         for (const answerObj of answerObjs) {
           var answerText = answerObj.getAttribute('string');
           if (answerText == curritem) {
@@ -42,7 +42,7 @@ window.PLOrderBlocks = function (uuid, options) {
       var answerObjs = $(currElementId).children();
       var studentAnswers = [];
       var textfieldName = '#' + uuid + '-' + i + '-input';
-      var curr_answer = document.getElementById("username").value;
+      var curr_answer = document.getElementById(textfieldName).value;
       var curr_lst = [];
       for (const answerObj of answerObjs) {
         if (!$(answerObj).hasClass('info-fixed')) {
@@ -68,7 +68,7 @@ window.PLOrderBlocks = function (uuid, options) {
       var new_answer = JSON.stringify(studentAnswers);
       $(textfieldName).val(new_answer);
       if (new_answer != curr_answer) {
-        helper_reset(curr_lst, i);
+        helper_reset(curr_lst, i+1);
         break;
       }
     }
