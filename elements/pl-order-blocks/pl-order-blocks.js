@@ -98,8 +98,9 @@ window.PLOrderBlocks = function (uuid, options) {
       var new_answer = JSON.stringify(studentAnswers);
       $(textfieldName).val(new_answer);
       if (new_answer != curr_answer) {
+        console.log(new_answer);
+        console.log(curr_answer);
         helper_reset(curr_lst, i+1);
-        break;
       }
     }
   }
