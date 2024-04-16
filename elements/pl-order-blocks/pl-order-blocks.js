@@ -9,7 +9,7 @@ window.PLOrderBlocks = function (uuid, options) {
   let optionsElementId = '#order-blocks-options-' + uuid;
   let dropzoneElementId = '#order-blocks-dropzone-' + uuid;
   let sortables = '';
-  for(let i = 0; i < 100; i++) {
+  for(let i = 1; i < 100; i++) {
     sortables += optionsElementId + '-' + i + ', ';
   }
   sortables += dropzoneElementId;
@@ -69,7 +69,7 @@ window.PLOrderBlocks = function (uuid, options) {
   }
 
   function setAnswer() {
-    for(let i = 0; i < 100; i++){
+    for(let i = 1; i < 100; i++){
       currElementId = optionsElementId + '-' + i;
       var answerObjs = $(currElementId).children();
       var studentAnswers = [];
