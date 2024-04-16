@@ -52,6 +52,8 @@ window.PLOrderBlocks = function (uuid, options) {
       for (curritem in new_order) {
         for (const answerObj of answerObjs) {
           var answerText = answerObj.getAttribute('string');
+          console.log(answerText);
+          console.log(curritem);
           if (answerText == curritem) {
             new_curr_order.push(answerObj);
             parentElement.removeChild(answerObj);
