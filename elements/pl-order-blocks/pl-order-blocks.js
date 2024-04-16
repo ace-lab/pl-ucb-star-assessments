@@ -70,8 +70,9 @@ window.PLOrderBlocks = function (uuid, options) {
       currElementId = optionsElementId + '-' + i;
       var answerObjs = $(currElementId).children();
       var studentAnswers = [];
-      var textfieldName = '#' + uuid + '-' + i + '-input';
-      var curr_answer = document.getElementById(textfieldName).value;
+      var sillyval = uuid + '-' + i + '-input';
+      var textfieldName = '#' + sillyval;
+      var curr_answer = document.getElementById(sillyval).value;
       var curr_lst = [];
       for (const answerObj of answerObjs) {
         if (!$(answerObj).hasClass('info-fixed')) {
