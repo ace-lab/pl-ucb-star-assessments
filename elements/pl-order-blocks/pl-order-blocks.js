@@ -49,7 +49,7 @@ window.PLOrderBlocks = function (uuid, options) {
       var parentElement = document.getElementById(currElementId);
       var answerObjs = $(currElementId).children();
       var new_curr_order = [] 
-      for (curritem of new_order) {
+      for (curritem in new_order) {
         for (const answerObj of answerObjs) {
           var answerText = answerObj.getAttribute('string');
           if (answerText == curritem) {
