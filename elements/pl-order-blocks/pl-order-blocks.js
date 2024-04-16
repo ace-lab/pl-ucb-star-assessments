@@ -14,6 +14,38 @@ window.PLOrderBlocks = function (uuid, options) {
   }
   sortables += dropzoneElementId;
 
+  for(let i = 0; i < 100; i++){
+    currElementId = optionsElementId + '-' + i;
+    var answerObjs = $(currElementId).children();
+    var studentAnswers = [];
+    var textfieldName = '#' + uuid + '-' + i + '-input';
+    var curr_answer = document.getElementById(textfieldName).value;
+    var curr_lst = [];
+    for (const answerObj of answerObjs) {
+      if (!$(answerObj).hasClass('info-fixed')) {
+        var answerText = answerObj.getAttribute('string');
+        curr_lst.append(answerText);
+        var answerUuid = answerObj.getAttribute('uuid');
+        var answerDistractorBin = answerObj.getAttribute('data-distractor-bin');
+        var answerIndent = null;
+        if (enableIndentation) {
+          answerIndent = parseInt($(answerObj).css('marginLeft').replace('px', ''));
+          answerIndent = Math.round(answerIndent / TABWIDTH); // get how many times the answer is indented
+        }
+
+        studentAnswers.push({
+          inner_html: answerText,
+          indent: answerIndent,
+          uuid: answerUuid,
+          distractor_bin: answerDistractorBin,
+        });
+      }
+    }
+
+    var new_answer = JSON.stringify(studentAnswers);
+    $(textfieldName).val(new_answer);
+  }
+
   function helper_reset(new_order, start) {
     for (let i = start; i < 100; i++) {
       var currElementId = optionsElementId + '-' + i;
