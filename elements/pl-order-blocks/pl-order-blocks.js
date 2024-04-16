@@ -22,7 +22,6 @@ window.PLOrderBlocks = function (uuid, options) {
     for (const answerObj of answerObjs) {
       if (!$(answerObj).hasClass('info-fixed')) {
         var answerText = answerObj.getAttribute('string');
-        curr_lst.append(answerText);
         var answerUuid = answerObj.getAttribute('uuid');
         var answerDistractorBin = answerObj.getAttribute('data-distractor-bin');
         var answerIndent = null;
