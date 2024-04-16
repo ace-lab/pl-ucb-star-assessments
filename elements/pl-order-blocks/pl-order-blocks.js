@@ -59,6 +59,7 @@ window.PLOrderBlocks = function (uuid, options) {
         }
       }
 
+      console.log(new_curr_order);
       for (new_new in new_curr_order) {
         parentElement.appendChild(new_new);
       }
