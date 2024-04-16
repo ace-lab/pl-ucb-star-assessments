@@ -56,15 +56,15 @@ window.PLOrderBlocks = function (uuid, options) {
           console.log(answerText);
           if (answerText == curritem) {
             new_curr_order.push(answerObj);
-            parentElement.removeChild(answerObj);
+            parentElement.appendChild(answerObj);
           }
         }
       }
 
-      console.log(new_curr_order);
-      for (new_new in new_curr_order) {
-        parentElement.appendChild(new_new);
-      }
+      // console.log(new_curr_order);
+      // for (new_new in new_curr_order) {
+      //   parentElement.appendChild(new_new);
+      // }
     }
   }
 
