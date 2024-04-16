@@ -47,6 +47,7 @@ window.PLOrderBlocks = function (uuid, options) {
     for (let i = start; i < 100; i++) {
       var currElementId = 'order-blocks-options-' + uuid + '-' + i;
       var parentElement = document.getElementById(currElementId);
+      var actual = '#' + currElementId
       var answerObjs = $(currElementId).children();
       var new_curr_order = []; 
       for (curritem in new_order) {
