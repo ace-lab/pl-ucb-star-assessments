@@ -50,11 +50,10 @@ window.PLOrderBlocks = function (uuid, options) {
       var actual = '#' + currElementId
       var answerObjs = $(actual).children();
       var new_curr_order = []; 
-      for (curritem in new_order) {
+      for (curritem of new_order) {
         for (const answerObj of answerObjs) {
           var answerText = answerObj.getAttribute('string');
           console.log(answerText);
-          console.log(curritem);
           if (answerText == curritem) {
             new_curr_order.push(answerObj);
             parentElement.removeChild(answerObj);
@@ -62,7 +61,7 @@ window.PLOrderBlocks = function (uuid, options) {
         }
       }
 
-      console.log(new_order);
+      console.log(new_curr_order);
       for (new_new in new_curr_order) {
         parentElement.appendChild(new_new);
       }
