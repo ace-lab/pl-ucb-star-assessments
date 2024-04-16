@@ -19,8 +19,6 @@ window.PLOrderBlocks = function (uuid, options) {
     var answerObjs = $(currElementId).children();
     var studentAnswers = [];
     var textfieldName = '#' + uuid + '-' + i + '-input';
-    var curr_answer = document.getElementById(textfieldName).value;
-    var curr_lst = [];
     for (const answerObj of answerObjs) {
       if (!$(answerObj).hasClass('info-fixed')) {
         var answerText = answerObj.getAttribute('string');
