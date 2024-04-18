@@ -863,7 +863,7 @@ def render(element_html: str, data: pl.QuestionData) -> str:
         )
 
         required_indents = set(
-            block["indent"] for block in data["correct_answers"][answer_name]
+            block["indent"] for block in data["correct_answers"][answer_name][1]
         )
         indentation_message = ""
         if check_indentation:
@@ -881,7 +881,7 @@ def render(element_html: str, data: pl.QuestionData) -> str:
                 "inner_html": solution["inner_html"],
                 "indent": max(0, (solution["indent"] or 0) * TAB_SIZE_PX),
             }
-            for solution in data["correct_answers"][answer_name]
+            for solution in data["correct_answers"][answer_name][1]
         ]
 
         html_params = {
