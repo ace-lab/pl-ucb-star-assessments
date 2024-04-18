@@ -968,6 +968,33 @@ def parse(element_html: str, data: pl.QuestionData) -> None:
                     )
                 answer["distractor_feedback"] = matching_block["distractor_feedback"]
 
+        else: 
+            for i in range(len(student_answer)):
+                for answer in student_answer[i]:
+                    matching_block = next(
+                        (
+                            block
+                            for block in correct_answers[i]
+                            if block["inner_html"] == answer["inner_html"]
+                        ),
+                        None,
+                    )
+                    answer["tag"] = (
+                        matching_block["tag"] if matching_block is not None else None
+                    )
+                    if grading_method is GradingMethodType.RANKING:
+                        answer["ranking"] = (
+                            matching_block["ranking"] if matching_block is not None else None
+                        )
+
+                    if matching_block is None:
+                        matching_block = next(
+                            block
+                            for block in blocks
+                            if block["inner_html"] == answer["inner_html"]
+                        )
+                    answer["distractor_feedback"] = matching_block["distractor_feedback"]
+
     if grading_method is GradingMethodType.EXTERNAL:
         for html_tags in element:
             if html_tags.tag == "pl-answer":
