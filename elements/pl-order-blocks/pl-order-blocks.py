@@ -706,7 +706,7 @@ def render(element_html: str, data: pl.QuestionData) -> str:
             return html
         else:
             all_blocks = data["params"][answer_name]
-            submitted_block_ids = {block["uuid"] for block in student_previous_submission}
+            # submitted_block_ids = {block["uuid"] for block in student_previous_submission}
             
             subblocks = []
             i = 0
