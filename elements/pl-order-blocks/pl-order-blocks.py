@@ -723,12 +723,12 @@ def render(element_html: str, data: pl.QuestionData) -> str:
                 subblocks.append(curr_subblock)
                 i += 1
 
-            for option in student_previous_submission:
-                submission_indent = option.get("indent", None)
+            # for option in student_previous_submission:
+            #     submission_indent = option.get("indent", None)
 
-                if submission_indent is not None:
-                    submission_indent = int(submission_indent) * TAB_SIZE_PX
-                option["indent"] = submission_indent
+            #     if submission_indent is not None:
+            #         submission_indent = int(submission_indent) * TAB_SIZE_PX
+            #     option["indent"] = submission_indent
 
             html_params = {
                 "question": True,
