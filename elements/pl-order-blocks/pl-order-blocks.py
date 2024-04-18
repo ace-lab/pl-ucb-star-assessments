@@ -539,7 +539,6 @@ def prepare(element_html: str, data: pl.QuestionData) -> None:
                 for k in range(len(all_blocks[i])):
                     if all_blocks[i][k]["inner_html"] == curr_elem:
                         swap(all_blocks[i], j, k)
-        #need to have code that copies this shuffle
     elif source_blocks_order == SourceBlocksOrderType.RANDOM:
         random.shuffle(all_blocks)
     elif source_blocks_order == SourceBlocksOrderType.ORDERED:
@@ -888,11 +887,25 @@ def parse(element_html: str, data: pl.QuestionData) -> None:
     allow_blank_submission = pl.get_boolean_attrib(
         element, "allow-blank", ALLOW_BLANK_DEFAULT
     )
+    grading_method = pl.get_enum_attrib(
+        element, "grading-method", GradingMethodType, GRADING_METHOD_DEFAULT
+    )
+    correct_answers = data["correct_answers"][answer_name]
+    blocks = data["params"][answer_name]
+    if grading_method is GradingMethodType.SORTING:
+        num_blocks = len(correct_answers)
+        submitted_answers = []
+        for i in range(num_blocks): 
+            answer_raw_name = answer_name + "-" + str(i) + "-input"
+            student_answer = data["raw_submitted_answers"].get(answer_raw_name, "[]")
+            student_answer = json.loads(student_answer)
+            submitted_answers.append(student_answer)
+        student_answer = submitted_answers
+    else:
+        answer_raw_name = answer_name + "-input"
+        student_answer = data["raw_submitted_answers"].get(answer_raw_name, "[]")
 
-    answer_raw_name = answer_name + "-input"
-    student_answer = data["raw_submitted_answers"].get(answer_raw_name, "[]")
-
-    student_answer = json.loads(student_answer)
+        student_answer = json.loads(student_answer)
 
     if (not allow_blank_submission) and (
         student_answer is None or student_answer == []
@@ -902,37 +915,32 @@ def parse(element_html: str, data: pl.QuestionData) -> None:
         ] = "Your submitted answer was blank; you did not drag any answer blocks into the answer area."
         return
 
-    grading_method = pl.get_enum_attrib(
-        element, "grading-method", GradingMethodType, GRADING_METHOD_DEFAULT
-    )
-    correct_answers = data["correct_answers"][answer_name]
-    blocks = data["params"][answer_name]
-
     if grading_method in LCS_GRADABLE_TYPES:
-        for answer in student_answer:
-            matching_block = next(
-                (
-                    block
-                    for block in correct_answers
-                    if block["inner_html"] == answer["inner_html"]
-                ),
-                None,
-            )
-            answer["tag"] = (
-                matching_block["tag"] if matching_block is not None else None
-            )
-            if grading_method is GradingMethodType.RANKING:
-                answer["ranking"] = (
-                    matching_block["ranking"] if matching_block is not None else None
-                )
-
-            if matching_block is None:
+        if grading_method != GradingMethodType.Sorting:
+            for answer in student_answer:
                 matching_block = next(
-                    block
-                    for block in blocks
-                    if block["inner_html"] == answer["inner_html"]
+                    (
+                        block
+                        for block in correct_answers
+                        if block["inner_html"] == answer["inner_html"]
+                    ),
+                    None,
                 )
-            answer["distractor_feedback"] = matching_block["distractor_feedback"]
+                answer["tag"] = (
+                    matching_block["tag"] if matching_block is not None else None
+                )
+                if grading_method is GradingMethodType.RANKING:
+                    answer["ranking"] = (
+                        matching_block["ranking"] if matching_block is not None else None
+                    )
+
+                if matching_block is None:
+                    matching_block = next(
+                        block
+                        for block in blocks
+                        if block["inner_html"] == answer["inner_html"]
+                    )
+                answer["distractor_feedback"] = matching_block["distractor_feedback"]
 
     if grading_method is GradingMethodType.EXTERNAL:
         for html_tags in element:
@@ -1042,10 +1050,15 @@ def grade(element_html: str, data: pl.QuestionData) -> None:
         final_score = max(0.0, final_score)  # scores cannot be below 0
 
     elif grading_method in LCS_GRADABLE_TYPES:
-        submission = [ans["tag"] for ans in student_answer]
         depends_graph = {}
         group_belonging = {}
-
+        if grading_method == GradingMethodType.SORTING: 
+            submission = []
+            for iteration in student_answer:
+                curr_submission = [ans["tag"] for ans in iteration]
+                submission.append(curr_submission)
+        else:
+            submission = [ans["tag"] for ans in student_answer]
         if grading_method in [GradingMethodType.RANKING, GradingMethodType.ORDERED]:
             if grading_method is GradingMethodType.ORDERED:
                 for index, answer in enumerate(true_answer_list):
@@ -1070,6 +1083,72 @@ def grade(element_html: str, data: pl.QuestionData) -> None:
                 depends_graph[tag] = cur_rank_depends
                 prev_rank = ranking
 
+        elif grading_method is GradingMethodType.SORTING:
+            i = 0 
+            total_correct_answers = 0
+            total_edit_distance = 0
+            no_feedback_yet = True
+            for curr_iteration in true_answer_list:
+                for index, answer in enumerate(curr_iteration):
+                    answer["ranking"] = index
+                curr_iteration = sorted(curr_iteration, key=lambda x: int(x["ranking"]))
+                true_answer = [answer["tag"] for answer in curr_iteration]
+                tag_to_rank = {
+                    answer["tag"]: answer["ranking"] for answer in curr_iteration
+                }
+                lines_of_rank = {
+                    rank: [tag for tag in tag_to_rank if tag_to_rank[tag] == rank]
+                    for rank in set(tag_to_rank.values())
+                }
+
+                cur_rank_depends = []
+                prev_rank = None
+                for tag in true_answer:
+                    ranking = tag_to_rank[tag]
+                    if prev_rank is not None and ranking != prev_rank:
+                        cur_rank_depends = lines_of_rank[prev_rank]
+                    depends_graph[tag] = cur_rank_depends
+                    prev_rank = ranking
+
+                num_initial_correct, true_answer_length = grade_dag(submission[i], depends_graph, group_belonging)
+                edit_distance = lcs_partial_credit(
+                    submission, depends_graph, group_belonging
+                )
+
+                total_correct_answers += true_answer_length
+                total_edit_distance += edit_distance
+                
+
+                if final_score < 1:
+                    first_wrong_is_distractor = first_wrong is not None and student_answer[
+                        first_wrong
+                    ]["uuid"] in set(
+                        block["uuid"]
+                        for block in get_distractors(
+                            data["params"][answer_name], data["correct_answers"][answer_name]
+                        )
+                    )
+
+                    if no_feedback_yet:
+                        feedback = construct_feedback(
+                            feedback_type,
+                            first_wrong,
+                            group_belonging,
+                            check_indentation,
+                            first_wrong_is_distractor,
+                        )
+                        no_feedback_yet = False
+
+                i += 1
+
+            final_score = max(0, float(total_correct_answers - total_edit_distance) / total_correct_answers)
+            data["partial_scores"][answer_name] = {
+                "score": round(final_score, 2),
+                "feedback": feedback,
+                "weight": answer_weight,
+            }
+
+            return
         elif grading_method is GradingMethodType.DAG:
             depends_graph, group_belonging = extract_dag(true_answer_list)
 
