@@ -74,7 +74,7 @@ FIRST_WRONG_TYPES = frozenset(
     [FeedbackType.FIRST_WRONG, FeedbackType.FIRST_WRONG_VERBOSE]
 )
 LCS_GRADABLE_TYPES = frozenset(
-    [GradingMethodType.RANKING, GradingMethodType.DAG, GradingMethodType.ORDERED]
+    [GradingMethodType.RANKING, GradingMethodType.DAG, GradingMethodType.ORDERED, GradingMethodType.SORTING]
 )
 GRADING_METHOD_DEFAULT = GradingMethodType.ORDERED
 SOURCE_BLOCKS_ORDER_DEFAULT = SourceBlocksOrderType.ALPHABETIZED
