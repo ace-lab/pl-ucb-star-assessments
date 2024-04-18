@@ -1138,32 +1138,32 @@ def grade(element_html: str, data: pl.QuestionData) -> None:
 
                 num_initial_correct, true_answer_length = grade_dag(submission[i], depends_graph, group_belonging)
                 edit_distance = lcs_partial_credit(
-                    submission, depends_graph, group_belonging
+                    submission[i], depends_graph, group_belonging
                 )
 
                 total_correct_answers += true_answer_length
                 total_edit_distance += edit_distance
                 
 
-                if final_score < 1:
-                    first_wrong_is_distractor = first_wrong is not None and student_answer[
-                        first_wrong
-                    ]["uuid"] in set(
-                        block["uuid"]
-                        for block in get_distractors(
-                            data["params"][answer_name], data["correct_answers"][answer_name]
-                        )
-                    )
+                # if final_score < 1:
+                #     first_wrong_is_distractor = first_wrong is not None and student_answer[
+                #         first_wrong
+                #     ]["uuid"] in set(
+                #         block["uuid"]
+                #         for block in get_distractors(
+                #             data["params"][answer_name], data["correct_answers"][answer_name]
+                #         )
+                #     )
 
-                    if no_feedback_yet:
-                        feedback = construct_feedback(
-                            feedback_type,
-                            first_wrong,
-                            group_belonging,
-                            check_indentation,
-                            first_wrong_is_distractor,
-                        )
-                        no_feedback_yet = False
+                #     if no_feedback_yet:
+                #         feedback = construct_feedback(
+                #             feedback_type,
+                #             first_wrong,
+                #             group_belonging,
+                #             check_indentation,
+                #             first_wrong_is_distractor,
+                #         )
+                #         no_feedback_yet = False
 
                 i += 1
 
