@@ -767,17 +767,27 @@ def render(element_html: str, data: pl.QuestionData) -> str:
 
         if grading_method is GradingMethodType.SORTING:
             subblock_data = data["submitted_answers"].get(answer_name, [])
-            for subblock in subblock_data:
-                student_submission.append([
-                    {
-                        "inner_html": attempt["inner_html"],
-                        "indent": (attempt["indent"] or 0) * TAB_SIZE_PX,
-                        "badge_type": attempt.get("badge_type", ""),
-                        "icon": attempt.get("icon", ""),
-                        "distractor_feedback": attempt.get("distractor_feedback", ""),
-                    }
-                    for attempt in subblock_data
-                ])
+            #for subblock in subblock_data:
+            # student_submission.append([
+            #     {
+            #         "inner_html": attempt["inner_html"],
+            #         "indent": (attempt["indent"] or 0) * TAB_SIZE_PX,
+            #         "badge_type": attempt.get("badge_type", ""),
+            #         "icon": attempt.get("icon", ""),
+            #         "distractor_feedback": attempt.get("distractor_feedback", ""),
+            #     }
+            #     for attempt in subblock_data
+            # ])
+            student_submission = [
+                {
+                    "inner_html": attempt["inner_html"],
+                    "indent": (attempt["indent"] or 0) * TAB_SIZE_PX,
+                    "badge_type": attempt.get("badge_type", ""),
+                    "icon": attempt.get("icon", ""),
+                    "distractor_feedback": attempt.get("distractor_feedback", ""),
+                }
+                for attempt in data["submitted_answers"].get(answer_name, [])[1]
+            ]
         else:
             student_submission = [
                 {
