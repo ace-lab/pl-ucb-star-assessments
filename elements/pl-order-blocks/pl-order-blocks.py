@@ -942,7 +942,7 @@ def parse(element_html: str, data: pl.QuestionData) -> None:
         return
 
     if grading_method in LCS_GRADABLE_TYPES:
-        if grading_method != GradingMethodType.Sorting:
+        if grading_method != GradingMethodType.SORTING:
             for answer in student_answer:
                 matching_block = next(
                     (
