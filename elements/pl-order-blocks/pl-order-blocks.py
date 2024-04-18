@@ -522,6 +522,16 @@ def prepare(element_html: str, data: pl.QuestionData) -> None:
 
     all_blocks = sampled_correct_answers + sampled_incorrect_answers
 
+    if grading_method == GradingMethodType.SORTING:
+        copy_of_correct_answers = []
+        for iteration in correct_answers: 
+            curr_iteration = []
+            for curr_anwser in iteration:
+                curr_iteration.append(curr_anwser)
+            copy_of_correct_answers.append(curr_iteration)
+        all_blocks = copy_of_correct_answers
+
+
     source_blocks_order = pl.get_enum_attrib(
         element,
         "source-blocks-order",
