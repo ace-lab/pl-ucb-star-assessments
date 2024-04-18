@@ -873,7 +873,7 @@ def render(element_html: str, data: pl.QuestionData) -> str:
                 indentation_message = ", some blocks require correct indentation"
 
         distractors = get_distractors(
-            data["params"][answer_name], data["correct_answers"][answer_name]
+            data["params"][answer_name], data["correct_answers"][answer_name][1]
         )
 
         question_solution = [
