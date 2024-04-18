@@ -763,16 +763,32 @@ def render(element_html: str, data: pl.QuestionData) -> str:
         if grading_method is GradingMethodType.EXTERNAL:
             return ""  # external grader is responsible for displaying results screen
 
-        student_submission = [
-            {
-                "inner_html": attempt["inner_html"],
-                "indent": (attempt["indent"] or 0) * TAB_SIZE_PX,
-                "badge_type": attempt.get("badge_type", ""),
-                "icon": attempt.get("icon", ""),
-                "distractor_feedback": attempt.get("distractor_feedback", ""),
-            }
-            for attempt in data["submitted_answers"].get(answer_name, [])
-        ]
+        student_submission = []
+
+        if grading_method is GradingMethodType.SORTING:
+            subblock_data = data["submitted_answers"].get(answer_name, [])
+            for subblock in subblock_data:
+                student_submission.append([
+                    {
+                        "inner_html": attempt["inner_html"],
+                        "indent": (attempt["indent"] or 0) * TAB_SIZE_PX,
+                        "badge_type": attempt.get("badge_type", ""),
+                        "icon": attempt.get("icon", ""),
+                        "distractor_feedback": attempt.get("distractor_feedback", ""),
+                    }
+                    for attempt in subblock_data
+                ])
+        else:
+            student_submission = [
+                {
+                    "inner_html": attempt["inner_html"],
+                    "indent": (attempt["indent"] or 0) * TAB_SIZE_PX,
+                    "badge_type": attempt.get("badge_type", ""),
+                    "icon": attempt.get("icon", ""),
+                    "distractor_feedback": attempt.get("distractor_feedback", ""),
+                }
+                for attempt in data["submitted_answers"].get(answer_name, [])
+            ]
 
         score = None
         feedback = None
@@ -783,7 +799,7 @@ def render(element_html: str, data: pl.QuestionData) -> str:
         html_params = {
             "submission": True,
             "parse-error": data["format_errors"].get(answer_name, None),
-            "student_submission": student_submission,
+            #"student_submission": student_submission,
             "feedback": feedback,
             "block_formatting": block_formatting,
             "allow_feedback_badges": not all(
