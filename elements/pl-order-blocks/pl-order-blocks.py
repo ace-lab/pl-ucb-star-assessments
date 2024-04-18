@@ -809,7 +809,7 @@ def render(element_html: str, data: pl.QuestionData) -> str:
         html_params = {
             "submission": True,
             "parse-error": data["format_errors"].get(answer_name, None),
-            #"student_submission": student_submission,
+            "student_submission": student_submission,
             "feedback": feedback,
             "block_formatting": block_formatting,
             "allow_feedback_badges": not all(
