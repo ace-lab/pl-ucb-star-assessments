@@ -881,7 +881,7 @@ def render(element_html: str, data: pl.QuestionData) -> str:
                 "inner_html": solution["inner_html"],
                 "indent": max(0, (solution["indent"] or 0) * TAB_SIZE_PX),
             }
-            for solution in datgia["correct_answers"][answer_name][2]
+            for solution in data["correct_answers"][answer_name][2]
         ]
 
         html_params = {
