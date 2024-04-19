@@ -796,7 +796,7 @@ def render(element_html: str, data: pl.QuestionData) -> str:
                     "icon": attempt.get("icon", ""),
                     "distractor_feedback": attempt.get("distractor_feedback", ""),
                 }
-                for attempt in data["submitted_answers"].get(answer_name, [])[2]
+                for attempt in data["submitted_answers"].get(answer_name, [])[1]
             ]
         else:
             student_submission = [
@@ -873,7 +873,7 @@ def render(element_html: str, data: pl.QuestionData) -> str:
         )
 
         required_indents = set(
-            block["indent"] for block in data["correct_answers"][answer_name][2]
+            block["indent"] for block in data["correct_answers"][answer_name][1]
         )
         indentation_message = ""
         if check_indentation:
@@ -883,7 +883,7 @@ def render(element_html: str, data: pl.QuestionData) -> str:
                 indentation_message = ", some blocks require correct indentation"
 
         distractors = get_distractors(
-            data["params"][answer_name][2], data["correct_answers"][answer_name][2]
+            data["params"][answer_name][1], data["correct_answers"][answer_name][1]
         )
 
         question_solution = [
@@ -891,7 +891,7 @@ def render(element_html: str, data: pl.QuestionData) -> str:
                 "inner_html": solution["inner_html"],
                 "indent": max(0, (solution["indent"] or 0) * TAB_SIZE_PX),
             }
-            for solution in data["correct_answers"][answer_name][2]
+            for solution in data["correct_answers"][answer_name][1]
         ]
 
         html_params = {
@@ -1205,6 +1205,7 @@ def grade(element_html: str, data: pl.QuestionData) -> None:
                 i += 1
 
             final_score = max(0, float(total_correct_answers - total_edit_distance) / total_correct_answers)
+            final_score *= 2
             data["partial_scores"][answer_name] = {
                 "score": round(final_score, 2),
                 "feedback": feedback,
