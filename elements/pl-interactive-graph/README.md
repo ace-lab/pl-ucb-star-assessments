@@ -9,7 +9,7 @@ To use the `pl-interactive-graph` element in your PrairieLearn course:
 
 1. **Include the Element in Your Question**: Embed the custom element tag `<pl-interactive-graph>`in your question HTML file.
 2. **Define the Graph**: Specify the graph structure within the tag using your desired graph generation method. Use DOT language to specify your graph, to learn how to use DOT language, navigate to https://graphviz.org/. *Note:* If you would like randomized graphs, you do not need need to use the DOT language.
-3. **Set Attributes**: Customize the behavior and appearance of the graph using XML attributes. Attributes numbered 8-15 are used for random graphs. If you are not using a random graph, these attributes add nothing. Further, attributes 15 and on are part of the existing `pl-graph` element. The element supports a variety of attributes to cater to different question types and requirements: 
+3. **Set Attributes**: Customize the behavior and appearance of the graph using XML attributes. Attributes numbered viii-xv are used for random graphs. If you are not using a random graph, these attributes add nothing. Further, attributes xv and on are part of the existing `pl-graph` element. The element supports a variety of attributes to cater to different question types and requirements: 
     1. `preserve-ordering`: String. If set to `"True"`, it requires the answer sequence to match exactly.
     2. `answers`: String. String of an array of node labels representing the correct answer. (Example: '["A","B","C"]')
     3. `partial-credit`: String. If set to `"True"`, it allows partial credit for partially correct sequences.
