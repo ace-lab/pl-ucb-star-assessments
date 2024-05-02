@@ -36,7 +36,7 @@ To use the `pl-interactive-graph` element in your PrairieLearn course:
 	6.  `select-nodes`: Boolean. If set to `True`, it allows the user to click on nodes for selection for interaction.
 
 	7.  `select-edges`: Boolean. If set to `True`, it allows the user to click on edges for selection for interaction.
-	8. `grading`: String. Autograding for the three following functions: `bfs`, `dfs`, `dijkstra's`. 
+	8. `grading`: String. Autograding for the three following functions: `bfs`, `dfs`, `dijkstras`. 
 
 	9.  `random-graph`: Boolean. If set to `True`, random graphs will be generated.
 
