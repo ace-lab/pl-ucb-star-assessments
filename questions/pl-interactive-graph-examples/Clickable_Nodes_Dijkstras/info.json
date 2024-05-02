@@ -1,6 +1,6 @@
 {
     "uuid": "38e1318c-967a-4506-a518-da7fe80cf249",
-    "title": "Clickable_Nodes_Dijkstras",
+    "title": "Dijkstras Example (Direct Autograding)",
     "topic": "Traversals",
     "tags": [
         "Fa23"
