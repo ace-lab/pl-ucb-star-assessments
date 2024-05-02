@@ -26,6 +26,7 @@ WEIGHTS_PRESENTATION_TYPE_DEFAULT = "f"
 NEGATIVE_WEIGHTS_DEFAULT = False
 DIRECTED_DEFAULT = True
 LOG_WARNINGS_DEFAULT = True
+AUTOGRADING = None
 
 
 def graphviz_from_networkx(
@@ -127,26 +128,56 @@ def graphviz_from_adj_matrix(
 
     return G.string()
 
-def generate_graph(min_nodes, max_nodes, min_edges, max_edges, directed=False, weighted=False, tree=False ):
-    n = random.randint(min_nodes, max_nodes)  
+def generate_graph(min_nodes, max_nodes, min_edges, max_edges, directed=False, weighted=False, tree=False):
+    # Step 1: Determine the number of nodes
+    n = random.randint(min_nodes, max_nodes)
+
+    # Step 2: Ensure that the graph has at least n-1 edges if min_edges is 0
     if min_edges == 0:
-        min_edges = n-1
+        min_edges = n - 1
+    # Set a reasonable upper limit on edges if max_edges is 0
     if max_edges == 0:
-        max_edges = round(n*1.5)
+        max_edges = round(n * 1.5)
+
+    # Step 3: Generate the graph
     if tree:
         G = nx.random_tree(n, create_using=nx.DiGraph() if directed else nx.Graph())
         if directed:
             G = nx.DiGraph([(u, v) for u, v in G.edges()])
     else:
-        # Generate a non-tree graph
-        m = random.randint(min_edges, max_edges if not directed else n*(n-1) // 2 ) 
-        G = nx.gnm_random_graph(n, m, directed=directed)
-    if weighted==True:
-        for (u, v) in G.edges():
-            G.edges[u, v]['weight'] = random.randint(1, 10) 
+        # Generate a connected non-tree graph by ensuring a spanning tree first
+        G = nx.random_tree(n, create_using=nx.DiGraph() if directed else nx.Graph())
 
-    ascii_labels = list(string.ascii_letters[:n])  # Get the first 'n' ASCII letters
-    mapping = {i: ascii_labels[i] for i in range(n)}  # Create a mapping from numeric to ASCII labels
+        # Add additional edges to meet the minimum and maximum constraints
+        m = random.randint(min_edges, max_edges if not directed else n * (n - 1) // 2)
+
+        existing_edges = set(G.edges())
+        remaining_edges = m - len(existing_edges)
+        possible_edges = set()
+
+        for u in range(n):
+            for v in range(u + 1, n):
+                if directed:
+                    possible_edges.add((u, v))
+                    possible_edges.add((v, u))
+                else:
+                    possible_edges.add((u, v))
+
+        # Add remaining edges randomly from available pairs
+        available_edges = list(possible_edges - existing_edges)
+        additional_edges = random.sample(available_edges, remaining_edges)
+
+        for u, v in additional_edges:
+            G.add_edge(u, v)
+
+    # Step 4: Add weights if necessary
+    if weighted:
+        for (u, v) in G.edges():
+            G.edges[u, v]['weight'] = random.randint(1, 10)
+
+    # Step 5: Relabel nodes to ASCII labels
+    ascii_labels = list(string.ascii_letters[:n])
+    mapping = {i: ascii_labels[i] for i in range(n)}
     G = nx.relabel_nodes(G, mapping)
 
     return G
@@ -155,6 +186,7 @@ def prepare(element_html: str, data: pl.QuestionData) -> None:
     optional_attribs = [
         "preserve-ordering",
         "answers",
+        "grading",
         "partial-credit",
         "node-fill-color",
         "edge-fill-color",
@@ -202,6 +234,7 @@ def render(element_html: str, data: pl.QuestionData) -> str:
     select_nodes = pl.get_string_attrib(element, "select-nodes", "True")
     select_edges = pl.get_string_attrib(element, "select-edges", True)
     random_graph = pl.get_string_attrib(element, "random-graph", False)
+    grading = pl.get_string_attrib(element, "grading", None)
 
     #if random_graph is true, generate a random graph instead of using existing functions
     if random_graph=="True":
@@ -400,6 +433,7 @@ def grade(element_html, data):
     select_nodes = pl.get_string_attrib(element, "select-nodes", "False")
     select_edges = pl.get_string_attrib(element, "select-edges", "False")
 
+    grading = pl.get_string_attrib(element, "grading", None)
 
     if select_nodes == "True":
         
@@ -423,6 +457,8 @@ def grade(element_html, data):
         }
 
             return data
+        
+    
 
     
     if select_nodes == "True":
@@ -443,10 +479,20 @@ def grade(element_html, data):
     graph = pygraphviz.AGraph(string=random_graph)
     ##########################
 
+    
+        
     correct_answer = eval(pl.from_json(element.get("answers", "[]")))
     preserve_ordering = pl.from_json(element.get("preserve-ordering"))
     partial_credit = pl.from_json(element.get("partial-credit"))
 
+    if grading == 'dfs':
+        correct_answer = dfs_agraph(graph, graph.nodes()[0])
+
+    if grading == 'bfs':
+        correct_answer = bfs_agraph(graph, graph.nodes()[0])
+
+    if grading == 'dijkstras':
+        correct_answer = dijkstra_agraph(graph, graph.nodes()[0])
 
 
     if select_nodes == "True":
@@ -603,59 +649,4 @@ def dijkstra_agraph(agraph, start_node):
     
     return visited_order
 
-
-
-
-def find(parent, i):
-    if parent[i] == i:
-        return i
-    return find(parent, parent[i])
-
-def union(parent, rank, x, y):
-    xroot = find(parent, x)
-    yroot = find(parent, y)
-    if rank[xroot] < rank[yroot]:
-        parent[xroot] = yroot
-    elif rank[xroot] > rank[yroot]:
-        parent[yroot] = xroot
-    else:
-        parent[yroot] = xroot
-        rank[xroot] += 1
-
-def kruskals_agraph(agraph):
-    """Performs Kruskal's algorithm on an AGraph object."""
-    # Initialize result
-    result = []  # This will store the resultant MST
-
-    i, e = 0, 0  # Variables to store number of edges processed and added to MST
-
-    # Step 1: Sort all the edges in non-decreasing order of their weight
-    edges = [(float(edge.attr['weight']), edge) for edge in agraph.edges()]
-    edges.sort(key=lambda x: x[0])
-
-    parent = {}
-    rank = {}
-
-    for node in agraph.nodes():
-        parent[node] = node
-        rank[node] = 0
-
-    # Number of edges to be taken is equal to V-1
-    while e < len(agraph.nodes()) - 1:
-        # Step 2: Pick the smallest edge and increment the index for next iteration
-        _, edge = edges[i]
-        i += 1
-        x = find(parent, edge[0])
-        y = find(parent, edge[1])
-
-        # If including this edge does not cause a cycle, include it in result
-        # and increment the index of the result for the next edge
-        if x != y:
-            e += 1
-            result.append(edge)
-            union(parent, rank, x, y)
-
-    # Format the result to match the specified format
-    formatted_result = [f"{edge[0]}--{edge[1]}" for edge in result]
-    return formatted_result
 

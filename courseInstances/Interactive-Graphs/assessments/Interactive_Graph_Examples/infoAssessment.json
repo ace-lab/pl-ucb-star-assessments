@@ -10,11 +10,19 @@
             "comment": "These are new questions created for the pl-interactive-graph element",
             "questions": [
                 {
-                    "id": "pl-interactive-graph-examples/Clickable_Nodes_Basic_Interaction",
+                    "id": "pl-interactive-graph-examples/BFS_Example",
                     "autoPoints": 1
                 },
                 {
-                    "id": "pl-interactive-graph-examples/Clickable_Nodes_BFS_In_Order",
+                    "id": "pl-interactive-graph-examples/DFS_Example",
+                    "autoPoints": 1
+                },
+                {
+                    "id": "pl-interactive-graph-examples/Random_Graph_BFS_Autograding_Example",
+                    "autoPoints": 1
+                },
+                {
+                    "id": "pl-interactive-graph-examples/Random_Graph_DFS_Autograding_Example",
                     "autoPoints": 1
                 },
                 {
@@ -26,7 +34,7 @@
                     "autoPoints": 1
                 },
                 {
-                    "id": "pl-interactive-graph-examples/Clickable_Nodes_Kruskals",
+                    "id": "pl-interactive-graph-examples/Clickable_Edges_Kruskals",
                     "autoPoints": 1
                 }
             ]
