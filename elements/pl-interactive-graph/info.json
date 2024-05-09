@@ -1,0 +1,6 @@
+{
+    "controller": "interactive-graphs.py",
+    "dependencies": {
+      "elementStyles": ["interactive-graphs-css.css"]
+    }
+  }

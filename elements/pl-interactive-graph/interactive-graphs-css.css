@@ -1,0 +1,38 @@
+.pl-graph {
+  display: flex;
+  flex-direction: column; /* Stack vertically */
+  align-items: center; /* Center-align the items */
+  overflow-x: auto;
+  width: 100%;
+  order: 1;
+}
+
+.pl-graph > svg {
+  margin-top: 1rem; /* Add space between the list and the graph */
+}
+
+#selectedNodeList {
+  width: 100%; /* List takes full width */
+  padding: 1rem;
+  box-sizing: border-box;
+  background-color: #f0f0f0;
+  border-radius: 5px;
+  margin-bottom: 1rem; /* Space before the graph */
+  order: -1; /* Makes the list come before the graph */
+  visibility: hidden;
+}
+#selectedEdgeList {
+  width: 100%; /* List takes full width */
+  padding: 1rem;
+  box-sizing: border-box;
+  background-color: #f0f0f0;
+  border-radius: 5px;
+  margin-bottom: 1rem; /* Space before the graph */
+  order: -1; /* Makes the list come before the graph */
+  visibility: hidden;
+
+}
+
+.edge text {
+  dy: 200px; /* Adjust this value as needed to increase spacing */
+}
