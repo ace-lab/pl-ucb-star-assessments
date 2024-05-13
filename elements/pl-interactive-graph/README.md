@@ -23,36 +23,37 @@ To use the `pl-interactive-graph` element in your PrairieLearn course:
 
 3.  **Set Attributes**: Customize the behavior and appearance of the graph using XML attributes. Attributes numbered 9-16 are used for random graphs. If you are not using a random graph, these attributes add nothing. Further, attributes 16 and on are part of the existing `pl-graph` element. The element supports a variety of attributes to cater to different question types and requirements:
 
-	1.  `preserve-ordering`: String. If set to `"True"`, it requires the answer sequence to match exactly.
+	1. `preserve-ordering`: String. If set to `"True"`, it requires the answer sequence to match exactly.
 
-	2.  `answers`: String. String of an array of node labels representing the correct answer. (Example: '["A","B","C"]')
+	2. `answers`: String. String of an array of node labels representing the correct answer. (Example: '["A","B","C"]')
 
-	3.  `partial-credit`: String. If set to `"True"`, it allows partial credit for partially correct sequences.
+	3. `partial-credit`: String. If set to `"True"`, it allows partial credit for partially correct sequences.
 
-	4.  `node-fill-color`: String. If set, changes the fill color of selected nodes to that color (default is "red").
+	4. `node-fill-color`: String. If set, changes the fill color of selected nodes to that color (default is "red").
 
-	5.  `edge-fill-color`: String. If set, changes the fill color of selected edges to that color (default is "green").
+	5. `edge-fill-color`: String. If set, changes the fill color of selected edges to that color (default is "green").
+	
+ 	6. `select-nodes`: Boolean. If set to `True`, it allows the user to click on nodes for selection for interaction.
 
-	6.  `select-nodes`: Boolean. If set to `True`, it allows the user to click on nodes for selection for interaction.
+	7. `select-edges`: Boolean. If set to `True`, it allows the user to click on edges for selection for interaction. 
 
-	7.  `select-edges`: Boolean. If set to `True`, it allows the user to click on edges for selection for interaction.
-	8. `grading`: String. Autograding for the three following functions: `bfs`, `dfs`, `dijkstras`. 
+	8. `random-graph`: Boolean. If set to `True`, random graphs will be generated.
 
-	9.  `random-graph`: Boolean. If set to `True`, random graphs will be generated.
+	9. `directed-random`: Boolean. If set to `True`, random graphs will be generated with directed edges.
 
-	10.  `directed-random`: Boolean. If set to `True`, random graphs will be generated with directed edges.
+	10. `min-nodes`: Integer. Defines the minimum number of nodes in a random graph.
 
-	11.  `min-nodes`: Integer. Defines the minimum number of nodes in a random graph.
+	11. `max-nodes`: Integer. Defines the maximum number of nodes in a random graph.
 
-	12.  `max-nodes`: Integer. Defines the maximum number of nodes in a random graph.
+	12. `min-edges`: Integer. Defines the minimum number of edges in a random graph.
 
-	13.  `min-edges`: Integer. Defines the minimum number of edges in a random graph.
+	13. `max-edges`: Integer. Defines the maximum number of edges in a random graph.
 
-	14.  `max-edges`: Integer. Defines the maximum number of edges in a random graph.
+	14. `weighted`: Boolean. Specifies if a random graph should have random edge weights.
 
-	15.  `weighted`: Boolean. Specifies if a random graph should have random edge weights.
+	15. `tree`: Boolean. Specifies if the random graph should be a tree.
 
-	16.  `tree`: Boolean. Specifies if the random graph should be a tree.
+    	16. `connected`: Boolean. Specifies if the random graph should be connected.
 
 	17.  `directed`: Boolean. Whether to treat edges in an adjacency matrix as directed or undirected. If set to false, then edges will be rendered as undirected. The input adjacency matrix must be symmetric if this is set to false.
 
