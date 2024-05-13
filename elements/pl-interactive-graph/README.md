@@ -14,54 +14,56 @@ To use the `pl-interactive-graph` element in your PrairieLearn course:
 	1. `preserve-ordering`: String. If set to `"True"`, it requires the answer sequence to match exactly.
 
 	2. `answers`: String. String of an array of node labels representing the correct answer. (Example: '["A","B","C"]')
+ 
+ 	3. `grading`: String. Can be 'bfs', 'dfs' and 'dijkstras' - if selected will automatically grade the answers based on the algorithm
 
-	3. `partial-credit`: String. If set to `"True"`, it allows partial credit for partially correct sequences.
+	4. `partial-credit`: String. If set to `"True"`, it allows partial credit for partially correct sequences.
 
-	4. `node-fill-color`: String. If set, changes the fill color of selected nodes to that color (default is "red").
+	5. `node-fill-color`: String. If set, changes the fill color of selected nodes to that color (default is "red").
 
-	5. `edge-fill-color`: String. If set, changes the fill color of selected edges to that color (default is "green").
+	6. `edge-fill-color`: String. If set, changes the fill color of selected edges to that color (default is "green").
 	
- 	6. `select-nodes`: Boolean. If set to `True`, it allows the user to click on nodes for selection for interaction.
+ 	7. `select-nodes`: Boolean. If set to `True`, it allows the user to click on nodes for selection for interaction.
 
-	7. `select-edges`: Boolean. If set to `True`, it allows the user to click on edges for selection for interaction. 
+	8. `select-edges`: Boolean. If set to `True`, it allows the user to click on edges for selection for interaction. 
 
-	8. `random-graph`: Boolean. If set to `True`, random graphs will be generated.
+	9. `random-graph`: Boolean. If set to `True`, random graphs will be generated.
 
-	9. `directed-random`: Boolean. If set to `True`, random graphs will be generated with directed edges.
+	10. `directed-random`: Boolean. If set to `True`, random graphs will be generated with directed edges.
 
-	10. `min-nodes`: Integer. Defines the minimum number of nodes in a random graph.
+	11. `min-nodes`: Integer. Defines the minimum number of nodes in a random graph.
 
-	11. `max-nodes`: Integer. Defines the maximum number of nodes in a random graph.
+	12. `max-nodes`: Integer. Defines the maximum number of nodes in a random graph.
 
-	12. `min-edges`: Integer. Defines the minimum number of edges in a random graph.
+	13. `min-edges`: Integer. Defines the minimum number of edges in a random graph.
 
-	13. `max-edges`: Integer. Defines the maximum number of edges in a random graph.
+	14. `max-edges`: Integer. Defines the maximum number of edges in a random graph.
 
-	14. `weighted`: Boolean. Specifies if a random graph should have random edge weights.
+	15. `weighted`: Boolean. Specifies if a random graph should have random edge weights.
 
-	15. `tree`: Boolean. Specifies if the random graph should be a tree.
+	16. `tree`: Boolean. Specifies if the random graph should be a tree.
 
-	16.  `directed`: Boolean. Whether to treat edges in an adjacency matrix as directed or undirected. If set to false, then edges will be rendered as undirected. The input adjacency matrix must be symmetric if this is set to false.
+	17.  `directed`: Boolean. Whether to treat edges in an adjacency matrix as directed or undirected. If set to false, then edges will be rendered as undirected. The input adjacency matrix must be symmetric if this is set to false.
 
-	17. `connected`: Boolean. Specifies if the random graph should be connected.
+	18. `connected`: Boolean. Specifies if the random graph should be connected.
      
- 	18.  `engine`: String. The rendering engine to use; supports circo, dot, fdp, neato, osage, and twopi.
+ 	19.  `engine`: String. The rendering engine to use; supports circo, dot, fdp, neato, osage, and twopi.
 
-	19.  `params-name`: String. The the name of a parameter containing the data to use as input. Data type to use depends on params-type attribute.
+	20.  `params-name`: String. The the name of a parameter containing the data to use as input. Data type to use depends on params-type attribute.
 
-	20.  `params-name-labels`: String. When using an adjacency matrix, the parameter that contains the labels for each node.
+	21.  `params-name-labels`: String. When using an adjacency matrix, the parameter that contains the labels for each node.
 
-   	21.  `params-type`: String. Type of graph representation, e.g., `"adjacency-matrix"` or `"networkx"`.
+   	22.  `params-type`: String. Type of graph representation, e.g., `"adjacency-matrix"` or `"networkx"`.
 
-	22.  `weights`: Boolean. When using an adjacency matrix, whether or not to show the edge weights. By default will automatically show weights for stochastic matrices (when they are not binary 0/1).
+	23.  `weights`: Boolean. When using an adjacency matrix, whether or not to show the edge weights. By default will automatically show weights for stochastic matrices (when they are not binary 0/1).
 
-	23.  `weights-digits`: Integer. When using an adjacency matrix, how many digits to show for the weights.
+	24.  `weights-digits`: Integer. When using an adjacency matrix, how many digits to show for the weights.
   
-	24.  `negative-weights`: Boolean. Whether to recognize negative weights in an adjacency matrix. If set to false, then all weights at most 0 are ignored (not counted as an edge). If set to true, then all weights that are not None are recognized.
+	25.  `negative-weights`: Boolean. Whether to recognize negative weights in an adjacency matrix. If set to false, then all weights at most 0 are ignored (not counted as an edge). If set to true, then all weights that are not None are recognized.
 
-	25.  `weights-presentation-type`: String. Number display format for the weights when using an adjacency matrix. If presentation-type is 'sigfig', each number is formatted using the to_precision module to digits significant figures. Otherwise, each number is formatted as {:.{digits}{presentation-type}}.
+	26.  `weights-presentation-type`: String. Number display format for the weights when using an adjacency matrix. If presentation-type is 'sigfig', each number is formatted using the to_precision module to digits significant figures. Otherwise, each number is formatted as {:.{digits}{presentation-type}}.
 
-	26.  `log-warnings`: Boolean. Whether to log warnings that occur during Graphviz rendering.
+	27.  `log-warnings`: Boolean. Whether to log warnings that occur during Graphviz rendering.
 
 Some of the attributes have been inherited from pl-graph, here is more information on those specific inherited attributes: https://prairielearn.readthedocs.io/en/latest/elements/#pl-graph-element
 
