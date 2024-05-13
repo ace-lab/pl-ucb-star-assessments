@@ -38,7 +38,7 @@ Some of the attributes have been inherited from pl-graph, here is more informati
 
 
 ## Description
-The students will be presented with a graph of your specified structure and each node and edge will be clickable according to your selection. Students can click the nodes/edges and depending on the element attribute values, the order might matter (they can also unclick nodes). A list of clicked nodes and/or edges in the corresponding order will be shown right under the graph. When the students click "submit" the element will record the clicked nodes and provide them to the backend. The backend has 2 options for grading, one with provision of direct answers through 'answers' attribute and automatic through 'grading' attribute, which allows to select of an algorithm to automatically grade the submission for both random and provided graph. 
+The students will be presented with a graph of your specified structure and each node and edge will be clickable according to your selection. Students can click the nodes/edges and depending on the element attribute values, the order might matter (they can also unclick nodes). A list of clicked nodes and/or edges in the corresponding order will be shown right under the graph. When the students click "submit" the element will record the clicked nodes and provide them to the backend. The backend has 2 options for grading, one with provision of direct answers through the 'answers' attribute and automatic through the 'grading' attribute, which allows to select of an algorithm to automatically grade the submission for both random and provided graph. 
 
 [Here](https://docs.google.com/presentation/d/1Dr3IpX5KgqjYPDt15EAJK48x462bg-Tt8RRgpj-p_MM/edit?usp=sharing) is our slide deck for the Spring 2024 semester.
 
@@ -51,24 +51,20 @@ Different examples have been included in the questions folder. They are titled `
 Here's an example of how you might use `pl-interactive-graph` in a question about graph traversal:
 
 ```html
-<p>
-  What is the Breadth-First Search traversal order of this algorithm? Click the nodes in the order they are selected and click submit.
-</p>
-<pl-question-panel>
-  <pl-interactive-graph 
-    preserve-ordering="True" 
-    partial-credit="True" 
-    answers='["A","B","C","D","E","F","G","H","I"]'>
-      graph G {
-        A -- B;
-        A -- C;
-        B -- D;
-        B -- E;
-        C -- F;
-        C -- G;
-        E -- H;
-        E -- I;
-      }
+<p>You are provided a graph below. Click on the nodes in the order they will be selected if we run Breadth-First Search (BFS) algorithm on this graph. You can see the order of your clicked list in a list under the graph and you are allowed to unclick and deselect nodes at any point. Press "Save & Grade" to submit your answer.</p>
+<pl-question-panel>  
+  <pl-interactive-graph node_fill_color="red" preserve-ordering="True" answers='["A", "B", "C", "D"]' partial-credit="True" select_nodes="True" select_edges="False">
+    digraph G {
+      A -> B;
+      A -> C;
+      B -> D;
+      B -> E;
+      C -> F;
+      C -> G;
+      E -> H;
+  }
+  
+  
   </pl-interactive-graph>
 </pl-question-panel>
 
