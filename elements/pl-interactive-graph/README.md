@@ -53,7 +53,7 @@ To use the `pl-interactive-graph` element in your PrairieLearn course:
 
 	15. `tree`: Boolean. Specifies if the random graph should be a tree.
 
-    	16. `connected`: Boolean. Specifies if the random graph should be connected.
+	16. `connected`: Boolean. Specifies if the random graph should be connected.
 
 	17.  `directed`: Boolean. Whether to treat edges in an adjacency matrix as directed or undirected. If set to false, then edges will be rendered as undirected. The input adjacency matrix must be symmetric if this is set to false.
 
