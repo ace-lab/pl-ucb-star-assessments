@@ -54,31 +54,31 @@ To use the `pl-interactive-graph` element in your PrairieLearn course:
 
 	16.  `tree`: Boolean. Specifies if the random graph should be a tree.
 
-	17.  `directed`: Boolean. Specify whether the graph is directed.
+	17.  `directed`: Boolean. Whether to treat edges in an adjacency matrix as directed or undirected. If set to false, then edges will be rendered as undirected. The input adjacency matrix must be symmetric if this is set to false.
 
-	18.  `engine`: String. Defines the layout engine for graph rendering (default is `"dot"`).
+	18.  `engine`: String. The rendering engine to use; supports circo, dot, fdp, neato, osage, and twopi.
 
-	19.  `params-name-matrix`, `params-name`: String. Parameter names for matrix or other input types.
+    	19.  `params-name`: String. The the name of a parameter containing the data to use as input. Data type to use depends on params-type attribute.
 
-	20.  `weights`: Boolean. Determines if weights are displayed on the graph.
+	20.  `params-name-labels`: String. When using an adjacency matrix, the parameter that contains the labels for each node.
 
-	21.  `weights-digits`: Integer. Number of digits to round the weights to.
+   	21.  `params-type`: String. Type of graph representation, e.g., `"adjacency-matrix"` or `"networkx"`.
 
-	22.  `weights-presentation-type`: String. Format for presenting weights.
+	22.  `weights`: Boolean. When using an adjacency matrix, whether or not to show the edge weights. By default will automatically show weights for stochastic matrices (when they are not binary 0/1).
 
-	23.  `params-name-labels`: String. Parameter name for node labels.
+	23.  `weights-digits`: Integer. When using an adjacency matrix, how many digits to show for the weights.
+  
+	24.  `negative-weights`: Boolean. Whether to recognize negative weights in an adjacency matrix. If set to false, then all weights at most 0 are ignored (not counted as an edge). If set to true, then all weights that are not None are recognized.
 
-	24.  `params-type`: String. Type of graph representation, e.g., `"adjacency-matrix"` or `"networkx"`.
+	25.  `weights-presentation-type`: String. Number display format for the weights when using an adjacency matrix. If presentation-type is 'sigfig', each number is formatted using the to_precision module to digits significant figures. Otherwise, each number is formatted as {:.{digits}{presentation-type}}.
 
-	25.  `negative-weights`: Boolean. Indicates if negative weights are to be shown.
-
-	26.  `log-warnings`: Boolean. Toggles logging of warnings.
+	26.  `log-warnings`: Boolean. Whether to log warnings that occur during Graphviz rendering.
 
 	Some of the attributes have been inherited from pl-graph, here is more information on those specific inherited attributes: https://prairielearn.readthedocs.io/en/latest/elements/#pl-graph-element
 
   
 
-4.  **Modify server.py if Needed**: Determine how would you want to grade the question. To access the order given by the student as the nodes were clicked, you can do student_nodes = data["submitted_answers"]["selectedNodes"], and to access the edges, you can do  student_edges = data["submitted_answers"]["selectedEdges"]. Note: If you have used custom attributes, like preserve-ordering or answers, this part might be different. There is existing autograding if answers are provided in the `<pl-interactive-graph>` as `<pl-interactive-graph answers='["A","B","C"]'>`, or if the `grading` attribute is set (see 3.8).
+5.  **Modify server.py if Needed**: Determine how would you want to grade the question. To access the order given by the student as the nodes were clicked, you can do student_nodes = data["submitted_answers"]["selectedNodes"], and to access the edges, you can do  student_edges = data["submitted_answers"]["selectedEdges"]. Note: If you have used custom attributes, like preserve-ordering or answers, this part might be different. There is existing autograding if answers are provided in the `<pl-interactive-graph>` as `<pl-interactive-graph answers='["A","B","C"]'>`, or if the `grading` attribute is set (see 3.8).
 
   
   
