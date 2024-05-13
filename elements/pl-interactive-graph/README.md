@@ -41,11 +41,11 @@ To use the `pl-interactive-graph` element in your PrairieLearn course:
 
 	15. `tree`: Boolean. Specifies if the random graph should be a tree.
 
-    	16. `connected`: Boolean. Specifies if the random graph should be connected.
+	16.  `directed`: Boolean. Whether to treat edges in an adjacency matrix as directed or undirected. If set to false, then edges will be rendered as undirected. The input adjacency matrix must be symmetric if this is set to false.
 
-	17.  `directed`: Boolean. Whether to treat edges in an adjacency matrix as directed or undirected. If set to false, then edges will be rendered as undirected. The input adjacency matrix must be symmetric if this is set to false.
-
-	18.  `engine`: String. The rendering engine to use; supports circo, dot, fdp, neato, osage, and twopi.
+	17. `connected`: Boolean. Specifies if the random graph should be connected.
+     
+ 	18.  `engine`: String. The rendering engine to use; supports circo, dot, fdp, neato, osage, and twopi.
 
 	19.  `params-name`: String. The the name of a parameter containing the data to use as input. Data type to use depends on params-type attribute.
 
