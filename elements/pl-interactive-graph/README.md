@@ -59,7 +59,7 @@ To use the `pl-interactive-graph` element in your PrairieLearn course:
 
 	18.  `engine`: String. The rendering engine to use; supports circo, dot, fdp, neato, osage, and twopi.
 
-    	19.  `params-name`: String. The the name of a parameter containing the data to use as input. Data type to use depends on params-type attribute.
+	19.  `params-name`: String. The the name of a parameter containing the data to use as input. Data type to use depends on params-type attribute.
 
 	20.  `params-name-labels`: String. When using an adjacency matrix, the parameter that contains the labels for each node.
 
