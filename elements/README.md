@@ -44,8 +44,11 @@ Some of the attributes have been inherited from pl-graph, here is more informati
 ## Description
 The students will be presented with a graph of your specified structure and each node will be clickable. Students can click the node and depending on the element attribute values, the order might matter (they can also unclick nodes). A list of clicked nodes in the corresponding order will be shown on the left bottom of the question panel, to avoid clashes with the graph (still might happen for very large left leaning graphs). When the students click "submit" the element will record the clicked nodes and provide them to the backend.
 
+Here is our slide deck for Spring 2024 semester: https://docs.google.com/presentation/d/1Dr3IpX5KgqjYPDt15EAJK48x462bg-Tt8RRgpj-p_MM/edit?usp=sharing
+
 ## Suggested Use
 This element is not only limited to purely graph traversal questions. Some of the possible problems that could be modelled by this element are (but not limited to): Network Flow, Finite State Machines, Pathfinding Algorithms, etc.
+
 
 ## Example
 Different examples have been included in the questions folder. They are titled `pl-interactive-graph-examples/Clickable_Nodes_BFS_In_Order`, `pl-interactive-graph-examples/Clickable_Nodes_Basic_Interaction`, and `pl-interactive-graph-examples/Clickable_Nodes_Finite_State_Machine` Here's an example of how you might use `pl-interactive-graph` in a question about graph traversal:
