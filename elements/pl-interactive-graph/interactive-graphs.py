@@ -459,17 +459,12 @@ def grade(element_html, data):
             return data
         
     
-
-    
     if select_nodes == "True":
         user_selected_nodes = eval(data["submitted_answers"]["selectedNodes"])
 
 
     if select_edges == "True":
         user_selected_edges = eval(data["submitted_answers"]["selectedEdges"])
-        
-
-
 
     # Use 'submitted_answers' instead of data["submitted_answers"]
     score = 0
