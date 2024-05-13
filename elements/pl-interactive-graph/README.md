@@ -13,7 +13,7 @@ To use the `pl-interactive-graph` element in your PrairieLearn course:
 
 	1. `preserve-ordering`: String. If set to `"True"`, it requires the answer sequence to match exactly.
 
-	2. `answers`: String. String of an array of node labels representing the correct answer. (Example: '["A","B","C"]')
+	2. `answers`: String. String of an array of node labels representing the correct answer. (Example: '["A","B","C"]' for nodes, '["A--B","B--C"]' for undirected edges and '["A->B","B->C"]' for directed edges)
  
  	3. `grading`: String. Can be 'bfs', 'dfs' and 'dijkstras' - if selected will automatically grade the answers based on the algorithm
 
