@@ -1,0 +1,1495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Table Visualizer</title>
+    <style>
+        #tableContainer {
+            width: 100%; /* Container width set to 50% of the screen */
+            overflow-x: auto; /* Allows horizontal scrolling if the table is wider than the container */
+        }
+        table, th, td {
+            border: 1px solid black;
+            font-size: 12px;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+        .dropdown-container {
+            margin-top: 20px; /* Spacing above the dropdowns */
+            display: flex; /* Aligns dropdowns side by side */
+            align-items: center; /* Aligns items vertically in the center */
+            flex-wrap: wrap; /* Children elements wrap onto a new line when they exceed the container's width */
+        }
+        .dropdown-label {
+            font-family: Consolas, 'Courier New', Monaco, monospace;
+            margin-right: 3px; /* Space between the label and the dropdown */
+            font-weight: bold; /* Makes the label text bold */
+        }
+        .dropdown {
+            font-family: Consolas, 'Courier New', Monaco, monospace;
+            margin-right: 3px; /* Spacing between dropdowns */
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+
+    <pl-question-panel>
+
+        <p> From the <b style="font-family: Consolas, 'Courier New', Monaco, monospace;">{{params.tbl_name}}</b> table below, {{params.question}}
+          </p>
+        
+        <p style="color: gray; font-size: 12px;">Note: The table shown below is a subset of the <b style="font-family: Consolas, 'Courier New', Monaco, monospace;">{{params.tbl_name}}</b> table.</p>
+        <pl-python-variable params-name="df"></pl-python-variable>
+        
+        </pl-question-panel>
+        <!--  label="$({{params.a}})_{10} =$" -->
+        <p>
+        <pl-string-input answers_name="b"  placeholder="answer in code" remove_spaces=True display="block" remove-leading-trailing=True></pl-string-input>
+        </p>
+        
+        <pl-question-panel>
+          <!-- This is not part of the question, and is included for documentation purposes-->
+          <p></p>
+          <div class="alert alert-info p-2" role="alert">
+              <small>Note: this is an example of <i>drilling for mastery</i> question.
+                Read more <a href="https://github.com/PrairieLearn/PrairieLearn/blob/master/exampleCourse/courseInstances/SectionA/assessments/homework/template/__docs/docs.md" target="_blank">here</a>.</small>
+                <pl-github-link></pl-github-link>
+          </div>
+        </pl-question-panel>
+        
+
+        <h1>Table Visualizer</h1>
+        <p style="color: gray; font-size: 12px;">Use this table visualizer as a tool to help you answer the question above. <br>Note: if you <b>do not</b> choose a second table function, clicking visualize will show you a grouped table <b>without</b> a following .where, .sort, or .select clause.</p>
+
+        <div id="tableContainer">
+            <table id="dataTable">
+                <thead>
+                    <tr></tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        
+    
+        <div class="dropdown-container">
+          <span class="dropdown-label">health.group('</span>
+          <select class="dropdown" id="columnSelect">
+              <option value="column">column...</option>
+              <option value="Sugar">Sugar</option>
+              <option value="Albumin">Albumin</option>
+              <option value="Blood Pressure">Blood Pressure</option>
+              <option value="Age">Age</option>
+              <option value="Bacteria">Bacteria</option>
+              <option value="Hypertension">Hypertension</option>
+              <option value="Coronary Artery Disease">Coronary Artery Disease</option>
+              <option value="Pedal Edema">Pedal Edema</option>
+              <option value="Anemia">Anemia</option>
+          </select>
+          <span class="dropdown-label">',</span>
+          <select class="dropdown" id="functionSelect">
+            <option value="function">function...</option>
+            <option value="max">max</option>
+            <option value="min">min</option>
+            <option value="np.average">np.average</option>
+        </select>
+        <span class="dropdown-label">).</span>
+        <select class="dropdown" id="funcSelect">
+          <option value="func">function...</option>
+          <option value="sort">sort</option>
+          <option value="where">where</option>
+          <option value="select">select</option>
+      </select>
+      <span class="dropdown-label">('</span>
+      <select class="dropdown" id="secondDropdown">
+        <option>parameter</option>
+      </select class="dropdown">
+      <span class="dropdown-label">',</span>
+      <span class="dropdown-label" id="displayText"></span>
+      <select class="dropdown" id="thirdDropdown">
+        <option>parameter</option>
+      </select class="dropdown">
+      <span class="dropdown-label" id="displayText2"></span>
+      <span class="dropdown-label">)</span>
+      </div>
+      <span class="dropdown-label"></span>
+</div>
+
+
+      <button id="executeButton" type="button">Visualize</button>
+
+
+      <button id="copyButton" type="button">Copy</button>
+
+
+        <script>
+
+document.getElementById('funcSelect').addEventListener('change', function() {
+  var displayText = document.getElementById('displayText');
+  if (this.value === 'select') {
+    displayText.textContent = "'"; // Set the text you want to display
+  } else {
+    displayText.textContent = ''; // Clear the text or you can use displayText.style.display = 'none'; to hide
+  }
+});
+
+document.getElementById('funcSelect').addEventListener('change', function() {
+  var displayText = document.getElementById('displayText2');
+  if (this.value === 'select') {
+    displayText.textContent = "'"; // Set the text you want to display
+  } else {
+    displayText.textContent = ''; // Clear the text or you can use displayText.style.display = 'none'; to hide
+  }
+});
+
+    
+    document.getElementById('columnSelect').addEventListener('change', function() {
+  document.getElementById('funcSelect').value = 'func';  // Reset funcSelect to "function"
+});
+
+document.getElementById('functionSelect').addEventListener('change', function() {
+  document.getElementById('funcSelect').value = 'func';  // Reset funcSelect to "function"
+});
+
+// Get the 'Copy' button element
+var copyButton = document.getElementById('copyButton');
+
+// Add a click event listener to the 'Copy' button
+copyButton.addEventListener('click', function() {
+  // Get the selected values from each dropdown
+  var columnSelectValue = document.getElementById('columnSelect').value;
+  var functionSelectValue = document.getElementById('functionSelect').value;
+  var funcSelectValue = document.getElementById('funcSelect').value;
+  var secondDropdownValue = document.getElementById('secondDropdown').value;
+  var thirdDropdownValue = document.getElementById('thirdDropdown').value;
+
+  // Get the labels from each dropdown
+  var columnSelectLabel = document.querySelector('#columnSelect option:checked').textContent;
+  var functionSelectLabel = document.querySelector('#functionSelect option:checked').textContent;
+  var funcSelectLabel = document.querySelector('#funcSelect option:checked').textContent;
+
+  // Create a string containing the desired format
+  var copiedText = "health.group('" + columnSelectLabel + "', " + functionSelectLabel + ")." + funcSelectLabel + "('" + secondDropdownValue + "', '" + thirdDropdownValue + ")";
+
+  // Copy the string to the clipboard
+  navigator.clipboard.writeText(copiedText)
+      .then(function() {
+          console.log('Text copied to clipboard: ' + copiedText);
+          // Optionally, you can provide user feedback here
+      })
+      .catch(function(err) {
+          console.error('Unable to copy text to clipboard: ', err);
+          // Optionally, you can provide error handling here
+      });
+});
+
+
+document.getElementById('funcSelect').addEventListener('change', function() {
+  var selectedCategory = this.value;
+  var secondDropdown = document.getElementById('secondDropdown');
+  var thirdDropdown = document.getElementById('thirdDropdown');
+
+  const columnSelect = document.getElementById('columnSelect').value;
+  const functionSelect = document.getElementById('functionSelect').value;
+
+if (columnSelect === 'Sugar' && functionSelect === 'np.average') {
+    let columns = ['Sugar', 'Age average', 'Blood Pressure average','Specific Gravity average', 'Albumin average','Blood Glucose Random average', 'Blood Urea average','Serum Creatinine average', 'Sodium average', 'Potassium average','Hemoglobin average', 'Packed Cell Volume average','White Blood Cell Count average', 'Red Blood Cell Count average','Class average'];
+    var optionsMap = {
+    sort: columns,
+    where: columns,
+    select: columns
+  };
+  var detailsMap = {
+    sort: ["descending=False", "descending=True"],
+    where: ["are.above({{params.number}})", "are.below({{params.number}})"],
+    select: columns,
+  };
+  } else if (columnSelect === 'Sugar' && functionSelect === 'max') {
+    let columns = ['Sugar', 'Age max', 'Blood Pressure max', 'Specific Gravity max',
+       'Albumin max', 'Blood Glucose Random max', 'Blood Urea max',
+       'Serum Creatinine max', 'Sodium max', 'Potassium max', 'Hemoglobin max',
+       'Packed Cell Volume max', 'White Blood Cell Count max',
+       'Red Blood Cell Count max', 'Class max'];
+    var optionsMap = {
+    sort: columns,
+    where: columns,
+    select: columns
+  };
+  var detailsMap = {
+    sort: ["descending=False", "descending=True"],
+    where: ["are.above({{params.number}})", "are.below({{params.number}})"],
+    select: columns,
+  };
+  } else if (columnSelect === 'Sugar' && functionSelect === 'min') {
+    let columns = ['Sugar', 'Age min', 'Blood Pressure min', 'Specific Gravity min',
+       'Albumin min', 'Blood Glucose Random min', 'Blood Urea min',
+       'Serum Creatinine min', 'Sodium min', 'Potassium min', 'Hemoglobin min',
+       'Packed Cell Volume min', 'White Blood Cell Count min',
+       'Red Blood Cell Count min', 'Class min'];
+    var optionsMap = {
+    sort: columns,
+    where: columns,
+    select: columns
+  };
+  var detailsMap = {
+    sort: ["descending=False", "descending=True"],
+    where: ["are.above({{params.number}})", "are.below({{params.number}})"],
+    select: columns,
+  };
+} else if (columnSelect === 'Albumin' && functionSelect === 'np.average') {
+    let columns = ['Albumin', 'Age average', 'Blood Pressure average',
+       'Specific Gravity average', 'Sugar average',
+       'Blood Glucose Random average', 'Blood Urea average',
+       'Serum Creatinine average', 'Sodium average', 'Potassium average',
+       'Hemoglobin average', 'Packed Cell Volume average',
+       'White Blood Cell Count average', 'Red Blood Cell Count average',
+       'Class average'];
+    var optionsMap = {
+    sort: columns,
+    where: columns,
+    select: columns
+  };
+  var detailsMap = {
+    sort: ["descending=False", "descending=True"],
+    where: ["are.above({{params.number}})", "are.below({{params.number}})"],
+    select: columns,
+  };
+} else if (columnSelect === 'Albumin' && functionSelect === 'max') {
+    let columns = ['Albumin', 'Age max', 'Blood Pressure max', 'Specific Gravity max',
+       'Sugar max', 'Blood Glucose Random max', 'Blood Urea max',
+       'Serum Creatinine max', 'Sodium max', 'Potassium max', 'Hemoglobin max',
+       'Packed Cell Volume max', 'White Blood Cell Count max',
+       'Red Blood Cell Count max', 'Class max'];
+    var optionsMap = {
+    sort: columns,
+    where: columns,
+    select: columns
+  };
+  var detailsMap = {
+    sort: ["descending=False", "descending=True"],
+    where: ["are.above({{params.number}})", "are.below({{params.number}})"],
+    select: columns,
+  };
+} else if (columnSelect === 'Albumin' && functionSelect === 'min') {
+    let columns = ['Albumin', 'Age min', 'Blood Pressure min', 'Specific Gravity min',
+       'Sugar min', 'Blood Glucose Random min', 'Blood Urea min',
+       'Serum Creatinine min', 'Sodium min', 'Potassium min', 'Hemoglobin min',
+       'Packed Cell Volume min', 'White Blood Cell Count min',
+       'Red Blood Cell Count min', 'Class min'];
+    var optionsMap = {
+    sort: columns,
+    where: columns,
+    select: columns
+  };
+  var detailsMap = {
+    sort: ["descending=False", "descending=True"],
+    where: ["are.above({{params.number}})", "are.below({{params.number}})"],
+    select: columns,
+  };
+} else if (columnSelect === 'Blood Pressure' && functionSelect === 'np.average') {
+    let columns = ['Blood Pressure', 'Age average', 'Specific Gravity average',
+       'Albumin average', 'Sugar average', 'Blood Glucose Random average',
+       'Blood Urea average', 'Serum Creatinine average', 'Sodium average',
+       'Potassium average', 'Hemoglobin average', 'Packed Cell Volume average',
+       'White Blood Cell Count average', 'Red Blood Cell Count average',
+       'Class average'];
+    var optionsMap = {
+    sort: columns,
+    where: columns,
+    select: columns
+  };
+  var detailsMap = {
+    sort: ["descending=False", "descending=True"],
+    where: ["are.above({{params.number}})", "are.below({{params.number}})"],
+    select: columns,
+  };
+} else if (columnSelect === 'Blood Pressure' && functionSelect === 'max') {
+    let columns = ['Blood Pressure', 'Age max', 'Specific Gravity max', 'Albumin max',
+       'Sugar max', 'Blood Glucose Random max', 'Blood Urea max',
+       'Serum Creatinine max', 'Sodium max', 'Potassium max', 'Hemoglobin max',
+       'Packed Cell Volume max', 'White Blood Cell Count max',
+       'Red Blood Cell Count max', 'Class max'];
+    var optionsMap = {
+    sort: columns,
+    where: columns,
+    select: columns
+  };
+  var detailsMap = {
+    sort: ["descending=False", "descending=True"],
+    where: ["are.above({{params.number}})", "are.below({{params.number}})"],
+    select: columns,
+  };
+} else if (columnSelect === 'Blood Pressure' && functionSelect === 'min') {
+    let columns = ['Blood Pressure', 'Age min', 'Specific Gravity min', 'Albumin min',
+       'Sugar min', 'Blood Glucose Random min', 'Blood Urea min',
+       'Serum Creatinine min', 'Sodium min', 'Potassium min', 'Hemoglobin min',
+       'Packed Cell Volume min', 'White Blood Cell Count min',
+       'Red Blood Cell Count min', 'Class min'];
+    var optionsMap = {
+    sort: columns,
+    where: columns,
+    select: columns
+  };
+  var detailsMap = {
+    sort: ["descending=False", "descending=True"],
+    where: ["are.above({{params.number}})", "are.below({{params.number}})"],
+    select: columns,
+  };
+} else if (columnSelect === 'Age' && functionSelect === 'np.average') {
+    let columns = ['Age', 'Blood Pressure average', 'Specific Gravity average',
+       'Albumin average', 'Sugar average', 'Blood Glucose Random average',
+       'Blood Urea average', 'Serum Creatinine average', 'Sodium average',
+       'Potassium average', 'Hemoglobin average', 'Packed Cell Volume average',
+       'White Blood Cell Count average', 'Red Blood Cell Count average',
+       'Class average'];
+    var optionsMap = {
+    sort: columns,
+    where: columns,
+    select: columns
+  };
+  var detailsMap = {
+    sort: ["descending=False", "descending=True"],
+    where: ["are.above({{params.number}})", "are.below({{params.number}})"],
+    select: columns,
+  };
+} else if (columnSelect === 'Age' && functionSelect === 'max') {
+    let columns = ['Age', 'Blood Pressure max', 'Specific Gravity max', 'Albumin max',
+       'Sugar max', 'Blood Glucose Random max', 'Blood Urea max',
+       'Serum Creatinine max', 'Sodium max', 'Potassium max', 'Hemoglobin max',
+       'Packed Cell Volume max', 'White Blood Cell Count max',
+       'Red Blood Cell Count max', 'Class max'];
+    var optionsMap = {
+    sort: columns,
+    where: columns,
+    select: columns
+  };
+  var detailsMap = {
+    sort: ["descending=False", "descending=True"],
+    where: ["are.above({{params.number}})", "are.below({{params.number}})"],
+    select: columns,
+  };
+} else if (columnSelect === 'Age' && functionSelect === 'min') {
+    let columns = ['Age', 'Blood Pressure min', 'Specific Gravity min', 'Albumin min',
+       'Sugar min', 'Blood Glucose Random min', 'Blood Urea min',
+       'Serum Creatinine min', 'Sodium min', 'Potassium min', 'Hemoglobin min',
+       'Packed Cell Volume min', 'White Blood Cell Count min',
+       'Red Blood Cell Count min', 'Class min'];
+    var optionsMap = {
+    sort: columns,
+    where: columns,
+    select: columns
+  };
+  var detailsMap = {
+    sort: ["descending=False", "descending=True"],
+    where: ["are.above({{params.number}})", "are.below({{params.number}})"],
+    select: columns,
+  };
+} else if (columnSelect === 'Bacteria' && functionSelect === 'np.average') {
+    let columns = ['Bacteria', 'Age average', 'Blood Pressure average',
+       'Specific Gravity average', 'Albumin average', 'Sugar average',
+       'Blood Glucose Random average', 'Blood Urea average',
+       'Serum Creatinine average', 'Sodium average', 'Potassium average',
+       'Hemoglobin average', 'Packed Cell Volume average',
+       'White Blood Cell Count average', 'Red Blood Cell Count average',
+       'Class average'];
+    var optionsMap = {
+    sort: columns,
+    where: columns,
+    select: columns
+  };
+  var detailsMap = {
+    sort: ["descending=False", "descending=True"],
+    where: ["are.above({{params.number}})", "are.below({{params.number}})"],
+    select: columns,
+  };
+} else if (columnSelect === 'Bacteria' && functionSelect === 'max') {
+    let columns = ['Bacteria','Age max', 'Blood Pressure max', 'Specific Gravity max', 'Albumin max',
+       'Sugar max', 'Blood Glucose Random max', 'Blood Urea max',
+       'Serum Creatinine max', 'Sodium max', 'Potassium max', 'Hemoglobin max',
+       'Packed Cell Volume max', 'White Blood Cell Count max',
+       'Red Blood Cell Count max', 'Class max'];
+    var optionsMap = {
+    sort: columns,
+    where: columns,
+    select: columns
+  };
+  var detailsMap = {
+    sort: ["descending=False", "descending=True"],
+    where: ["are.above({{params.number}})", "are.below({{params.number}})"],
+    select: columns,
+  };
+} else if (columnSelect === 'Bacteria' && functionSelect === 'min') {
+    let columns = ['Bacteria','Age min', 'Blood Pressure min', 'Specific Gravity min', 'Albumin min',
+       'Sugar min', 'Blood Glucose Random min', 'Blood Urea min',
+       'Serum Creatinine min', 'Sodium min', 'Potassium min', 'Hemoglobin min',
+       'Packed Cell Volume min', 'White Blood Cell Count min',
+       'Red Blood Cell Count min', 'Class min'];
+    var optionsMap = {
+    sort: columns,
+    where: columns,
+    select: columns
+  };
+  var detailsMap = {
+    sort: ["descending=False", "descending=True"],
+    where: ["are.above({{params.number}})", "are.below({{params.number}})"],
+    select: columns,
+  };
+} else if (columnSelect === 'Hypertension' && functionSelect === 'np.average') {
+    let columns = ['Hypertension','Age average', 'Blood Pressure average', 'Specific Gravity average',
+       'Albumin average', 'Sugar average', 'Blood Glucose Random average',
+       'Blood Urea average', 'Serum Creatinine average', 'Sodium average',
+       'Potassium average', 'Hemoglobin average', 'Packed Cell Volume average',
+       'White Blood Cell Count average', 'Red Blood Cell Count average',
+       'Class average'];
+    var optionsMap = {
+    sort: columns,
+    where: columns,
+    select: columns
+  };
+  var detailsMap = {
+    sort: ["descending=False", "descending=True"],
+    where: ["are.above({{params.number}})", "are.below({{params.number}})"],
+    select: columns,
+  };
+} else if (columnSelect === 'Hypertension' && functionSelect === 'max') {
+    let columns = ['Hypertension', 'Age max', 'Blood Pressure max', 'Specific Gravity max', 'Albumin max',
+       'Sugar max', 'Blood Glucose Random max', 'Blood Urea max',
+       'Serum Creatinine max', 'Sodium max', 'Potassium max', 'Hemoglobin max',
+       'Packed Cell Volume max', 'White Blood Cell Count max',
+       'Red Blood Cell Count max', 'Class max'];
+    var optionsMap = {
+    sort: columns,
+    where: columns,
+    select: columns
+  };
+  var detailsMap = {
+    sort: ["descending=False", "descending=True"],
+    where: ["are.above({{params.number}})", "are.below({{params.number}})"],
+    select: columns,
+  };
+} else if (columnSelect === 'Hypertension' && functionSelect === 'min') {
+    let columns = ['Hypertension', 'Age min', 'Blood Pressure min', 'Specific Gravity min', 'Albumin min',
+       'Sugar min', 'Blood Glucose Random min', 'Blood Urea min',
+       'Serum Creatinine min', 'Sodium min', 'Potassium min', 'Hemoglobin min',
+       'Packed Cell Volume min', 'White Blood Cell Count min',
+       'Red Blood Cell Count min', 'Class min'];
+    var optionsMap = {
+    sort: columns,
+    where: columns,
+    select: columns
+  };
+  var detailsMap = {
+    sort: ["descending=False", "descending=True"],
+    where: ["are.above({{params.number}})", "are.below({{params.number}})"],
+    select: columns,
+  };
+} else if (columnSelect === 'Coronary Artery Disease' && functionSelect === 'np.average') {
+    let columns = ['Coronary Artery Disease', 'Age average', 'Blood Pressure average', 'Specific Gravity average',
+       'Albumin average', 'Sugar average', 'Blood Glucose Random average',
+       'Blood Urea average', 'Serum Creatinine average', 'Sodium average',
+       'Potassium average', 'Hemoglobin average', 'Packed Cell Volume average',
+       'White Blood Cell Count average', 'Red Blood Cell Count average',
+       'Class average'];
+    var optionsMap = {
+    sort: columns,
+    where: columns,
+    select: columns
+  };
+  var detailsMap = {
+    sort: ["descending=False", "descending=True"],
+    where: ["are.above({{params.number}})", "are.below({{params.number}})"],
+    select: columns,
+  };
+} else if (columnSelect === 'Coronary Artery Disease' && functionSelect === 'max') {
+    let columns = ['Coronary Artery Disease', 'Age max', 'Blood Pressure max', 'Specific Gravity max', 'Albumin max',
+       'Sugar max', 'Blood Glucose Random max', 'Blood Urea max',
+       'Serum Creatinine max', 'Sodium max', 'Potassium max', 'Hemoglobin max',
+       'Packed Cell Volume max', 'White Blood Cell Count max',
+       'Red Blood Cell Count max', 'Class max'];
+    var optionsMap = {
+    sort: columns,
+    where: columns,
+    select: columns
+  };
+  var detailsMap = {
+    sort: ["descending=False", "descending=True"],
+    where: ["are.above({{params.number}})", "are.below({{params.number}})"],
+    select: columns,
+  };
+} else if (columnSelect === 'Coronary Artery Disease' && functionSelect === 'min') {
+    let columns = ['Coronary Artery Disease', 'Age min', 'Blood Pressure min', 'Specific Gravity min', 'Albumin min',
+       'Sugar min', 'Blood Glucose Random min', 'Blood Urea min',
+       'Serum Creatinine min', 'Sodium min', 'Potassium min', 'Hemoglobin min',
+       'Packed Cell Volume min', 'White Blood Cell Count min',
+       'Red Blood Cell Count min', 'Class min'];
+    var optionsMap = {
+    sort: columns,
+    where: columns,
+    select: columns
+  };
+  var detailsMap = {
+    sort: ["descending=False", "descending=True"],
+    where: ["are.above({{params.number}})", "are.below({{params.number}})"],
+    select: columns,
+  };
+} else if (columnSelect === 'Pedal Edema' && functionSelect === 'np.average') {
+    let columns = ['Pedal Edema', 'Age average', 'Blood Pressure average', 'Specific Gravity average',
+       'Albumin average', 'Sugar average', 'Blood Glucose Random average',
+       'Blood Urea average', 'Serum Creatinine average', 'Sodium average',
+       'Potassium average', 'Hemoglobin average', 'Packed Cell Volume average',
+       'White Blood Cell Count average', 'Red Blood Cell Count average',
+       'Class average'];
+    var optionsMap = {
+    sort: columns,
+    where: columns,
+    select: columns
+  };
+  var detailsMap = {
+    sort: ["descending=False", "descending=True"],
+    where: ["are.above({{params.number}})", "are.below({{params.number}})"],
+    select: columns,
+  };
+} else if (columnSelect === 'Pedal Edema' && functionSelect === 'max') {
+    let columns = ['Pedal Edema', 'Age max', 'Blood Pressure max', 'Specific Gravity max', 'Albumin max',
+       'Sugar max', 'Blood Glucose Random max', 'Blood Urea max',
+       'Serum Creatinine max', 'Sodium max', 'Potassium max', 'Hemoglobin max',
+       'Packed Cell Volume max', 'White Blood Cell Count max',
+       'Red Blood Cell Count max', 'Class max'];
+    var optionsMap = {
+    sort: columns,
+    where: columns,
+    select: columns
+  };
+  var detailsMap = {
+    sort: ["descending=False", "descending=True"],
+    where: ["are.above({{params.number}})", "are.below({{params.number}})"],
+    select: columns,
+  };
+} else if (columnSelect === 'Pedal Edema' && functionSelect === 'min') {
+    let columns = ['Pedal Edema', 'Age min', 'Blood Pressure min', 'Specific Gravity min', 'Albumin min',
+       'Sugar min', 'Blood Glucose Random min', 'Blood Urea min',
+       'Serum Creatinine min', 'Sodium min', 'Potassium min', 'Hemoglobin min',
+       'Packed Cell Volume min', 'White Blood Cell Count min',
+       'Red Blood Cell Count min', 'Class min'];
+    var optionsMap = {
+    sort: columns,
+    where: columns,
+    select: columns
+  };
+  var detailsMap = {
+    sort: ["descending=False", "descending=True"],
+    where: ["are.above({{params.number}})", "are.below({{params.number}})"],
+    select: columns,
+  };
+} else if (columnSelect === 'Anemia' && functionSelect === 'np.average') {
+    let columns = ['Anemia', 'Age average', 'Blood Pressure average', 'Specific Gravity average',
+       'Albumin average', 'Sugar average', 'Blood Glucose Random average',
+       'Blood Urea average', 'Serum Creatinine average', 'Sodium average',
+       'Potassium average', 'Hemoglobin average', 'Packed Cell Volume average',
+       'White Blood Cell Count average', 'Red Blood Cell Count average',
+       'Class average'];
+    var optionsMap = {
+    sort: columns,
+    where: columns,
+    select: columns
+  };
+  var detailsMap = {
+    sort: ["descending=False", "descending=True"],
+    where: ["are.above({{params.number}})", "are.below({{params.number}})"],
+    select: columns,
+  };
+} else if (columnSelect === 'Anemia' && functionSelect === 'max') {
+    let columns = ['Anemia', 'Age max', 'Blood Pressure max', 'Specific Gravity max', 'Albumin max',
+       'Sugar max', 'Blood Glucose Random max', 'Blood Urea max',
+       'Serum Creatinine max', 'Sodium max', 'Potassium max', 'Hemoglobin max',
+       'Packed Cell Volume max', 'White Blood Cell Count max',
+       'Red Blood Cell Count max', 'Class max'];
+    var optionsMap = {
+    sort: columns,
+    where: columns,
+    select: columns
+  };
+  var detailsMap = {
+    sort: ["descending=False", "descending=True"],
+    where: ["are.above({{params.number}})", "are.below({{params.number}})"],
+    select: columns,
+  };
+} else if (columnSelect === 'Anemia' && functionSelect === 'min') {
+    let columns = ['Anemia', 'Age min', 'Blood Pressure min', 'Specific Gravity min', 'Albumin min',
+       'Sugar min', 'Blood Glucose Random min', 'Blood Urea min',
+       'Serum Creatinine min', 'Sodium min', 'Potassium min', 'Hemoglobin min',
+       'Packed Cell Volume min', 'White Blood Cell Count min',
+       'Red Blood Cell Count min', 'Class min'];
+    var optionsMap = {
+    sort: columns,
+    where: columns,
+    select: columns
+  };
+  var detailsMap = {
+    sort: ["descending=False", "descending=True"],
+    where: ["are.above({{params.number}})", "are.below({{params.number}})"],
+    select: columns,
+  };
+} else {
+  let columns = ['...']
+  var optionsMap = {
+    sort: columns,
+    where: columns,
+    select: columns
+  };
+  var detailsMap = {
+    sort: columns,
+    where: columns,
+    select: columns,
+  };
+}
+
+  // Update function to populate dropdown
+  function updateDropdown(dropdown, options) {
+    dropdown.innerHTML = ''; // Clear existing options
+    if (options) {
+      options.forEach(function(item) {
+        var option = document.createElement('option');
+        option.value = item //.toLowerCase();
+        option.textContent = item;
+        dropdown.appendChild(option);
+      });
+    } else {
+      var placeholderOption = document.createElement('option');
+      placeholderOption.textContent = "parameter";
+      dropdown.appendChild(placeholderOption);
+    }
+  }
+
+  // Update both dropdowns based on the selected category
+  updateDropdown(secondDropdown, optionsMap[selectedCategory]);
+  updateDropdown(thirdDropdown, detailsMap[selectedCategory]);
+});
+
+
+
+            const csvData = `Age,Blood Pressure,Specific Gravity,Albumin,Sugar,Red Blood Cells,Pus Cell,Pus Cell clumps,Bacteria,Blood Glucose Random,Blood Urea,Serum Creatinine,Sodium,Potassium,Hemoglobin,Packed Cell Volume,White Blood Cell Count,Red Blood Cell Count,Hypertension,Diabetes Mellitus,Coronary Artery Disease,Appetite,Pedal Edema,Anemia,Class
+48,70,1.005,4,0,normal,abnormal,present,notpresent,117,56,3.8,111,2.5,11.2,32,6700,3.9,yes,no,no,poor,yes,yes,1
+53,90,1.020,2,0,abnormal,abnormal,present,notpresent,70,107,7.2,114,3.7,9.5,29,12100,3.7,yes,yes,no,poor,no,yes,1
+63,70,1.010,3,0,abnormal,abnormal,present,notpresent,380,60,2.7,131,4.2,10.8,32,4500,3.8,yes,yes,no,poor,yes,no,1
+68,80,1.010,3,2,normal,abnormal,present,present,157,90,4.1,130,6.4,5.6,16,11000,2.6,yes,yes,yes,poor,yes,no,1
+61,80,1.015,2,0,abnormal,abnormal,notpresent,notpresent,173,148,3.9,135,5.2,7.7,24,9200,3.2,yes,yes,yes,poor,yes,yes,1
+48,80,1.025,4,0,normal,abnormal,notpresent,notpresent,95,163,7.7,136,3.8,9.8,32,6900,3.4,yes,no,no,good,no,yes,1
+69,70,1.010,3,4,normal,abnormal,notpresent,notpresent,264,87,2.7,130,4.0,12.5,37,9600,4.1,yes,yes,yes,good,yes,no,1
+73,70,1.005,0,0,normal,normal,notpresent,notpresent,70,32,0.9,125,4.0,10.0,29,18900,3.5,yes,yes,no,good,yes,no,1
+73,80,1.020,2,0,abnormal,abnormal,notpresent,notpresent,253,142,4.6,138,5.8,10.5,33,7200,4.3,yes,yes,yes,good,no,no,1
+46,60,1.010,1,0,normal,normal,notpresent,notpresent,163,92,3.3,141,4.0,9.8,28,14600,3.2,yes,yes,no,good,no,no,1
+56,90,1.015,2,0,abnormal,abnormal,notpresent,notpresent,129,107,6.7,131,4.8,9.1,29,6400,3.4,yes,no,no,good,no,no,1`;
+
+            const dSugarAve = `Sugar,Age average,Blood Pressure average,Specific Gravity average,Albumin average,Red Blood Cells average,Pus Cell average,Pus Cell clumps average,Bacteria average,Blood Glucose Random average,Blood Urea average,Serum Creatinine average,Sodium average,Potassium average,Hemoglobin average,Packed Cell Volume average,White Blood Cell Count average,Red Blood Cell Count average,Hypertension average,Diabetes Mellitus average,Coronary Artery Disease average,Appetite average,Pedal Edema average,Anemia average,Class average
+0,48.2142857143,72.9285714286,1.02089285714,0.485714285714,,,,,114.864285714,46.2857142857,1.71214285714,139.521428571,4.35,14.1971428571,43.5642857143,8200.0,5.06214285714,,,,,,,0.178571428571
+1,57.6666666667,75.0,1.01083333333,3.33333333333,,,,,233.333333333,122.833333333,6.51666666667,132.666666667,4.5,9.3,28.5,10433.3333333,3.45,,,,,,,1.0
+2,64.3333333333,96.6666666667,1.01333333333,3.33333333333,,,,,233.666666667,73.5,6.01666666667,137.5,4.63333333333,9.03333333333,27.0,11916.6666667,3.53333333333,,,,,,,1.0
+3,60.0,76.6666666667,1.01166666667,3.0,,,,,287.333333333,105.666666667,4.53333333333,130.333333333,18.4666666667,10.0333333333,29.3333333333,8900.0,3.43333333333,,,,,,,1.0
+4,54.5,70.0,1.0125,3.0,,,,,258.5,118.5,7.3,131.0,4.8,11.7,34.0,9200.0,3.75,,,,,,,1.0
+5,60.0,90.0,1.01,3.0,,,,,490.0,95.0,2.7,131.0,3.8,11.5,35.0,12000.0,4.5,,,,,,,1.0
+`;
+          const dSugarMax = `Sugar,Age max,Blood Pressure max,Specific Gravity max,Albumin max,Red Blood Cells max,Pus Cell max,Pus Cell clumps max,Bacteria max,Blood Glucose Random max,Blood Urea max,Serum Creatinine max,Sodium max,Potassium max,Hemoglobin max,Packed Cell Volume max,White Blood Cell Count max,Red Blood Cell Count max,Hypertension max,Diabetes Mellitus max,Coronary Artery Disease max,Appetite max,Pedal Edema max,Anemia max,Class max
+0,83,110,1.025,4,normal,normal,present,present,380,215,15.2,150,7.6,17.8,54,19100,8.0,yes,yes,yes,poor,yes,yes,1
+1,64,90,1.015,4,normal,normal,present,present,288,309,14.2,137,6.5,16.1,52,15200,5.6,yes,yes,no,poor,yes,yes,1
+2,73,100,1.02,4,normal,normal,present,present,295,132,12.8,143,6.4,13.0,40,26400,4.2,yes,yes,yes,poor,yes,yes,1
+3,69,90,1.015,4,normal,abnormal,present,present,424,166,6.3,138,47.0,12.6,37,11500,4.1,yes,yes,yes,good,yes,yes,1
+4,69,70,1.015,3,normal,normal,notpresent,notpresent,264,150,11.9,132,5.6,12.5,37,9600,4.1,yes,yes,yes,poor,yes,no,1
+5,60,90,1.01,3,abnormal,normal,notpresent,present,490,95,2.7,131,3.8,11.5,35,12000,4.5,yes,yes,no,good,no,no,1
+`
+
+          const dSugarMin = `Sugar,Age min,Blood Pressure min,Specific Gravity min,Albumin min,Red Blood Cells min,Pus Cell min,Pus Cell clumps min,Bacteria min,Blood Glucose Random min,Blood Urea min,Serum Creatinine min,Sodium min,Potassium min,Hemoglobin min,Packed Cell Volume min,White Blood Cell Count min,Red Blood Cell Count min,Hypertension min,Diabetes Mellitus min,Coronary Artery Disease min,Appetite min,Pedal Edema min,Anemia min,Class min
+0,6,50,1.005,0,abnormal,abnormal,notpresent,notpresent,70,10,0.4,111,2.5,7.1,22,3800,2.1,no,no,no,good,no,no,0
+1,55,60,1.01,2,abnormal,abnormal,notpresent,notpresent,176,26,1.7,124,3.0,3.1,9,5400,2.1,no,no,no,good,no,no,1
+2,59,80,1.01,2,abnormal,abnormal,notpresent,notpresent,157,35,3.2,130,2.9,5.6,16,7000,2.6,yes,no,no,good,no,no,1
+3,52,70,1.01,1,abnormal,abnormal,notpresent,notpresent,214,55,1.7,120,3.9,8.1,23,5000,2.9,yes,yes,no,good,no,no,1
+4,40,70,1.01,3,normal,abnormal,notpresent,notpresent,253,87,2.7,130,4.0,10.9,31,8800,3.4,yes,yes,no,good,yes,no,1
+5,60,90,1.01,3,abnormal,normal,notpresent,present,490,95,2.7,131,3.8,11.5,35,12000,4.5,yes,yes,no,good,no,no,1
+`
+          const dAlbuminAve = `Albumin,Age average,Blood Pressure average,Specific Gravity average,Sugar average,Red Blood Cells average,Pus Cell average,Pus Cell clumps average,Bacteria average,Blood Glucose Random average,Blood Urea average,Serum Creatinine average,Sodium average,Potassium average,Hemoglobin average,Packed Cell Volume average,White Blood Cell Count average,Red Blood Cell Count average,Hypertension average,Diabetes Mellitus average,Coronary Artery Disease average,Appetite average,Pedal Edema average,Anemia average,Class average
+0,46.9051724138,71.8103448276,1.02237068966,0.0,,,,,107.612068966,32.9913793103,0.871551724138,141.629310345,4.30862068966,15.1077586207,46.3620689655,7795.68965517,5.32327586207,,,,,,,0.00862068965517
+1,54.6666666667,70.0,1.01,1.0,,,,,296.666666667,60.6666666667,2.1,133.666666667,4.0,10.9333333333,33.3333333333,11900.0,3.86666666667,,,,,,,1.0
+2,57.3333333333,86.6666666667,1.015,0.333333333333,,,,,169.777777778,120.777777778,5.94444444444,133.222222222,4.46666666667,9.71111111111,29.1111111111,11688.8888889,3.57777777778,,,,,,,1.0
+3,61.2666666667,77.3333333333,1.01233333333,1.26666666667,,,,,222.4,107.666666667,6.48,129.066666667,4.6,9.62666666667,29.4,9060.0,3.38666666667,,,,,,,1.0
+4,52.7333333333,81.3333333333,1.013,1.0,,,,,167.666666667,106.4,5.84666666667,131.533333333,7.44,9.7,29.4666666667,10540.0,4.05333333333,,,,,,,1.0
+`
+          const dAlbuminMax = `Albumin,Age max,Blood Pressure max,Specific Gravity max,Sugar max,Red Blood Cells max,Pus Cell max,Pus Cell clumps max,Bacteria max,Blood Glucose Random max,Blood Urea max,Serum Creatinine max,Sodium max,Potassium max,Hemoglobin max,Packed Cell Volume max,White Blood Cell Count max,Red Blood Cell Count max,Hypertension max,Diabetes Mellitus max,Coronary Artery Disease max,Appetite max,Pedal Edema max,Anemia max,Class max
+0,80,80,1.025,0,normal,normal,notpresent,notpresent,140,50,1.2,150,5.0,17.8,54,18900,6.5,yes,yes,no,good,yes,no,1
+1,59,80,1.01,3,normal,normal,notpresent,notpresent,424,92,3.3,141,4.5,12.6,37,14600,4.3,yes,yes,yes,poor,no,no,1
+2,73,100,1.025,2,normal,normal,present,present,280,235,14.2,143,5.8,13.0,40,19100,4.3,yes,yes,yes,poor,yes,yes,1
+3,83,110,1.025,5,normal,normal,present,present,490,215,15.2,140,7.6,12.6,39,15700,4.5,yes,yes,yes,poor,yes,yes,1
+4,71,100,1.025,3,normal,normal,present,present,255,309,13.3,140,47.0,16.1,52,26400,8.0,yes,yes,yes,poor,yes,yes,1
+`
+          const dAlbuminMin = `Albumin,Age min,Blood Pressure min,Specific Gravity min,Sugar min,Red Blood Cells min,Pus Cell min,Pus Cell clumps min,Bacteria min,Blood Glucose Random min,Blood Urea min,Serum Creatinine min,Sodium min,Potassium min,Hemoglobin min,Packed Cell Volume min,White Blood Cell Count min,Red Blood Cell Count min,Hypertension min,Diabetes Mellitus min,Coronary Artery Disease min,Appetite min,Pedal Edema min,Anemia min,Class min
+0,12,60,1.005,0,normal,normal,notpresent,notpresent,70,10,0.4,125,3.3,10.0,29,4300,3.5,no,no,no,good,no,no,0
+1,46,60,1.01,0,abnormal,abnormal,notpresent,notpresent,163,35,1.3,122,3.5,9.8,28,10200,3.2,no,yes,no,good,no,no,1
+2,45,70,1.01,0,abnormal,abnormal,notpresent,notpresent,70,35,2.2,114,3.4,7.7,22,6400,2.7,no,no,no,good,no,no,1
+3,40,50,1.01,0,abnormal,abnormal,notpresent,notpresent,76,36,1.7,114,2.9,5.6,16,3800,2.1,no,no,no,good,no,no,1
+4,6,60,1.005,0,abnormal,abnormal,notpresent,notpresent,94,26,1.0,111,2.5,3.1,9,5000,2.1,no,no,no,good,no,no,1
+` 
+          const dBloodAve = `Blood Pressure,Age average,Specific Gravity average,Albumin average,Sugar average,Red Blood Cells average,Pus Cell average,Pus Cell clumps average,Bacteria average,Blood Glucose Random average,Blood Urea average,Serum Creatinine average,Sodium average,Potassium average,Hemoglobin average,Packed Cell Volume average,White Blood Cell Count average,Red Blood Cell Count average,Hypertension average,Diabetes Mellitus average,Coronary Artery Disease average,Appetite average,Pedal Edema average,Anemia average,Class average
+50,59.0,1.01,3.0,0.0,,,,,241.0,191.0,12.0,114.0,2.9,9.6,31.0,15700.0,3.8,,,,,,,1.0
+60,46.575,1.02075,0.4,0.05,,,,,116.925,39.7,1.1375,141.85,4.3425,14.1675,44.925,8702.5,5.1325,,,,,,,0.125
+70,54.5945945946,1.01932432432,0.972972972973,0.405405405405,,,,,138.027027027,48.5405405405,2.07297297297,137.378378378,4.34054054054,13.7189189189,41.4864864865,8529.72972973,4.77297297297,,,,,,,0.351351351351
+80,46.6825396825,1.02166666667,0.301587301587,0.047619047619,,,,,117.888888889,40.6825396825,1.33968253968,140.222222222,4.40476190476,14.6698412698,44.4761904762,7644.44444444,5.14920634921,,,,,,,0.111111111111
+90,51.4444444444,1.01222222222,2.77777777778,1.11111111111,,,,,189.111111111,146.666666667,6.98888888889,128.888888889,9.18888888889,8.57777777778,25.0,10522.2222222,3.35555555556,,,,,,,1.0
+100,62.4285714286,1.01357142857,3.42857142857,1.42857142857,,,,,213.142857143,90.5714285714,7.01428571429,136.142857143,4.21428571429,9.81428571429,29.5714285714,11214.2857143,4.3,,,,,,,1.0
+110,48.0,1.015,3.0,0.0,,,,,106.0,215.0,15.2,120.0,5.7,8.6,26.0,5000.0,2.5,,,,,,,1.0
+`
+          const dBloodMax = `Blood Pressure,Age max,Specific Gravity max,Albumin max,Sugar max,Red Blood Cells max,Pus Cell max,Pus Cell clumps max,Bacteria max,Blood Glucose Random max,Blood Urea max,Serum Creatinine max,Sodium max,Potassium max,Hemoglobin max,Packed Cell Volume max,White Blood Cell Count max,Red Blood Cell Count max,Hypertension max,Diabetes Mellitus max,Coronary Artery Disease max,Appetite max,Pedal Edema max,Anemia max,Class max
+50,59,1.01,3,0,normal,abnormal,notpresent,notpresent,241,191,12.0,114,2.9,9.6,31,15700,3.8,no,yes,no,good,yes,no,1
+60,74,1.025,4,1,normal,normal,present,present,288,125,5.3,150,5.4,17.8,54,16700,6.4,yes,yes,no,poor,yes,yes,1
+70,83,1.025,4,4,normal,normal,present,present,424,186,15.0,150,7.6,17.4,54,19100,6.5,yes,yes,yes,poor,yes,yes,1
+80,80,1.025,4,2,normal,normal,present,present,303,163,8.5,150,6.4,17.8,54,11000,6.5,yes,yes,yes,poor,yes,yes,1
+90,60,1.02,4,5,normal,normal,present,present,490,309,14.2,136,47.0,11.5,35,16300,4.5,yes,yes,no,poor,yes,yes,1
+100,73,1.02,4,2,normal,normal,present,present,295,158,12.8,143,5.7,13.0,40,26400,8.0,yes,yes,yes,poor,yes,yes,1
+110,48,1.015,3,0,abnormal,normal,present,notpresent,106,215,15.2,120,5.7,8.6,26,5000,2.5,yes,no,yes,good,no,yes,1
+`
+          const dBloodMin = `Blood Pressure,Age min,Specific Gravity min,Albumin min,Sugar min,Red Blood Cells min,Pus Cell min,Pus Cell clumps min,Bacteria min,Blood Glucose Random min,Blood Urea min,Serum Creatinine min,Sodium min,Potassium min,Hemoglobin min,Packed Cell Volume min,White Blood Cell Count min,Red Blood Cell Count min,Hypertension min,Diabetes Mellitus min,Coronary Artery Disease min,Appetite min,Pedal Edema min,Anemia min,Class min
+50,59,1.01,3,0,normal,abnormal,notpresent,notpresent,241,191,12.0,114,2.9,9.6,31,15700,3.8,no,yes,no,good,yes,no,1
+60,6,1.01,0,0,abnormal,abnormal,notpresent,notpresent,79,17,0.4,130,3.0,7.9,25,5200,3.0,no,no,no,good,no,no,0
+70,20,1.005,0,0,abnormal,abnormal,notpresent,notpresent,70,16,0.5,111,2.5,7.1,22,3800,2.1,no,no,no,good,no,no,0
+80,12,1.005,0,0,abnormal,abnormal,notpresent,notpresent,70,10,0.5,122,3.3,5.6,16,4300,2.6,no,no,no,good,no,no,0
+90,21,1.01,2,0,abnormal,abnormal,notpresent,notpresent,70,40,1.7,114,3.4,3.1,9,5000,2.1,no,no,no,good,no,no,1
+100,49,1.01,2,0,abnormal,abnormal,notpresent,notpresent,118,35,3.2,122,2.9,7.3,20,7000,3.2,yes,no,no,good,no,no,1
+110,48,1.015,3,0,abnormal,normal,present,notpresent,106,215,15.2,120,5.7,8.6,26,5000,2.5,yes,no,yes,good,no,yes,1
+`
+
+          const dAgeAve = `Age,Blood Pressure average,Specific Gravity average,Albumin average,Sugar average,Red Blood Cells average,Pus Cell average,Pus Cell clumps average,Bacteria average,Blood Glucose Random average,Blood Urea average,Serum Creatinine average,Sodium average,Potassium average,Hemoglobin average,Packed Cell Volume average,White Blood Cell Count average,Red Blood Cell Count average,Hypertension average,Diabetes Mellitus average,Coronary Artery Disease average,Appetite average,Pedal Edema average,Anemia average,Class average
+6,60.0,1.01,4.0,0.0,,,,,94.0,67.0,1.0,135.0,4.9,9.9,30.0,16700.0,4.8,,,,,,,1.0
+12,80.0,1.02,0.0,0.0,,,,,100.0,26.0,0.6,137.0,4.4,15.8,49.0,6600.0,5.4,,,,,,,0.0
+15,80.0,1.025,0.0,0.0,,,,,93.0,17.0,0.9,136.0,3.9,16.7,50.0,6200.0,5.2,,,,,,,0.0
+17,60.0,1.025,0.0,0.0,,,,,114.0,50.0,1.0,135.0,4.9,14.2,51.0,7200.0,5.9,,,,,,,0.0
+20,70.0,1.02,0.0,0.0,,,,,123.0,44.0,1.0,135.0,3.8,14.6,44.0,5500.0,4.8,,,,,,,0.0
+21,90.0,1.01,4.0,0.0,,,,,107.0,40.0,1.7,125.0,3.5,8.3,23.0,12400.0,3.9,,,,,,,1.0
+22,60.0,1.025,0.0,0.0,,,,,97.0,18.0,1.2,138.0,4.3,13.5,42.0,7900.0,6.4,,,,,,,0.0
+23,75.0,1.0225,0.0,0.0,,,,,93.75,35.0,1.025,145.5,4.4,16.0,47.75,6900.0,5.025,,,,,,,0.0
+24,70.0,1.025,0.0,0.0,,,,,140.0,23.0,0.6,140.0,4.7,16.3,48.0,5800.0,5.6,,,,,,,0.0
+25,75.0,1.0225,0.0,0.0,,,,,104.5,30.5,0.85,139.0,4.2,14.15,48.0,6950.0,5.1,,,,,,,0.0
+28,60.0,1.025,0.0,0.0,,,,,79.0,50.0,0.5,145.0,5.0,17.6,51.0,6500.0,5.0,,,,,,,0.0
+29,80.0,1.02,0.0,0.0,,,,,76.5,32.5,0.8,138.5,3.4,15.6,47.0,7650.0,5.25,,,,,,,0.0
+30,76.0,1.023,0.0,0.0,,,,,103.6,35.6,0.7,145.2,4.64,14.58,45.6,9740.0,5.3,,,,,,,0.0
+32,65.0,1.025,0.0,0.0,,,,,101.0,23.0,0.75,144.5,4.6,14.45,42.0,6750.0,5.5,,,,,,,0.0
+33,75.0,1.025,0.0,0.0,,,,,99.25,29.75,0.95,141.75,4.1,14.775,46.25,7750.0,5.1,,,,,,,0.0
+34,70.0,1.02333333333,0.0,0.0,,,,,99.6666666667,38.0,0.966666666667,141.0,4.4,14.7333333333,49.0,8400.0,5.76666666667,,,,,,,0.0
+35,70.0,1.0225,0.0,0.0,,,,,104.5,35.0,0.85,135.0,4.45,15.4,44.0,5050.0,5.7,,,,,,,0.0
+36,80.0,1.025,0.0,0.0,,,,,85.0,16.0,1.1,142.0,4.1,15.6,44.0,5800.0,6.3,,,,,,,0.0
+37,60.0,1.0225,0.0,0.0,,,,,110.0,41.0,0.95,138.0,4.5,15.6,49.0,6250.0,5.45,,,,,,,0.0
+38,70.0,1.02,0.0,0.0,,,,,95.0,27.5,0.6,141.0,3.6,13.8,45.0,8200.0,6.1,,,,,,,0.0
+39,65.0,1.0225,0.0,0.0,,,,,108.5,41.5,0.6,147.5,5.0,14.6,46.0,7600.0,4.6,,,,,,,0.0
+40,75.0,1.02,1.5,2.0,,,,,196.5,80.0,6.55,133.5,5.3,12.95,39.5,9600.0,3.95,,,,,,,0.5
+41,76.6666666667,1.02166666667,0.0,0.0,,,,,119.666666667,37.0,0.7,139.333333333,5.0,16.9666666667,44.6666666667,7533.33333333,5.63333333333,,,,,,,0.0
+42,75.0,1.02125,0.0,0.0,,,,,99.5,26.75,0.825,141.0,3.95,15.35,47.75,7075.0,5.375,,,,,,,0.0
+43,70.0,1.025,0.0,0.0,,,,,109.0,36.5,0.85,140.75,4.825,15.15,47.5,7325.0,5.075,,,,,,,0.0
+44,63.3333333333,1.02333333333,0.0,0.0,,,,,94.3333333333,39.6666666667,0.766666666667,142.0,4.53333333333,15.3,47.6666666667,7466.66666667,5.83333333333,,,,,,,0.0
+45,76.6666666667,1.02333333333,0.666666666667,0.0,,,,,105.333333333,49.0,1.33333333333,140.0,4.4,14.0333333333,40.3333333333,12266.6666667,4.53333333333,,,,,,,0.333333333333
+46,62.5,1.02,0.25,0.0,,,,,122.0,53.0,1.375,140.0,4.35,13.775,41.25,9400.0,4.975,,,,,,,0.25
+47,65.0,1.02125,0.0,0.0,,,,,121.75,27.0,0.95,142.25,4.15,14.325,42.75,7100.0,5.25,,,,,,,0.0
+48,80.0,1.01714285714,2.14285714286,0.0,,,,,108.571428571,96.0,5.44285714286,132.0,4.47142857143,12.1571428571,38.4285714286,7100.0,4.5,,,,,,,0.571428571429
+49,90.0,1.015,1.5,0.0,,,,,125.5,95.0,6.5,130.5,3.55,12.55,32.5,7600.0,4.2,,,,,,,0.5
+50,83.3333333333,1.01666666667,0.666666666667,0.0,,,,,120.666666667,98.0,3.53333333333,141.0,4.76666666667,12.1666666667,38.3333333333,12100.0,4.1,,,,,,,0.333333333333
+51,70.0,1.0225,0.0,0.0,,,,,96.5,26.5,1.0,139.5,3.7,14.25,47.5,8900.0,5.8,,,,,,,0.0
+52,82.5,1.02,1.0,0.75,,,,,144.0,60.75,2.2,136.75,14.95,13.7,42.5,5075.0,4.625,,,,,,,0.25
+53,90.0,1.02,2.0,0.0,,,,,70.0,107.0,7.2,114.0,3.7,9.5,29.0,12100.0,3.7,,,,,,,1.0
+55,81.4285714286,1.01785714286,0.714285714286,0.285714285714,,,,,158.857142857,67.1428571429,3.25714285714,139.714285714,4.48571428571,13.7714285714,40.0,8571.42857143,4.71428571429,,,,,,,0.285714285714
+56,78.0,1.018,2.0,0.4,,,,,157.2,95.0,4.8,134.6,4.96,11.36,35.4,7480.0,4.44,,,,,,,0.6
+57,70.0,1.02125,0.0,0.0,,,,,122.25,33.0,1.175,145.5,4.6,15.325,43.5,8550.0,5.6,,,,,,,0.0
+58,75.0,1.0225,0.0,0.0,,,,,105.25,33.0,1.15,141.75,3.7,15.3,49.0,7675.0,5.675,,,,,,,0.0
+59,75.0,1.015,2.0,0.875,,,,,224.25,87.625,5.975,133.375,4.6375,10.875,34.375,11250.0,3.9375,,,,,,,0.75
+60,76.6666666667,1.01666666667,1.33333333333,1.0,,,,,204.833333333,42.3333333333,1.36666666667,137.166666667,4.23333333333,12.3666666667,38.0,11600.0,4.6,,,,,,,0.5
+61,73.3333333333,1.02166666667,0.666666666667,0.0,,,,,142.0,71.6666666667,1.86666666667,138.0,4.1,12.9333333333,41.0,8466.66666667,4.46666666667,,,,,,,0.333333333333
+62,76.6666666667,1.02333333333,1.0,0.0,,,,,110.666666667,40.3333333333,1.03333333333,140.333333333,3.9,15.5,44.3333333333,6000.0,4.7,,,,,,,0.333333333333
+63,77.5,1.01625,1.25,0.5,,,,,225.75,39.25,1.85,142.5,4.4,13.425,41.25,7400.0,4.45,,,,,,,0.5
+64,72.5,1.01625,2.0,0.75,,,,,151.25,41.5,3.225,143.0,4.525,11.4,36.5,7375.0,4.075,,,,,,,0.5
+65,60.0,1.02,0.0,0.0,,,,,109.0,39.0,1.0,144.0,3.5,13.9,48.0,9600.0,4.8,,,,,,,0.0
+66,70.0,1.0225,0.0,0.0,,,,,100.5,17.5,0.9,137.5,3.75,14.8,41.5,8150.0,5.4,,,,,,,0.0
+68,70.0,1.0175,1.5,1.0,,,,,141.0,65.5,2.6,134.5,5.1,11.5,33.0,8850.0,4.35,,,,,,,0.5
+69,70.0,1.01333333333,2.33333333333,2.33333333333,,,,,187.0,75.0,3.4,129.666666667,3.86666666667,12.7,38.3333333333,10133.3333333,4.26666666667,,,,,,,0.666666666667
+70,90.0,1.0175,2.0,0.0,,,,,96.0,83.0,2.9,139.5,4.7,13.55,42.5,9050.0,6.8,,,,,,,0.5
+71,66.6666666667,1.015,2.33333333333,0.0,,,,,139.333333333,75.0,3.23333333333,138.0,4.76666666667,12.1666666667,37.3333333333,10200.0,4.63333333333,,,,,,,0.666666666667
+72,60.0,1.02,0.0,0.0,,,,,109.0,26.0,0.9,150.0,4.9,15.0,52.0,10500.0,5.5,,,,,,,0.0
+73,78.0,1.016,1.0,0.4,,,,,172.6,71.2,2.46,138.0,3.94,11.92,37.8,10680.0,4.08,,,,,,,0.6
+74,60.0,1.02,0.0,0.0,,,,,88.0,50.0,0.6,147.0,3.7,17.2,53.0,6000.0,4.5,,,,,,,0.0
+75,70.0,1.02,0.0,0.0,,,,,107.0,48.0,0.8,144.0,3.5,13.6,46.0,10300.0,4.8,,,,,,,0.0
+79,80.0,1.025,0.0,0.0,,,,,111.0,44.0,1.2,146.0,3.6,16.3,40.0,8000.0,6.4,,,,,,,0.0
+80,80.0,1.025,0.0,0.0,,,,,119.0,46.0,0.7,141.0,4.9,13.9,49.0,5100.0,5.0,,,,,,,0.0
+83,70.0,1.02,3.0,0.0,,,,,102.0,60.0,2.6,115.0,5.7,8.7,26.0,12800.0,3.1,,,,,,,1.0
+`
+          const dAgeMax = `Age,Blood Pressure max,Specific Gravity max,Albumin max,Sugar max,Red Blood Cells max,Pus Cell max,Pus Cell clumps max,Bacteria max,Blood Glucose Random max,Blood Urea max,Serum Creatinine max,Sodium max,Potassium max,Hemoglobin max,Packed Cell Volume max,White Blood Cell Count max,Red Blood Cell Count max,Hypertension max,Diabetes Mellitus max,Coronary Artery Disease max,Appetite max,Pedal Edema max,Anemia max,Class max
+6,60,1.01,4,0,abnormal,abnormal,notpresent,present,94,67,1.0,135,4.9,9.9,30,16700,4.8,no,no,no,poor,no,no,1
+12,80,1.02,0,0,normal,normal,notpresent,notpresent,100,26,0.6,137,4.4,15.8,49,6600,5.4,no,no,no,good,no,no,0
+15,80,1.025,0,0,normal,normal,notpresent,notpresent,93,17,0.9,136,3.9,16.7,50,6200,5.2,no,no,no,good,no,no,0
+17,60,1.025,0,0,normal,normal,notpresent,notpresent,114,50,1.0,135,4.9,14.2,51,7200,5.9,no,no,no,good,no,no,0
+20,70,1.02,0,0,normal,normal,notpresent,notpresent,123,44,1.0,135,3.8,14.6,44,5500,4.8,no,no,no,good,no,no,0
+21,90,1.01,4,0,normal,abnormal,present,present,107,40,1.7,125,3.5,8.3,23,12400,3.9,no,no,no,good,no,yes,1
+22,60,1.025,0,0,normal,normal,notpresent,notpresent,97,18,1.2,138,4.3,13.5,42,7900,6.4,no,no,no,good,no,no,0
+23,80,1.025,0,0,normal,normal,notpresent,notpresent,111,46,1.2,150,5.0,17.7,52,9800,5.5,no,no,no,good,no,no,0
+24,70,1.025,0,0,normal,normal,notpresent,notpresent,140,23,0.6,140,4.7,16.3,48,5800,5.6,no,no,no,good,no,no,0
+25,80,1.025,0,0,normal,normal,notpresent,notpresent,121,42,1.2,142,4.9,15.0,48,7000,5.3,no,no,no,good,no,no,0
+28,60,1.025,0,0,normal,normal,notpresent,notpresent,79,50,0.5,145,5.0,17.6,51,6500,5.0,no,no,no,good,no,no,0
+29,80,1.02,0,0,normal,normal,notpresent,notpresent,83,49,0.9,139,3.5,17.5,54,9900,5.8,no,no,no,good,no,no,0
+30,80,1.025,0,0,normal,normal,notpresent,notpresent,131,42,1.0,150,5.0,16.7,52,10700,5.9,no,no,no,good,no,no,0
+32,70,1.025,0,0,normal,normal,notpresent,notpresent,102,29,1.1,147,4.7,14.6,43,6800,5.9,no,no,no,good,no,no,0
+33,80,1.025,0,0,normal,normal,notpresent,notpresent,128,38,1.2,146,5.0,16.9,52,10300,6.0,no,no,no,good,no,no,0
+34,80,1.025,0,0,normal,normal,notpresent,notpresent,121,49,1.2,144,4.8,17.1,52,9200,6.3,no,no,no,good,no,no,0
+35,80,1.025,0,0,normal,normal,notpresent,notpresent,105,39,1.2,135,5.0,16.1,45,5800,6.2,no,no,no,good,no,no,0
+36,80,1.025,0,0,normal,normal,notpresent,notpresent,85,16,1.1,142,4.1,15.6,44,5800,6.3,no,no,no,good,no,no,0
+37,60,1.025,0,0,normal,normal,notpresent,notpresent,111,47,1.1,141,4.9,16.2,50,7000,5.7,no,no,no,good,no,no,0
+38,80,1.02,0,0,normal,normal,notpresent,notpresent,99,36,0.7,147,3.7,14.0,46,9100,6.4,no,no,no,good,no,no,0
+39,70,1.025,0,0,normal,normal,notpresent,notpresent,131,46,0.6,150,5.0,15.6,51,9400,4.7,no,no,no,good,no,no,0
+40,80,1.025,3,4,normal,normal,notpresent,notpresent,253,150,11.9,135,5.6,15.0,48,10400,4.5,yes,yes,no,poor,yes,no,1
+41,80,1.025,0,0,normal,normal,notpresent,notpresent,125,48,0.8,140,5.0,17.1,52,9100,5.9,no,no,no,good,no,no,0
+42,80,1.025,0,0,normal,normal,notpresent,notpresent,132,32,1.2,143,4.7,16.6,54,8400,6.2,no,no,no,good,no,no,0
+43,80,1.025,0,0,normal,normal,notpresent,notpresent,130,46,1.1,144,5.0,17.8,54,7800,5.5,no,no,no,good,no,no,0
+44,70,1.025,0,0,normal,normal,notpresent,notpresent,96,46,0.9,147,4.9,16.9,52,7700,6.3,no,no,no,good,no,no,0
+45,80,1.025,2,0,normal,normal,present,notpresent,117,52,2.2,147,5.0,16.2,46,19100,5.2,no,no,no,good,no,no,1
+46,70,1.025,1,0,normal,normal,notpresent,notpresent,163,92,3.3,142,5.0,16.4,50,14600,6.5,yes,yes,no,good,no,no,1
+47,80,1.025,0,0,normal,normal,notpresent,notpresent,137,44,1.2,150,4.9,15.8,45,8300,5.7,no,no,no,good,no,no,0
+48,110,1.025,4,0,normal,normal,present,present,133,215,15.2,146,5.7,16.8,51,9500,6.5,yes,yes,yes,poor,yes,yes,1
+49,100,1.02,3,0,normal,normal,notpresent,notpresent,129,158,11.8,139,3.9,17.0,41,9600,4.9,yes,yes,no,poor,yes,yes,1
+50,90,1.02,2,0,normal,normal,present,present,137,208,9.2,150,5.0,14.2,48,16300,5.0,no,no,no,poor,yes,yes,1
+51,80,1.025,0,0,normal,normal,notpresent,notpresent,99,38,1.2,144,3.7,15.5,49,9500,6.4,no,no,no,good,no,no,0
+52,90,1.025,4,3,normal,normal,notpresent,notpresent,224,166,5.6,140,47.0,16.5,52,6300,5.7,yes,yes,no,good,no,yes,1
+53,90,1.02,2,0,abnormal,abnormal,present,notpresent,70,107,7.2,114,3.7,9.5,29,12100,3.7,yes,yes,no,poor,no,yes,1
+55,90,1.025,3,1,normal,normal,present,present,273,235,14.2,150,5.0,17.3,52,14600,6.0,yes,yes,no,poor,yes,yes,1
+56,90,1.025,4,1,normal,normal,present,notpresent,210,309,13.3,147,6.5,16.1,52,12500,5.6,yes,yes,no,poor,yes,yes,1
+57,80,1.025,0,0,normal,normal,notpresent,notpresent,133,49,1.2,150,4.7,15.7,46,11000,6.2,no,no,no,good,no,no,0
+58,80,1.025,0,0,normal,normal,notpresent,notpresent,131,50,1.2,147,4.3,16.4,53,9100,6.5,no,no,no,good,no,no,0
+59,100,1.025,4,3,normal,normal,notpresent,notpresent,424,191,15.0,147,7.6,15.3,54,26400,4.9,yes,yes,yes,poor,yes,yes,1
+60,90,1.025,3,5,normal,normal,present,present,490,95,2.7,146,5.2,15.0,48,15200,5.6,yes,yes,no,poor,no,yes,1
+61,80,1.025,2,0,normal,normal,notpresent,notpresent,173,148,3.9,142,5.2,17.4,52,9200,5.3,yes,yes,yes,poor,yes,yes,1
+62,80,1.025,3,0,normal,normal,notpresent,notpresent,132,45,1.7,147,4.7,17.8,50,7900,5.7,yes,yes,no,good,no,no,1
+63,100,1.025,3,2,normal,normal,present,present,380,60,3.2,150,5.0,16.5,52,9800,5.1,yes,yes,yes,poor,yes,no,1
+64,100,1.02,4,2,normal,normal,notpresent,present,239,58,7.2,150,5.4,14.4,49,8100,4.8,yes,yes,no,poor,yes,no,1
+65,60,1.02,0,0,normal,normal,notpresent,notpresent,109,39,1.0,144,3.5,13.9,48,9600,4.8,no,no,no,good,no,no,0
+66,70,1.025,0,0,normal,normal,notpresent,notpresent,107,19,1.1,140,3.9,16.0,42,11000,5.9,no,no,no,good,no,no,0
+68,80,1.025,3,2,normal,normal,present,present,157,90,4.1,139,6.4,17.4,50,11000,6.1,yes,yes,yes,poor,yes,no,1
+69,70,1.02,4,4,normal,normal,present,present,264,96,6.3,139,4.0,16.2,50,11500,5.4,yes,yes,yes,good,yes,yes,1
+70,100,1.02,4,0,normal,normal,notpresent,notpresent,118,125,5.3,143,4.9,15.1,48,9700,8.0,yes,no,no,good,no,no,1
+71,70,1.02,4,0,normal,normal,present,present,219,125,5.3,145,5.0,14.7,44,15200,6.0,yes,yes,yes,poor,yes,no,1
+72,60,1.02,0,0,normal,normal,notpresent,notpresent,109,26,0.9,150,4.9,15.0,52,10500,5.5,no,no,no,good,no,no,0
+73,100,1.025,3,2,normal,normal,present,notpresent,295,142,5.6,150,5.8,15.1,52,18900,4.7,yes,yes,yes,poor,yes,no,1
+74,60,1.02,0,0,normal,normal,notpresent,notpresent,88,50,0.6,147,3.7,17.2,53,6000,4.5,no,no,no,good,no,no,0
+75,70,1.02,0,0,normal,normal,notpresent,notpresent,107,48,0.8,144,3.5,13.6,46,10300,4.8,no,no,no,good,no,no,0
+79,80,1.025,0,0,normal,normal,notpresent,notpresent,111,44,1.2,146,3.6,16.3,40,8000,6.4,no,no,no,good,no,no,0
+80,80,1.025,0,0,normal,normal,notpresent,notpresent,119,46,0.7,141,4.9,13.9,49,5100,5.0,no,no,no,good,no,no,0
+83,70,1.02,3,0,normal,normal,notpresent,notpresent,102,60,2.6,115,5.7,8.7,26,12800,3.1,yes,no,no,poor,no,yes,1
+`
+          const dAgeMin = `Age,Blood Pressure min,Specific Gravity min,Albumin min,Sugar min,Red Blood Cells min,Pus Cell min,Pus Cell clumps min,Bacteria min,Blood Glucose Random min,Blood Urea min,Serum Creatinine min,Sodium min,Potassium min,Hemoglobin min,Packed Cell Volume min,White Blood Cell Count min,Red Blood Cell Count min,Hypertension min,Diabetes Mellitus min,Coronary Artery Disease min,Appetite min,Pedal Edema min,Anemia min,Class min
+6,60,1.01,4,0,abnormal,abnormal,notpresent,present,94,67,1.0,135,4.9,9.9,30,16700,4.8,no,no,no,poor,no,no,1
+12,80,1.02,0,0,normal,normal,notpresent,notpresent,100,26,0.6,137,4.4,15.8,49,6600,5.4,no,no,no,good,no,no,0
+15,80,1.025,0,0,normal,normal,notpresent,notpresent,93,17,0.9,136,3.9,16.7,50,6200,5.2,no,no,no,good,no,no,0
+17,60,1.025,0,0,normal,normal,notpresent,notpresent,114,50,1.0,135,4.9,14.2,51,7200,5.9,no,no,no,good,no,no,0
+20,70,1.02,0,0,normal,normal,notpresent,notpresent,123,44,1.0,135,3.8,14.6,44,5500,4.8,no,no,no,good,no,no,0
+21,90,1.01,4,0,normal,abnormal,present,present,107,40,1.7,125,3.5,8.3,23,12400,3.9,no,no,no,good,no,yes,1
+22,60,1.025,0,0,normal,normal,notpresent,notpresent,97,18,1.2,138,4.3,13.5,42,7900,6.4,no,no,no,good,no,no,0
+23,60,1.02,0,0,normal,normal,notpresent,notpresent,70,24,0.8,142,4.0,14.3,41,4300,4.6,no,no,no,good,no,no,0
+24,70,1.025,0,0,normal,normal,notpresent,notpresent,140,23,0.6,140,4.7,16.3,48,5800,5.6,no,no,no,good,no,no,0
+25,70,1.02,0,0,normal,normal,notpresent,notpresent,88,19,0.5,136,3.5,13.3,48,6900,4.9,no,no,no,good,no,no,0
+28,60,1.025,0,0,normal,normal,notpresent,notpresent,79,50,0.5,145,5.0,17.6,51,6500,5.0,no,no,no,good,no,no,0
+29,80,1.02,0,0,normal,normal,notpresent,notpresent,70,16,0.7,138,3.3,13.7,40,5400,4.7,no,no,no,good,no,no,0
+30,60,1.02,0,0,normal,normal,notpresent,notpresent,82,25,0.5,139,3.8,13.4,42,9000,4.5,no,no,no,good,no,no,0
+32,60,1.025,0,0,normal,normal,notpresent,notpresent,100,17,0.4,142,4.5,14.3,41,6700,5.1,no,no,no,good,no,no,0
+33,60,1.025,0,0,normal,normal,notpresent,notpresent,80,19,0.6,135,3.5,13.1,40,6200,4.5,no,no,no,good,no,no,0
+34,60,1.02,0,0,normal,normal,notpresent,notpresent,87,27,0.5,135,3.9,13.5,47,7400,4.9,no,no,no,good,no,no,0
+35,60,1.02,0,0,normal,normal,notpresent,notpresent,104,31,0.5,135,3.9,14.7,43,4300,5.2,no,no,no,good,no,no,0
+36,80,1.025,0,0,normal,normal,notpresent,notpresent,85,16,1.1,142,4.1,15.6,44,5800,6.3,no,no,no,good,no,no,0
+37,60,1.02,0,0,normal,normal,notpresent,notpresent,109,35,0.8,135,4.1,15.0,48,5500,5.2,no,no,no,good,no,no,0
+38,60,1.02,0,0,normal,normal,notpresent,notpresent,91,19,0.5,135,3.5,13.6,44,7300,5.8,no,no,no,good,no,no,0
+39,60,1.02,0,0,normal,normal,notpresent,notpresent,86,37,0.6,145,5.0,13.6,41,5800,4.5,no,no,no,good,no,no,0
+40,70,1.015,0,0,normal,normal,notpresent,notpresent,140,10,1.2,132,5.0,10.9,31,8800,3.4,no,no,no,good,no,no,0
+41,70,1.02,0,0,normal,normal,notpresent,notpresent,112,25,0.6,138,5.0,16.8,41,6300,5.2,no,no,no,good,no,no,0
+42,70,1.02,0,0,normal,normal,notpresent,notpresent,75,20,0.5,140,3.5,13.9,43,5000,4.5,no,no,no,good,no,no,0
+43,60,1.025,0,0,normal,normal,notpresent,notpresent,81,25,0.6,135,4.4,13.0,43,6900,4.5,no,no,no,good,no,no,0
+44,60,1.02,0,0,normal,normal,notpresent,notpresent,92,33,0.5,138,4.2,14.0,41,7200,5.0,no,no,no,good,no,no,0
+45,70,1.02,0,0,normal,abnormal,notpresent,notpresent,82,46,0.6,136,3.8,10.0,30,8600,3.7,no,no,no,good,no,no,0
+46,60,1.01,0,0,normal,normal,notpresent,notpresent,100,27,0.5,135,3.5,9.8,28,5700,3.2,no,no,no,good,no,no,0
+47,60,1.02,0,0,normal,normal,notpresent,notpresent,109,17,0.5,138,3.5,13.0,41,5200,4.5,no,no,no,good,no,no,0
+48,60,1.005,0,0,abnormal,abnormal,notpresent,notpresent,75,22,0.8,111,2.5,8.6,26,5000,2.5,no,no,no,good,no,no,0
+49,80,1.01,0,0,abnormal,abnormal,notpresent,notpresent,122,32,1.2,122,3.2,8.1,24,5600,3.5,no,no,no,good,no,no,0
+50,80,1.01,0,0,normal,abnormal,notpresent,notpresent,97,40,0.6,134,4.5,8.2,22,9500,2.7,no,no,no,good,no,no,0
+51,60,1.02,0,0,normal,normal,notpresent,notpresent,94,15,0.8,135,3.7,13.0,46,8300,5.2,no,no,no,good,no,no,0
+52,80,1.015,0,0,normal,abnormal,notpresent,notpresent,99,22,0.8,133,3.7,8.1,23,4300,2.9,no,no,no,good,no,no,0
+53,90,1.02,2,0,abnormal,abnormal,present,notpresent,70,107,7.2,114,3.7,9.5,29,12100,3.7,yes,yes,no,poor,no,yes,1
+55,80,1.01,0,0,abnormal,abnormal,notpresent,notpresent,104,17,0.5,132,3.4,8.3,22,6700,2.9,no,no,no,good,no,no,0
+56,60,1.01,0,0,abnormal,abnormal,notpresent,notpresent,129,15,1.1,124,3.8,3.1,9,5400,2.1,no,no,no,good,no,no,0
+57,60,1.02,0,0,normal,normal,notpresent,notpresent,105,17,1.1,135,4.3,14.8,42,6200,4.5,no,no,no,good,no,no,0
+58,70,1.02,0,0,normal,normal,notpresent,notpresent,88,16,1.1,139,3.5,14.0,40,6700,4.9,no,no,no,good,no,no,0
+59,50,1.01,0,0,abnormal,abnormal,notpresent,notpresent,76,23,0.7,114,2.9,7.1,20,3800,2.1,no,no,no,good,no,no,0
+60,60,1.01,0,0,abnormal,abnormal,notpresent,notpresent,81,10,0.5,130,3.0,7.9,25,10500,3.0,no,no,no,good,no,no,0
+61,70,1.015,0,0,abnormal,abnormal,notpresent,notpresent,120,29,0.7,135,3.5,7.7,24,7000,3.2,no,no,no,good,no,no,0
+62,70,1.02,0,0,normal,abnormal,notpresent,notpresent,78,34,0.6,136,3.5,12.6,39,4700,3.9,no,no,no,good,no,no,0
+63,70,1.01,0,0,abnormal,abnormal,notpresent,notpresent,113,25,0.6,131,3.5,10.8,32,4500,3.8,no,no,no,good,no,no,0
+64,60,1.01,0,0,abnormal,abnormal,notpresent,notpresent,97,27,0.7,137,3.3,7.9,26,6400,3.4,no,no,no,good,no,no,0
+65,60,1.02,0,0,normal,normal,notpresent,notpresent,109,39,1.0,144,3.5,13.9,48,9600,4.8,no,no,no,good,no,no,0
+66,70,1.02,0,0,normal,normal,notpresent,notpresent,94,16,0.7,135,3.6,13.6,41,5300,4.9,no,no,no,good,no,no,0
+68,60,1.01,0,0,normal,abnormal,notpresent,notpresent,125,41,1.1,130,3.8,5.6,16,6700,2.6,no,no,no,good,no,no,0
+69,70,1.01,0,0,normal,abnormal,notpresent,notpresent,83,42,1.2,120,3.7,9.4,28,9300,3.3,no,no,no,good,no,no,0
+70,80,1.015,0,0,normal,normal,notpresent,notpresent,74,41,0.5,136,4.5,12.0,37,8400,5.6,no,no,no,good,no,no,0
+71,60,1.01,0,0,normal,abnormal,notpresent,notpresent,81,18,0.8,133,4.4,10.4,33,5600,3.6,no,no,no,good,no,no,0
+72,60,1.02,0,0,normal,normal,notpresent,notpresent,109,26,0.9,150,4.9,15.0,52,10500,5.5,no,no,no,good,no,no,0
+73,60,1.005,0,0,abnormal,abnormal,notpresent,notpresent,70,32,0.5,125,2.9,9.2,29,7000,3.2,no,no,no,good,no,no,0
+74,60,1.02,0,0,normal,normal,notpresent,notpresent,88,50,0.6,147,3.7,17.2,53,6000,4.5,no,no,no,good,no,no,0
+75,70,1.02,0,0,normal,normal,notpresent,notpresent,107,48,0.8,144,3.5,13.6,46,10300,4.8,no,no,no,good,no,no,0
+79,80,1.025,0,0,normal,normal,notpresent,notpresent,111,44,1.2,146,3.6,16.3,40,8000,6.4,no,no,no,good,no,no,0
+80,80,1.025,0,0,normal,normal,notpresent,notpresent,119,46,0.7,141,4.9,13.9,49,5100,5.0,no,no,no,good,no,no,0
+83,70,1.02,3,0,normal,normal,notpresent,notpresent,102,60,2.6,115,5.7,8.7,26,12800,3.1,yes,no,no,poor,no,yes,1
+`
+          const dBacteriaAve = `Bacteria,Age average,Blood Pressure average,Specific Gravity average,Albumin average,Sugar average,Red Blood Cells average,Pus Cell average,Pus Cell clumps average,Blood Glucose Random average,Blood Urea average,Serum Creatinine average,Sodium average,Potassium average,Hemoglobin average,Packed Cell Volume average,White Blood Cell Count average,Red Blood Cell Count average,Hypertension average,Diabetes Mellitus average,Coronary Artery Disease average,Appetite average,Pedal Edema average,Anemia average,Class average
+notpresent,49.2602739726,73.4931506849,1.02068493151,0.58904109589,0.164383561644,,,,125.438356164,49.7945205479,1.98698630137,139.321917808,4.63698630137,14.0253424658,42.9520547945,8323.97260274,4.99178082192,,,,,,,0.212328767123
+present,53.25,80.8333333333,1.01,3.33333333333,1.33333333333,,,,203.166666667,86.4166666667,4.64166666667,133.083333333,4.63333333333,9.575,29.3333333333,10325.0,3.675,,,,,,,1.0
+`
+          const dBacteriaMax = `Bacteria,Age max,Blood Pressure max,Specific Gravity max,Albumin max,Sugar max,Red Blood Cells max,Pus Cell max,Pus Cell clumps max,Blood Glucose Random max,Blood Urea max,Serum Creatinine max,Sodium max,Potassium max,Hemoglobin max,Packed Cell Volume max,White Blood Cell Count max,Red Blood Cell Count max,Hypertension max,Diabetes Mellitus max,Coronary Artery Disease max,Appetite max,Pedal Edema max,Anemia max,Class max
+notpresent,83,110,1.025,4,4,normal,normal,present,424,309,15.2,150,47.0,17.8,54,26400,8.0,yes,yes,yes,poor,yes,yes,1
+present,71,100,1.015,4,5,normal,normal,present,490,208,9.2,143,6.4,13.0,40,16700,4.8,yes,yes,yes,poor,yes,yes,1
+`
+          const dBacteriaMin = `Bacteria,Age min,Blood Pressure min,Specific Gravity min,Albumin min,Sugar min,Red Blood Cells min,Pus Cell min,Pus Cell clumps min,Blood Glucose Random min,Blood Urea min,Serum Creatinine min,Sodium min,Potassium min,Hemoglobin min,Packed Cell Volume min,White Blood Cell Count min,Red Blood Cell Count min,Hypertension min,Diabetes Mellitus min,Coronary Artery Disease min,Appetite min,Pedal Edema min,Anemia min,Class min
+notpresent,12,50,1.005,0,0,abnormal,abnormal,notpresent,70,10,0.4,111,2.5,3.1,9,3800,2.1,no,no,no,good,no,no,0
+present,6,60,1.005,2,0,abnormal,abnormal,notpresent,94,35,1.0,120,3.5,5.6,16,5600,2.6,no,no,no,good,no,no,1
+`
+          const dHypertensionAve = `Hypertension,Age average,Blood Pressure average,Specific Gravity average,Albumin average,Sugar average,Red Blood Cells average,Pus Cell average,Pus Cell clumps average,Bacteria average,Blood Glucose Random average,Blood Urea average,Serum Creatinine average,Sodium average,Potassium average,Hemoglobin average,Packed Cell Volume average,White Blood Cell Count average,Red Blood Cell Count average,Diabetes Mellitus average,Coronary Artery Disease average,Appetite average,Pedal Edema average,Anemia average,Class average
+no,46.5483870968,72.0967741935,1.02173387097,0.209677419355,0.00806451612903,,,,,111.701612903,37.1451612903,1.12983870968,140.919354839,4.30403225806,14.8096774194,45.4919354839,8110.48387097,5.24919354839,,,,,,0.0725806451613
+yes,60.5588235294,81.1764705882,1.01308823529,2.94117647059,1.14705882353,,,,,202.970588235,108.852941176,6.05,131.294117647,5.85,9.59411764706,28.8823529412,9808.82352941,3.58823529412,,,,,,1.0
+`
+          const dHypertensionMax = `Hypertension,Age max,Blood Pressure max,Specific Gravity max,Albumin max,Sugar max,Red Blood Cells max,Pus Cell max,Pus Cell clumps max,Bacteria max,Blood Glucose Random max,Blood Urea max,Serum Creatinine max,Sodium max,Potassium max,Hemoglobin max,Packed Cell Volume max,White Blood Cell Count max,Red Blood Cell Count max,Diabetes Mellitus max,Coronary Artery Disease max,Appetite max,Pedal Edema max,Anemia max,Class max
+no,80,90,1.025,4,1,normal,normal,present,present,303,208,12.0,150,5.5,17.8,54,19100,6.5,yes,no,poor,yes,yes,1
+yes,83,110,1.025,4,5,normal,normal,present,present,490,309,15.2,143,47.0,13.0,40,26400,8.0,yes,yes,poor,yes,yes,1
+`
+          const dHypertensionMin = `Hypertension,Age min,Blood Pressure min,Specific Gravity min,Albumin min,Sugar min,Red Blood Cells min,Pus Cell min,Pus Cell clumps min,Bacteria min,Blood Glucose Random min,Blood Urea min,Serum Creatinine min,Sodium min,Potassium min,Hemoglobin min,Packed Cell Volume min,White Blood Cell Count min,Red Blood Cell Count min,Diabetes Mellitus min,Coronary Artery Disease min,Appetite min,Pedal Edema min,Anemia min,Class min
+no,6,50,1.005,0,0,abnormal,abnormal,notpresent,notpresent,70,10,0.4,114,2.9,8.2,22,4300,2.7,no,no,good,no,no,0
+yes,40,60,1.005,0,0,abnormal,abnormal,notpresent,notpresent,70,32,0.9,111,2.5,3.1,9,3800,2.1,no,no,good,no,no,1
+`
+          const dCoronaryAve = `Coronary Artery Disease,Age average,Blood Pressure average,Specific Gravity average,Albumin average,Sugar average,Red Blood Cells average,Pus Cell average,Pus Cell clumps average,Bacteria average,Blood Glucose Random average,Blood Urea average,Serum Creatinine average,Sodium average,Potassium average,Hemoglobin average,Packed Cell Volume average,White Blood Cell Count average,Red Blood Cell Count average,Hypertension average,Diabetes Mellitus average,Appetite average,Pedal Edema average,Anemia average,Class average
+no,48.4217687075,73.2653061224,1.02044217687,0.65306122449,0.149659863946,,,,,123.210884354,48.537414966,1.91904761905,139.292517007,4.62993197279,13.9850340136,42.8503401361,8457.82312925,4.9925170068,,,,,,0.21768707483
+yes,64.8181818182,84.5454545455,1.01227272727,2.72727272727,1.63636363636,,,,,240.0,106.545454545,5.79090909091,132.909090909,4.72727272727,9.70909090909,29.4545454545,8718.18181818,3.54545454545,,,,,,1.0
+`
+          const dCoronaryMax = `Coronary Artery Disease,Age max,Blood Pressure max,Specific Gravity max,Albumin max,Sugar max,Red Blood Cells max,Pus Cell max,Pus Cell clumps max,Bacteria max,Blood Glucose Random max,Blood Urea max,Serum Creatinine max,Sodium max,Potassium max,Hemoglobin max,Packed Cell Volume max,White Blood Cell Count max,Red Blood Cell Count max,Hypertension max,Diabetes Mellitus max,Appetite max,Pedal Edema max,Anemia max,Class max
+no,83,100,1.025,4,5,normal,normal,present,present,490,309,15.0,150,47.0,17.8,54,26400,8.0,yes,yes,poor,yes,yes,1
+yes,73,110,1.02,4,4,normal,normal,present,present,424,215,15.2,143,6.4,13.0,40,11500,4.3,yes,yes,poor,yes,yes,1
+`
+          const dCoronaryMin = `Coronary Artery Disease,Age min,Blood Pressure min,Specific Gravity min,Albumin min,Sugar min,Red Blood Cells min,Pus Cell min,Pus Cell clumps min,Bacteria min,Blood Glucose Random min,Blood Urea min,Serum Creatinine min,Sodium min,Potassium min,Hemoglobin min,Packed Cell Volume min,White Blood Cell Count min,Red Blood Cell Count min,Hypertension min,Diabetes Mellitus min,Appetite min,Pedal Edema min,Anemia min,Class min
+no,6,50,1.005,0,0,abnormal,abnormal,notpresent,notpresent,70,10,0.4,111,2.5,3.1,9,3800,2.1,no,no,good,no,no,0
+yes,48,70,1.01,1,0,abnormal,abnormal,notpresent,notpresent,106,35,1.7,120,2.9,5.6,16,5000,2.5,yes,no,good,no,no,1
+`
+          const dPedalAve = `Pedal Edema,Age average,Blood Pressure average,Specific Gravity average,Albumin average,Sugar average,Red Blood Cells average,Pus Cell average,Pus Cell clumps average,Bacteria average,Blood Glucose Random average,Blood Urea average,Serum Creatinine average,Sodium average,Potassium average,Hemoglobin average,Packed Cell Volume average,White Blood Cell Count average,Red Blood Cell Count average,Hypertension average,Diabetes Mellitus average,Coronary Artery Disease average,Appetite average,Anemia average,Class average
+no,48.1956521739,73.5507246377,1.02119565217,0.463768115942,0.13768115942,,,,,123.057971014,42.115942029,1.46086956522,140.173913043,4.62608695652,14.3398550725,44.0144927536,8140.57971014,5.11086956522,,,,,,0.166666666667
+yes,59.0,77.5,1.01075,3.1,1.05,,,,,188.5,124.75,7.21,129.7,4.71,9.185,27.45,10790.0,3.38,,,,,,1.0
+`
+          const dPedalMax = `Pedal Edema,Age max,Blood Pressure max,Specific Gravity max,Albumin max,Sugar max,Red Blood Cells max,Pus Cell max,Pus Cell clumps max,Bacteria max,Blood Glucose Random max,Blood Urea max,Serum Creatinine max,Sodium max,Potassium max,Hemoglobin max,Packed Cell Volume max,White Blood Cell Count max,Red Blood Cell Count max,Hypertension max,Diabetes Mellitus max,Coronary Artery Disease max,Appetite max,Anemia max,Class max
+no,83,110,1.025,4,5,normal,normal,present,present,490,215,15.2,150,47.0,17.8,54,19100,8.0,yes,yes,yes,poor,yes,1
+yes,73,100,1.02,4,4,normal,normal,present,present,380,309,15.0,140,7.6,12.5,37,26400,4.3,yes,yes,yes,poor,yes,1
+`
+          const dPedalMin = `Pedal Edema,Age min,Blood Pressure min,Specific Gravity min,Albumin min,Sugar min,Red Blood Cells min,Pus Cell min,Pus Cell clumps min,Bacteria min,Blood Glucose Random min,Blood Urea min,Serum Creatinine min,Sodium min,Potassium min,Hemoglobin min,Packed Cell Volume min,White Blood Cell Count min,Red Blood Cell Count min,Hypertension min,Diabetes Mellitus min,Coronary Artery Disease min,Appetite min,Anemia min,Class min
+no,6,60,1.01,0,0,abnormal,abnormal,notpresent,notpresent,70,10,0.4,114,2.9,7.3,20,4300,2.5,no,no,no,good,no,0
+yes,40,50,1.005,0,0,abnormal,abnormal,notpresent,notpresent,70,32,0.9,111,2.5,3.1,9,3800,2.1,no,no,no,good,no,1
+`
+          const dAnemiaAve = `Anemia,Age average,Blood Pressure average,Specific Gravity average,Albumin average,Sugar average,Red Blood Cells average,Pus Cell average,Pus Cell clumps average,Bacteria average,Blood Glucose Random average,Blood Urea average,Serum Creatinine average,Sodium average,Potassium average,Hemoglobin average,Packed Cell Volume average,White Blood Cell Count average,Red Blood Cell Count average,Hypertension average,Diabetes Mellitus average,Coronary Artery Disease average,Appetite average,Pedal Edema average,Class average
+no,49.014084507,72.8873239437,1.02063380282,0.528169014085,0.204225352113,,,,,128.302816901,42.1971830986,1.50563380282,140.26056338,4.34788732394,14.3049295775,43.9154929577,8330.28169014,5.09014084507,,,,,,0.19014084507
+yes,54.4375,84.375,1.013125,3.1875,0.6875,,,,,158.3125,144.6875,8.25,126.3125,7.2,8.20625,24.1875,9768.75,3.13125,,,,,,1.0
+`
+          const dAnemiaMax = `Anemia,Age max,Blood Pressure max,Specific Gravity max,Albumin max,Sugar max,Red Blood Cells max,Pus Cell max,Pus Cell clumps max,Bacteria max,Blood Glucose Random max,Blood Urea max,Serum Creatinine max,Sodium max,Potassium max,Hemoglobin max,Packed Cell Volume max,White Blood Cell Count max,Red Blood Cell Count max,Hypertension max,Diabetes Mellitus max,Coronary Artery Disease max,Appetite max,Pedal Edema max,Class max
+no,80,100,1.025,4,5,normal,normal,present,present,490,191,12.0,150,6.4,17.8,54,26400,8.0,yes,yes,yes,poor,yes,1
+yes,83,110,1.025,4,3,normal,normal,present,present,288,309,15.2,136,47.0,11.2,32,16300,3.9,yes,yes,yes,poor,yes,1
+`
+          const dAnemiaMin = `Anemia,Age min,Blood Pressure min,Specific Gravity min,Albumin min,Sugar min,Red Blood Cells min,Pus Cell min,Pus Cell clumps min,Bacteria min,Blood Glucose Random min,Blood Urea min,Serum Creatinine min,Sodium min,Potassium min,Hemoglobin min,Packed Cell Volume min,White Blood Cell Count min,Red Blood Cell Count min,Hypertension min,Diabetes Mellitus min,Coronary Artery Disease min,Appetite min,Pedal Edema min,Class min
+no,6,50,1.005,0,0,abnormal,abnormal,notpresent,notpresent,70,10,0.4,114,2.9,5.6,16,4300,2.6,no,no,no,good,no,0
+yes,21,60,1.005,2,0,abnormal,abnormal,notpresent,notpresent,70,36,1.7,111,2.5,3.1,9,3800,2.1,no,no,no,good,no,1
+`
+
+            function parseCSV(csvText) {
+                const lines = csvText.trim().split('\n');
+                return lines.map(line => line.split(','));
+            }
+    
+            const parsedData = parseCSV(csvData);
+            const sugarAve = parseCSV(dSugarAve);
+            const sugarMax = parseCSV(dSugarMax);
+            const sugarMin = parseCSV(dSugarMin);
+
+            const AlbuminAve = parseCSV(dAlbuminAve);
+            const AlbuminMax = parseCSV(dAlbuminMax);
+            const AlbuminMin = parseCSV(dAlbuminMin);
+
+            const BloodAve = parseCSV(dBloodAve);
+            const BloodMax = parseCSV(dBloodMax);
+            const BloodMin = parseCSV(dBloodMin);
+
+            const AgeAve = parseCSV(dAgeAve);
+            const AgeMax = parseCSV(dAgeMax);
+            const AgeMin = parseCSV(dAgeMin);
+
+            const BacteriaAve = parseCSV(dBacteriaAve);
+            const BacteriaMax = parseCSV(dBacteriaMax);
+            const BacteriaMin = parseCSV(dBacteriaMin);
+
+            const HypertensionAve = parseCSV(dHypertensionAve);
+            const HypertensionMax = parseCSV(dHypertensionMax);
+            const HypertensionMin = parseCSV(dHypertensionMin);
+
+            const CoronaryAve = parseCSV(dCoronaryAve);
+            const CoronaryMax = parseCSV(dCoronaryMax);
+            const CoronaryMin = parseCSV(dCoronaryMin);
+
+            const PedalAve = parseCSV(dPedalAve);
+            const PedalMax = parseCSV(dPedalMax);
+            const PedalMin = parseCSV(dPedalMin);
+
+            const AnemiaAve = parseCSV(dAnemiaAve);
+            const AnemiaMax = parseCSV(dAnemiaMax);
+            const AnemiaMin = parseCSV(dAnemiaMin);
+
+            const table = document.getElementById('dataTable');
+            const thead = table.querySelector('thead tr');
+            const tbody = table.querySelector('tbody');
+    
+            function updateTable(data) {
+                thead.innerHTML = '';
+                tbody.innerHTML = '';
+                data[0].forEach(header => {
+                    const th = document.createElement('th');
+                    th.textContent = header;
+                    thead.appendChild(th);
+                });
+                data.slice(1).forEach(row => {
+                    const tr = document.createElement('tr');
+                    row.forEach(cell => {
+                        const td = document.createElement('td');
+                        td.textContent = cell;
+                        tr.appendChild(td);
+                    });
+                    tbody.appendChild(tr);
+                });
+            }
+    
+            document.getElementById('executeButton').addEventListener('click', function() {
+                const columnSelect = document.getElementById('columnSelect').value;
+                const functionSelect = document.getElementById('functionSelect').value;
+                const funcSelect = document.getElementById('funcSelect').value;
+                const column = document.getElementById('secondDropdown').value;
+                const desc = document.getElementById('thirdDropdown').value;
+    
+                if (columnSelect === 'Sugar' && functionSelect === 'np.average' && funcSelect === 'func') {
+                    updateTable(sugarAve);
+                } else if (columnSelect === 'Sugar' && functionSelect === 'max' && funcSelect === 'func') {
+                    updateTable(sugarMax); }
+                  else if (columnSelect === 'Sugar' && functionSelect === 'min' && funcSelect === 'func') {
+                    updateTable(sugarMin); }  
+
+                  else if (columnSelect === 'Albumin' && functionSelect === 'np.average' && funcSelect === 'func') {
+                    updateTable(AlbuminAve); }  
+                  else if (columnSelect === 'Albumin' && functionSelect === 'max' && funcSelect === 'func') {
+                    updateTable(AlbuminMax);}
+                  else if (columnSelect === 'Albumin' && functionSelect === 'min' && funcSelect === 'func') {
+                    updateTable(AlbuminMin);}
+
+                  else if (columnSelect === 'Blood Pressure' && functionSelect === 'np.average' && funcSelect === 'func') {
+                    updateTable(BloodAve); }  
+                  else if (columnSelect === 'Blood Pressure' && functionSelect === 'max' && funcSelect === 'func') {
+                    updateTable(BloodMax);}
+                  else if (columnSelect === 'Blood Pressure' && functionSelect === 'min' && funcSelect === 'func') {
+                    updateTable(BloodMin);}
+
+                  else if (columnSelect === 'Age' && functionSelect === 'np.average' && funcSelect === 'func') {
+                    updateTable(AgeAve);}
+                  else if (columnSelect === 'Age' && functionSelect === 'max' && funcSelect === 'func') {
+                    updateTable(AgeMax);}
+                  else if (columnSelect === 'Age' && functionSelect === 'min' && funcSelect === 'func') {
+                    updateTable(AgeMin);}
+
+                  else if (columnSelect === 'Bacteria' && functionSelect === 'np.average' && funcSelect === 'func') {
+                    updateTable(BacteriaAve);}
+                  else if (columnSelect === 'Bacteria' && functionSelect === 'max' && funcSelect === 'func') {
+                    updateTable(BacteriaMax);}
+                  else if (columnSelect === 'Bacteria' && functionSelect === 'min' && funcSelect === 'func') {
+                    updateTable(BacteriaMin);}
+
+                  else if (columnSelect === 'Hypertension' && functionSelect === 'np.average' && funcSelect === 'func') {
+                    updateTable(HypertensionAve);}
+                  else if (columnSelect === 'Hypertension' && functionSelect === 'max' && funcSelect === 'func') {
+                    updateTable(HypertensionMax);}
+                  else if (columnSelect === 'Hypertension' && functionSelect === 'min' && funcSelect === 'func') {
+                    updateTable(HypertensionMin);}
+
+                  else if (columnSelect === 'Coronary Artery Disease' && functionSelect === 'np.average' && funcSelect === 'func') {
+                    updateTable(CoronaryAve);}
+                  else if (columnSelect === 'Coronary Artery Disease' && functionSelect === 'max' && funcSelect === 'func') {
+                    updateTable(CoronaryMax);}
+                  else if (columnSelect === 'Coronary Artery Disease' && functionSelect === 'min' && funcSelect === 'func') {
+                    updateTable(CoronaryMin);}
+                  
+                  else if (columnSelect === 'Pedal Edema' && functionSelect === 'np.average' && funcSelect === 'func') {
+                    updateTable(PedalAve);}
+                  else if (columnSelect === 'Pedal Edema' && functionSelect === 'max' && funcSelect === 'func') {
+                    updateTable(PedalMax);}
+                  else if (columnSelect === 'Pedal Edema' && functionSelect === 'min' && funcSelect === 'func') {
+                    updateTable(PedalMin);}
+
+                  else if (columnSelect === 'Anemia' && functionSelect === 'np.average' && funcSelect === 'func') {
+                    updateTable(AnemiaAve);}
+                  else if (columnSelect === 'Anemia' && functionSelect === 'max' && funcSelect === 'func') {
+                    updateTable(AnemiaMax);}
+                  else if (columnSelect === 'Anemia' && functionSelect === 'min' && funcSelect === 'func') {
+                    updateTable(AnemiaMin);}
+
+                  else if (columnSelect === 'Sugar' && functionSelect === 'np.average' && funcSelect === 'sort') {
+                    const sortedTable = sortTable(dSugarAve, column, desc);
+                    updateTable(parseCSV(sortedTable));
+                } else if (columnSelect === 'Sugar' && functionSelect === 'max' && funcSelect === 'sort') {
+                    const sortedTable = sortTable(dSugarMax, column, desc);
+                    updateTable(parseCSV(sortedTable)); }
+                  else if (columnSelect === 'Sugar' && functionSelect === 'min' && funcSelect === 'sort') {
+                    const sortedTable = sortTable(dSugarMin, column, desc);
+                    updateTable(parseCSV(sortedTable)); }
+
+
+                  else if (columnSelect === 'Albumin' && functionSelect === 'np.average' && funcSelect === 'sort') {
+                    const sortedTable = sortTable(dAlbuminAve, column, desc);
+                    updateTable(parseCSV(sortedTable));
+                } else if (columnSelect === 'Albumin' && functionSelect === 'max' && funcSelect === 'sort') {
+                    const sortedTable = sortTable(dAlbuminMax, column, desc);
+                    updateTable(parseCSV(sortedTable)); }
+                  else if (columnSelect === 'Albumin' && functionSelect === 'min' && funcSelect === 'sort') {
+                    const sortedTable = sortTable(dAlbuminMin, column, desc);
+                    updateTable(parseCSV(sortedTable)); }
+
+                  else if (columnSelect === 'Blood Pressure' && functionSelect === 'np.average' && funcSelect === 'sort') {
+                    const sortedTable = sortTable(dBloodAve, column, desc);
+                    updateTable(parseCSV(sortedTable));
+                } else if (columnSelect === 'Blood Pressure' && functionSelect === 'max' && funcSelect === 'sort') {
+                    const sortedTable = sortTable(dBloodMax, column, desc);
+                    updateTable(parseCSV(sortedTable)); }
+                  else if (columnSelect === 'Blood Pressure' && functionSelect === 'min' && funcSelect === 'sort') {
+                    const sortedTable = sortTable(dBloodMin, column, desc);
+                    updateTable(parseCSV(sortedTable)); }
+
+                  else if (columnSelect === 'Age' && functionSelect === 'np.average' && funcSelect === 'sort') {
+                    const sortedTable = sortTable(dAgeAve, column, desc);
+                    updateTable(parseCSV(sortedTable));
+                } else if (columnSelect === 'Age' && functionSelect === 'max' && funcSelect === 'sort') {
+                    const sortedTable = sortTable(dAgeMax, column, desc);
+                    updateTable(parseCSV(sortedTable)); }
+                  else if (columnSelect === 'Age' && functionSelect === 'min' && funcSelect === 'sort') {
+                    const sortedTable = sortTable(dAgeMin, column, desc);
+                    updateTable(parseCSV(sortedTable)); }
+
+                  else if (columnSelect === 'Bacteria' && functionSelect === 'np.average' && funcSelect === 'sort') {
+                    const sortedTable = sortTable(dBacteriaAve, column, desc);
+                    updateTable(parseCSV(sortedTable));
+                } else if (columnSelect === 'Bacteria' && functionSelect === 'max' && funcSelect === 'sort') {
+                    const sortedTable = sortTable(dBacteriaMax, column, desc);
+                    updateTable(parseCSV(sortedTable)); }
+                  else if (columnSelect === 'Bacteria' && functionSelect === 'min' && funcSelect === 'sort') {
+                    const sortedTable = sortTable(dBacteriaMin, column, desc);
+                    updateTable(parseCSV(sortedTable)); }
+
+                  else if (columnSelect === 'Hypertension' && functionSelect === 'np.average' && funcSelect === 'sort') {
+                    const sortedTable = sortTable(dHypertensionAve, column, desc);
+                    updateTable(parseCSV(sortedTable));
+                } else if (columnSelect === 'Hypertension' && functionSelect === 'max' && funcSelect === 'sort') {
+                    const sortedTable = sortTable(dHypertensionMax, column, desc);
+                    updateTable(parseCSV(sortedTable)); }
+                  else if (columnSelect === 'Hypertension' && functionSelect === 'min' && funcSelect === 'sort') {
+                    const sortedTable = sortTable(dHypertensionMin, column, desc);
+                    updateTable(parseCSV(sortedTable)); }
+
+                  else if (columnSelect === 'Coronary Artery Disease' && functionSelect === 'np.average' && funcSelect === 'sort') {
+                    const sortedTable = sortTable(dCoronaryAve, column, desc);
+                    updateTable(parseCSV(sortedTable));
+                } else if (columnSelect === 'Coronary Artery Disease' && functionSelect === 'max' && funcSelect === 'sort') {
+                    const sortedTable = sortTable(dCoronaryMax, column, desc);
+                    updateTable(parseCSV(sortedTable)); }
+                  else if (columnSelect === 'Coronary Artery Disease' && functionSelect === 'min' && funcSelect === 'sort') {
+                    const sortedTable = sortTable(dCoronaryMin, column, desc);
+                    updateTable(parseCSV(sortedTable)); }
+
+                  else if (columnSelect === 'Pedal Edema' && functionSelect === 'np.average' && funcSelect === 'sort') {
+                    const sortedTable = sortTable(dPedalAve, column, desc);
+                    updateTable(parseCSV(sortedTable));
+                } else if (columnSelect === 'Pedal Edema' && functionSelect === 'max' && funcSelect === 'sort') {
+                    const sortedTable = sortTable(dPedalMax, column, desc);
+                    updateTable(parseCSV(sortedTable)); }
+                  else if (columnSelect === 'Pedal Edema' && functionSelect === 'min' && funcSelect === 'sort') {
+                    const sortedTable = sortTable(dPedalMin, column, desc);
+                    updateTable(parseCSV(sortedTable)); }
+
+                  else if (columnSelect === 'Anemia' && functionSelect === 'np.average' && funcSelect === 'sort') {
+                    const sortedTable = sortTable(dAnemiaAve, column, desc);
+                    updateTable(parseCSV(sortedTable));
+                } else if (columnSelect === 'Anemia' && functionSelect === 'max' && funcSelect === 'sort') {
+                    const sortedTable = sortTable(dAnemiaMax, column, desc);
+                    updateTable(parseCSV(sortedTable)); }
+                  else if (columnSelect === 'Anemia' && functionSelect === 'min' && funcSelect === 'sort') {
+                    const sortedTable = sortTable(dAnemiaMin, column, desc);
+                    updateTable(parseCSV(sortedTable)); }
+
+                  else if (columnSelect === 'Sugar' && functionSelect === 'np.average' && funcSelect === 'where') {
+                    const filteredTable = filterTableString(dSugarAve, column, desc);
+                    updateTable(parseCSV(filteredTable)); }
+                  else if (columnSelect === 'Sugar' && functionSelect === 'max' && funcSelect === 'where') {
+                    const filteredTable = filterTableString(dSugarMax, column, desc)
+                    updateTable(parseCSV(filteredTable));}
+                  else if (columnSelect === 'Sugar' && functionSelect === 'min' && funcSelect === 'where') {
+                    const filteredTable = filterTableString(dSugarMin, column, desc)
+                    updateTable(parseCSV(filteredTable)); }
+
+                  else if (columnSelect === 'Albumin' && functionSelect === 'np.average' && funcSelect === 'where') {
+                    const filteredTable = filterTableString(dAlbuminAve, column, desc);
+                    updateTable(parseCSV(filteredTable)); }
+                  else if (columnSelect === 'Albumin' && functionSelect === 'max' && funcSelect === 'where') {
+                    const filteredTable = filterTableString(dAlbuminMax, column, desc)
+                    updateTable(parseCSV(filteredTable));}
+                  else if (columnSelect === 'Albumin' && functionSelect === 'min' && funcSelect === 'where') {
+                    const filteredTable = filterTableString(dAlbuminMin, column, desc)
+                    updateTable(parseCSV(filteredTable)); }
+
+                  else if (columnSelect === 'Blood Pressure' && functionSelect === 'np.average' && funcSelect === 'where') {
+                    const filteredTable = filterTableString(dBloodAve, column, desc);
+                    updateTable(parseCSV(filteredTable)); }
+                  else if (columnSelect === 'Blood Pressure' && functionSelect === 'max' && funcSelect === 'where') {
+                    const filteredTable = filterTableString(dBloodMax, column, desc)
+                    updateTable(parseCSV(filteredTable));}
+                  else if (columnSelect === 'Blood Pressure' && functionSelect === 'min' && funcSelect === 'where') {
+                    const filteredTable = filterTableString(dBloodMin, column, desc)
+                    updateTable(parseCSV(filteredTable)); }
+
+                  else if (columnSelect === 'Age' && functionSelect === 'np.average' && funcSelect === 'where') {
+                    const filteredTable = filterTableString(dAgeAve, column, desc);
+                    updateTable(parseCSV(filteredTable)); }
+                  else if (columnSelect === 'Age' && functionSelect === 'max' && funcSelect === 'where') {
+                    const filteredTable = filterTableString(dAgeMax, column, desc)
+                    updateTable(parseCSV(filteredTable));}
+                  else if (columnSelect === 'Age' && functionSelect === 'min' && funcSelect === 'where') {
+                    const filteredTable = filterTableString(dAgeMin, column, desc)
+                    updateTable(parseCSV(filteredTable)); }
+
+                  else if (columnSelect === 'Bacteria' && functionSelect === 'np.average' && funcSelect === 'where') {
+                    const filteredTable = filterTableString(dBacteriaAve, column, desc);
+                    updateTable(parseCSV(filteredTable)); }
+                  else if (columnSelect === 'Bacteria' && functionSelect === 'max' && funcSelect === 'where') {
+                    const filteredTable = filterTableString(dBacteriaMax, column, desc)
+                    updateTable(parseCSV(filteredTable));}
+                  else if (columnSelect === 'Bacteria' && functionSelect === 'min' && funcSelect === 'where') {
+                    const filteredTable = filterTableString(dBacteriaMin, column, desc)
+                    updateTable(parseCSV(filteredTable)); }
+
+                  else if (columnSelect === 'Hypertension' && functionSelect === 'np.average' && funcSelect === 'where') {
+                    const filteredTable = filterTableString(dHypertensionAve, column, desc);
+                    updateTable(parseCSV(filteredTable)); }
+                  else if (columnSelect === 'Hypertension' && functionSelect === 'max' && funcSelect === 'where') {
+                    const filteredTable = filterTableString(dHypertensionMax, column, desc)
+                    updateTable(parseCSV(filteredTable));}
+                  else if (columnSelect === 'Hypertension' && functionSelect === 'min' && funcSelect === 'where') {
+                    const filteredTable = filterTableString(dHypertensionMin, column, desc)
+                    updateTable(parseCSV(filteredTable)); }
+
+                  else if (columnSelect === 'Coronary Artery Disease' && functionSelect === 'np.average' && funcSelect === 'where') {
+                    const filteredTable = filterTableString(dCoronaryAve, column, desc);
+                    updateTable(parseCSV(filteredTable)); }
+                  else if (columnSelect === 'Coronary Artery Disease' && functionSelect === 'max' && funcSelect === 'where') {
+                    const filteredTable = filterTableString(dCoronaryMax, column, desc)
+                    updateTable(parseCSV(filteredTable));}
+                  else if (columnSelect === 'Coronary Artery Disease' && functionSelect === 'min' && funcSelect === 'where') {
+                    const filteredTable = filterTableString(dCoronaryMin, column, desc)
+                    updateTable(parseCSV(filteredTable)); }
+
+                  else if (columnSelect === 'Pedal Edema' && functionSelect === 'np.average' && funcSelect === 'where') {
+                    const filteredTable = filterTableString(dPedalAve, column, desc);
+                    updateTable(parseCSV(filteredTable)); }
+                  else if (columnSelect === 'Pedal Edema' && functionSelect === 'max' && funcSelect === 'where') {
+                    const filteredTable = filterTableString(dPedalMax, column, desc)
+                    updateTable(parseCSV(filteredTable));}
+                  else if (columnSelect === 'Pedal Edema' && functionSelect === 'min' && funcSelect === 'where') {
+                    const filteredTable = filterTableString(dPedalMin, column, desc)
+                    updateTable(parseCSV(filteredTable)); }
+
+                  else if (columnSelect === 'Anemia' && functionSelect === 'np.average' && funcSelect === 'where') {
+                    const filteredTable = filterTableString(dAnemiaAve, column, desc);
+                    updateTable(parseCSV(filteredTable)); }
+                  else if (columnSelect === 'Anemia' && functionSelect === 'max' && funcSelect === 'where') {
+                    const filteredTable = filterTableString(dAnemiaMax, column, desc)
+                    updateTable(parseCSV(filteredTable));}
+                  else if (columnSelect === 'Anemia' && functionSelect === 'min' && funcSelect === 'where') {
+                    const filteredTable = filterTableString(dAnemiaMin, column, desc)
+                    updateTable(parseCSV(filteredTable)); }
+
+                  else if (columnSelect === 'Sugar' && functionSelect === 'np.average' && funcSelect === 'select') {
+                    const filteredCols = filterColumns(dSugarAve, column, desc);
+                    updateTable(parseCSV(filteredCols)); }
+                  else if (columnSelect === 'Sugar' && functionSelect === 'max' && funcSelect === 'select') {
+                    const filteredCols = filterColumns(dSugarMax, column, desc)
+                    updateTable(parseCSV(filteredCols));}
+                  else if (columnSelect === 'Sugar' && functionSelect === 'min' && funcSelect === 'select') {
+                    const filteredCols = filterColumns(dSugarMin, column, desc)
+                    updateTable(parseCSV(filteredCols)); }
+                    
+                  else if (columnSelect === 'Albumin' && functionSelect === 'np.average' && funcSelect === 'select') {
+                    const filteredCols = filterColumns(dAlbuminAve, column, desc);
+                    updateTable(parseCSV(filteredCols)); }
+                  else if (columnSelect === 'Albumin' && functionSelect === 'max' && funcSelect === 'select') {
+                    const filteredCols = filterColumns(dAlbuminMax, column, desc)
+                    updateTable(parseCSV(filteredCols));}
+                  else if (columnSelect === 'Albumin' && functionSelect === 'min' && funcSelect === 'select') {
+                    const filteredCols = filterColumns(dAlbuminMin, column, desc)
+                    updateTable(parseCSV(filteredCols)); }
+
+                  else if (columnSelect === 'Blood Pressure' && functionSelect === 'np.average' && funcSelect === 'select') {
+                    const filteredCols = filterColumns(dBloodAve, column, desc);
+                    updateTable(parseCSV(filteredCols)); }
+                  else if (columnSelect === 'Blood Pressure' && functionSelect === 'max' && funcSelect === 'select') {
+                    const filteredCols = filterColumns(dBloodMax, column, desc)
+                    updateTable(parseCSV(filteredCols));}
+                  else if (columnSelect === 'Blood Pressure' && functionSelect === 'min' && funcSelect === 'select') {
+                    const filteredCols = filterColumns(dBloodMin, column, desc)
+                    updateTable(parseCSV(filteredCols)); }
+
+                  else if (columnSelect === 'Age' && functionSelect === 'np.average' && funcSelect === 'select') {
+                    const filteredCols = filterColumns(dAgeAve, column, desc);
+                    updateTable(parseCSV(filteredCols)); }
+                  else if (columnSelect === 'Age' && functionSelect === 'max' && funcSelect === 'select') {
+                    const filteredCols = filterColumns(dAgeMax, column, desc)
+                    updateTable(parseCSV(filteredCols));}
+                  else if (columnSelect === 'Age' && functionSelect === 'min' && funcSelect === 'select') {
+                    const filteredCols = filterColumns(dAgeMin, column, desc)
+                    updateTable(parseCSV(filteredCols)); }
+
+                  else if (columnSelect === 'Bacteria' && functionSelect === 'np.average' && funcSelect === 'select') {
+                    const filteredCols = filterColumns(dBacteriaAve, column, desc);
+                    updateTable(parseCSV(filteredCols)); }
+                  else if (columnSelect === 'Bacteria' && functionSelect === 'max' && funcSelect === 'select') {
+                    const filteredCols = filterColumns(dBacteriaMax, column, desc)
+                    updateTable(parseCSV(filteredCols));}
+                  else if (columnSelect === 'Bacteria' && functionSelect === 'min' && funcSelect === 'select') {
+                    const filteredCols = filterColumns(dBacteriaMin, column, desc)
+                    updateTable(parseCSV(filteredCols)); }
+
+                  else if (columnSelect === 'Hypertension' && functionSelect === 'np.average' && funcSelect === 'select') {
+                    const filteredCols = filterColumns(dHypertensionAve, column, desc);
+                    updateTable(parseCSV(filteredCols)); }
+                  else if (columnSelect === 'Hypertension' && functionSelect === 'max' && funcSelect === 'select') {
+                    const filteredCols = filterColumns(dHypertensionMax, column, desc)
+                    updateTable(parseCSV(filteredCols));}
+                  else if (columnSelect === 'Hypertension' && functionSelect === 'min' && funcSelect === 'select') {
+                    const filteredCols = filterColumns(dHypertensionMin, column, desc)
+                    updateTable(parseCSV(filteredCols)); }
+
+                  else if (columnSelect === 'Coronary Artery Disease' && functionSelect === 'np.average' && funcSelect === 'select') {
+                    const filteredCols = filterColumns(dCoronaryAve, column, desc);
+                    updateTable(parseCSV(filteredCols)); }
+                  else if (columnSelect === 'Coronary Artery Disease' && functionSelect === 'max' && funcSelect === 'select') {
+                    const filteredCols = filterColumns(dCoronaryMax, column, desc)
+                    updateTable(parseCSV(filteredCols));}
+                  else if (columnSelect === 'Coronary Artery Disease' && functionSelect === 'min' && funcSelect === 'select') {
+                    const filteredCols = filterColumns(dCoronaryMin, column, desc)
+                    updateTable(parseCSV(filteredCols)); }
+
+                  else if (columnSelect === 'Pedal Edema' && functionSelect === 'np.average' && funcSelect === 'select') {
+                    const filteredCols = filterColumns(dPedalAve, column, desc);
+                    updateTable(parseCSV(filteredCols)); }
+                  else if (columnSelect === 'Pedal Edema' && functionSelect === 'max' && funcSelect === 'select') {
+                    const filteredCols = filterColumns(dPedalMax, column, desc)
+                    updateTable(parseCSV(filteredCols));}
+                  else if (columnSelect === 'Pedal Edema' && functionSelect === 'min' && funcSelect === 'select') {
+                    const filteredCols = filterColumns(dPedalMin, column, desc)
+                    updateTable(parseCSV(filteredCols)); }
+
+                  else if (columnSelect === 'Anemia' && functionSelect === 'np.average' && funcSelect === 'select') {
+                    const filteredCols = filterColumns(dAnemiaAve, column, desc);
+                    updateTable(parseCSV(filteredCols)); }
+                  else if (columnSelect === 'Anemia' && functionSelect === 'max' && funcSelect === 'select') {
+                    const filteredCols = filterColumns(dAnemiaMax, column, desc)
+                    updateTable(parseCSV(filteredCols));}
+                  else if (columnSelect === 'Anemia' && functionSelect === 'min' && funcSelect === 'select') {
+                    const filteredCols = filterColumns(dAnemiaMin, column, desc)
+                    updateTable(parseCSV(filteredCols)); }
+                  
+                else {
+                    updateTable(parsedData);
+                }
+            });
+
+
+    function sortTable(dataString, columnName, descending = 'descending=False') {
+    // Parse the header to find the index of the specified column
+    const rows = dataString.trim().split('\n');
+    const headers = rows.shift().split(',');
+    const columnIndex = headers.indexOf(columnName);
+    if (columnIndex === -1) {
+        throw new Error(`Column ${columnName} not found in data.`);
+    }
+
+    // Parse each row into an array of values
+    const data = rows.map(row => row.split(','));
+
+    // Determine sort order based on 'descending' parameter
+    const sortOrder = descending === 'descending=True' ? -1 : 1;
+
+    // Sort the data based on the specified column and order
+    data.sort((a, b) => {
+        const valA = isNaN(a[columnIndex]) ? a[columnIndex] : +a[columnIndex];
+        const valB = isNaN(b[columnIndex]) ? b[columnIndex] : +b[columnIndex];
+        return (valA < valB) ? -1 * sortOrder : (valA > valB) ? 1 * sortOrder : 0;
+    });
+
+    // Reconstruct the sorted data back into a string
+    const sortedDataString = [headers.join(',')].concat(data.map(row => row.join(','))).join('\n');
+    return sortedDataString;
+}
+
+function filterTableString(tableString, columnName, conditionString) {
+  // Parse the condition and extract the number
+  const conditionMatch = conditionString.match(/\(([^)]+)\)/);
+  if (!conditionMatch) return tableString; // If no condition found, return original table
+
+  const conditionValue = parseFloat(conditionMatch[1]);
+  if (isNaN(conditionValue)) return tableString; // If no valid number, return original table
+
+  // Split table into rows and headers
+  const rows = tableString.trim().split('\n');
+  const headers = rows.shift().split(',');
+  const columnIndex = headers.indexOf(columnName);
+
+  if (columnIndex === -1) return tableString; // If column not found, return original table
+
+  // Filter rows based on condition
+  const filteredRows = rows.filter(row => {
+    const rowValues = row.split(',');
+    const cellValue = parseFloat(rowValues[columnIndex]);
+    if (isNaN(cellValue)) return false; // If cell does not contain a number, exclude row
+
+    if (conditionString.includes('are.above')) {
+      return cellValue > conditionValue;
+    } else if (conditionString.includes('are.below')) {
+      return cellValue < conditionValue;
+    }
+    return true;
+  });
+
+  // Reconstruct the table string
+  return [headers.join(','), ...filteredRows].join('\n');
+}
+
+function filterColumns(tableString, firstColumnName, secondColumnName) {
+  // Split the table into rows
+  const rows = tableString.trim().split('\n');
+  // Extract the header row and find the indices of the desired columns
+  const headers = rows[0].split(',');
+  const firstColumnIndex = headers.indexOf(firstColumnName);
+  const secondColumnIndex = headers.indexOf(secondColumnName);
+
+  if (firstColumnIndex === -1 || secondColumnIndex === -1) return ''; // Column not found
+
+  // Map each row to a new row containing only the two desired columns
+  const filteredRows = rows.map(row => {
+    const cells = row.split(',');
+    return `${cells[firstColumnIndex]},${cells[secondColumnIndex]}`;
+  });
+
+  // Join the filtered rows into a single string to form the new table
+  return filteredRows.join('\n');
+}
+
+        </script>
+    </body>
+    </html>
