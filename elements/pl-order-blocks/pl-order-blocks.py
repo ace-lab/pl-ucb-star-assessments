@@ -1212,7 +1212,6 @@ def grade(element_html: str, data: pl.QuestionData) -> None:
                 i += 1
 
             final_score = max(0, float(total_correct_answers - total_edit_distance) / total_correct_answers)
-            final_score *= 2
             data["partial_scores"][answer_name] = {
                 "score": round(final_score, 2),
                 "feedback": feedback,
