@@ -1152,34 +1152,41 @@ def grade(element_html: str, data: pl.QuestionData) -> None:
             total_edit_distance = 0
             no_feedback_yet = True
             for curr_iteration in true_answer_list:
+                total_correct_answers += len(curr_iteration)
+
                 for index, answer in enumerate(curr_iteration):
                     answer["ranking"] = index
                 curr_iteration_trueans = sorted(curr_iteration, key=lambda x: int(x["ranking"]))
                 true_answer = [answer["tag"] for answer in curr_iteration_trueans]
-                tag_to_rank = {
-                    answer["tag"]: answer["ranking"] for answer in curr_iteration_trueans
-                }
-                lines_of_rank = {
-                    rank: [tag for tag in tag_to_rank if tag_to_rank[tag] == rank]
-                    for rank in set(tag_to_rank.values())
-                }
+                j = 0
+                for curr in submission[i]: 
+                    if true_answer[j] != curr:
+                        total_edit_distance += 1
+                    j += 1
+                # tag_to_rank = {
+                #     answer["tag"]: answer["ranking"] for answer in curr_iteration_trueans
+                # }
+                # lines_of_rank = {
+                #     rank: [tag for tag in tag_to_rank if tag_to_rank[tag] == rank]
+                #     for rank in set(tag_to_rank.values())
+                # }
 
-                cur_rank_depends = []
-                prev_rank = None
-                for tag in true_answer:
-                    ranking = tag_to_rank[tag]
-                    if prev_rank is not None and ranking != prev_rank:
-                        cur_rank_depends = lines_of_rank[prev_rank]
-                    depends_graph[tag] = cur_rank_depends
-                    prev_rank = ranking
+                # cur_rank_depends = []
+                # prev_rank = None
+                # for tag in true_answer:
+                #     ranking = tag_to_rank[tag]
+                #     if prev_rank is not None and ranking != prev_rank:
+                #         cur_rank_depends = lines_of_rank[prev_rank]
+                #     depends_graph[tag] = cur_rank_depends
+                #     prev_rank = ranking
 
-                num_initial_correct, true_answer_length = grade_dag(submission[i], depends_graph, group_belonging)
-                edit_distance = lcs_partial_credit(
-                    submission[i], depends_graph, group_belonging
-                )
+                # num_initial_correct, true_answer_length = grade_dag(submission[i], depends_graph, group_belonging)
+                # edit_distance = lcs_partial_credit(
+                #     submission[i], depends_graph, group_belonging
+                # )
 
-                total_correct_answers += true_answer_length
-                total_edit_distance += edit_distance
+                # total_correct_answers += true_answer_length
+                # total_edit_distance += edit_distance
                 
 
                 # if final_score < 1:
@@ -1202,7 +1209,7 @@ def grade(element_html: str, data: pl.QuestionData) -> None:
                 #         )
                 #         no_feedback_yet = False
 
-#                i += 1
+                i += 1
 
             final_score = max(0, float(total_correct_answers - total_edit_distance) / total_correct_answers)
             final_score *= 2
