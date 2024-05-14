@@ -725,7 +725,7 @@ def render(element_html: str, data: pl.QuestionData) -> str:
                 curroptions = [] 
                 for block in subblock:
                     curroptions.append(block)
-                source_header = "iteration " + str(i)
+                source_header = "swap " + str(i)
                 curr_subblock["options"] = curroptions
                 curr_subblock["source-header"] = source_header
                 curr_subblock["uuid"] = str(uuid) + '-' + str(i)
