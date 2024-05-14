@@ -50,7 +50,6 @@ $(function() {
         {{/incorrect}}
         </div>
         <ul class="card-body list-group list-unstyled">
-            {{#submissions}}
             {{#student_submission}}
                 {{#distractor_feedback}}
                 <li class="pl-order-blocks-pairing-indicator list-group-item-warning">
@@ -81,7 +80,6 @@ $(function() {
                 </li>
                 {{/distractor_feedback}}
             {{/student_submission}}
-            {{/submissions}}
         </ul>
     </div>
     <p>{{{feedback}}}</p>
