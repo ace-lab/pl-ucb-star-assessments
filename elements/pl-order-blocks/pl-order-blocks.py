@@ -914,17 +914,20 @@ def render(element_html: str, data: pl.QuestionData) -> str:
             data["params"][answer_name][1], data["correct_answers"][answer_name][1]
         )
 
-        question_solution = [
-            {
-                "inner_html": solution["inner_html"],
-                "indent": max(0, (solution["indent"] or 0) * TAB_SIZE_PX),
-            }
-            for solution in data["correct_answers"][answer_name][1]
-        ]
+        question_solutions = []
+        for i in range(len(data["correct_answers"][answer_name])):
+            question_solution = [
+                {
+                    "inner_html": solution["inner_html"],
+                    "indent": max(0, (solution["indent"] or 0) * TAB_SIZE_PX),
+                }
+                for solution in data["correct_answers"][answer_name][i]
+            ]
+            question_solutions.append(question_solution)
 
         html_params = {
             "true_answer": True,
-            "question_solution": question_solution,
+            "question_solutions": question_solutions,
             "ordering_message": ordering_message,
             "indentation_message": indentation_message,
             "block_formatting": block_formatting,
@@ -937,7 +940,7 @@ def render(element_html: str, data: pl.QuestionData) -> str:
                 else "pl-order-blocks-right"
             ),
         }
-        with open("pl-order-blocks.mustache", "r", encoding="utf-8") as f:
+        with open("pl-order-blocks-sorted-1.mustache", "r", encoding="utf-8") as f:
             html = chevron.render(f, html_params)
         return html
 
