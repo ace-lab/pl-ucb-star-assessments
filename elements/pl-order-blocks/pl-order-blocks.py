@@ -788,7 +788,8 @@ def render(element_html: str, data: pl.QuestionData) -> str:
             #     }
             #     for attempt in subblock_data
             # ])
-            submissions = []
+            treamsubmissions = []
+            submissions = {}
             for i in range(data["submitted_answers"].get(answer_name, [])):
                 student_submission = [
                     {
@@ -800,7 +801,8 @@ def render(element_html: str, data: pl.QuestionData) -> str:
                     }
                     for attempt in data["submitted_answers"].get(answer_name, [])[i]
                 ]
-                submissions.append(student_submission)
+                treamsubmissions.append(student_submission)
+            submissions["student_submission"] = treamsubmissions
         else:
             student_submission = [
                 {
