@@ -36,21 +36,12 @@ $(function() {
 
 {{#submission}}
     {{^parse-error}}
+    {{#submissions}}
     <div class="pl-order-blocks-answer-container {{block_layout}} {{dropzone_layout}}">
         <div class="card-header">
             Your answer:
-        {{#correct}}
-            <span class="badge badge-success"><i class="fa fa-check" aria-hidden="true"></i> 100%</span>
-        {{/correct}}
-        {{#partially_correct}}
-            <span class="badge badge-warning"><i class="fa fa-times" aria-hidden="true"></i> {{partially_correct}}%</span>
-        {{/partially_correct}}
-        {{#incorrect}}
-            <span class="badge badge-danger"><i class="fa fa-times" aria-hidden="true"></i> 0%</span>
-        {{/incorrect}}
         </div>
         <ul class="card-body list-group list-unstyled">
-            {{#submissions}}
             {{#student_submission}}
                 {{#distractor_feedback}}
                 <li class="pl-order-blocks-pairing-indicator list-group-item-warning">
@@ -81,9 +72,9 @@ $(function() {
                 </li>
                 {{/distractor_feedback}}
             {{/student_submission}}
-            {{/submissions}}
         </ul>
     </div>
+    {{/submissions}}
     <p>{{{feedback}}}</p>
     {{/parse-error}}
 

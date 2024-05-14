@@ -776,21 +776,15 @@ def render(element_html: str, data: pl.QuestionData) -> str:
         student_submission = []
 
         if grading_method is GradingMethodType.SORTING:
-            subblock_data = data["submitted_answers"].get(answer_name, [])
-            #for subblock in subblock_data:
-            # student_submission.append([
-            #     {
-            #         "inner_html": attempt["inner_html"],
-            #         "indent": (attempt["indent"] or 0) * TAB_SIZE_PX,
-            #         "badge_type": attempt.get("badge_type", ""),
-            #         "icon": attempt.get("icon", ""),
-            #         "distractor_feedback": attempt.get("distractor_feedback", ""),
-            #     }
-            #     for attempt in subblock_data
-            # ])
-            treamsubmissions = []
-            submissions = {}
+            submissions = []
             for i in range(len(data["submitted_answers"].get(answer_name, []))):
+                curriter = {}
+                curriter["block_layout"] ="pl-order-blocks-horizontal" if inline else ""
+                curriter["dropzone_layout"] = (
+                    "pl-order-blocks-bottom"
+                    if dropzone_layout is SolutionPlacementType.BOTTOM
+                    else "pl-order-blocks-right"
+                )
                 student_submission = [
                     {
                         "inner_html": attempt["inner_html"],
@@ -801,8 +795,8 @@ def render(element_html: str, data: pl.QuestionData) -> str:
                     }
                     for attempt in data["submitted_answers"].get(answer_name, [])[i]
                 ]
-                treamsubmissions.append(student_submission)   
-            submissions["student_submission"] = treamsubmissions
+                curriter["student_submission"] = student_submission
+                submissions.append(curriter)
         else:
             student_submission = [
                 {
@@ -832,12 +826,12 @@ def render(element_html: str, data: pl.QuestionData) -> str:
                 "allow_feedback_badges": not all(
                     block.get("badge_type", "") == "" for block in student_submission
                 ),
-                "block_layout": "pl-order-blocks-horizontal" if inline else "",
-                "dropzone_layout": (
-                    "pl-order-blocks-bottom"
-                    if dropzone_layout is SolutionPlacementType.BOTTOM
-                    else "pl-order-blocks-right"
-                ),
+                # "block_layout": "pl-order-blocks-horizontal" if inline else "",
+                # "dropzone_layout": (
+                #     "pl-order-blocks-bottom"
+                #     if dropzone_layout is SolutionPlacementType.BOTTOM
+                #     else "pl-order-blocks-right"
+                # ),
             }
         else:
             html_params = {
