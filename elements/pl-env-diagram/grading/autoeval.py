@@ -82,7 +82,6 @@ class FrameTree():
         code_list.insert(0, "self.add_newFrame()")
         # Insert lines that will create all non-Global Frames by identifying ####
         i = 1 # TODO: modify to consider initalized vars // I am no longer sure what this means
-        ### i = 1
         # Keep track of how much the current line has been shifted by (for example, if I am on what was line 2 but I added 3 lines before it, the shift is 3)
         shift = 0
         while i < len(code_list):     
@@ -143,8 +142,6 @@ class FrameTree():
         self.framecounter = 0
         self.root = None
 
-        # 
-        #exitlines_pq = exitlines_pq.copy()
         code_list = codestring.split("\n")
 
         # TODO: fix to include correct variable names
