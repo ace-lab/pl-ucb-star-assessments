@@ -916,6 +916,15 @@ def render(element_html: str, data: pl.QuestionData) -> str:
 
         question_solutions = []
         for i in range(len(data["correct_answers"][answer_name])):
+            curr_anwser = {}
+            curr_anwser["block_layout"] = "pl-order-blocks-horizontal" if inline else ""
+            curr_anwser["dropzone_layout"] = (
+                "pl-order-blocks-bottom"
+                if dropzone_layout is SolutionPlacementType.BOTTOM
+                else "pl-order-blocks-right"
+            )
+            curr_anwser["ordering_message"] = ordering_message
+            curr_anwser["indentation_message"] = indentation_message
             question_solution = [
                 {
                     "inner_html": solution["inner_html"],
@@ -923,22 +932,24 @@ def render(element_html: str, data: pl.QuestionData) -> str:
                 }
                 for solution in data["correct_answers"][answer_name][i]
             ]
-            question_solutions.append(question_solution)
+            curr_anwser["question_solution"] = question_solution
+        
+        
 
         html_params = {
             "true_answer": True,
             "question_solutions": question_solutions,
-            "ordering_message": ordering_message,
-            "indentation_message": indentation_message,
-            "block_formatting": block_formatting,
-            "distractors": distractors,
-            "show_distractors": (len(distractors) > 0),
-            "block_layout": "pl-order-blocks-horizontal" if inline else "",
-            "dropzone_layout": (
-                "pl-order-blocks-bottom"
-                if dropzone_layout is SolutionPlacementType.BOTTOM
-                else "pl-order-blocks-right"
-            ),
+            # "ordering_message": ordering_message,
+            # "indentation_message": indentation_message,
+            # "block_formatting": block_formatting,
+            # "distractors": distractors,
+            # "show_distractors": (len(distractors) > 0),
+            # "block_layout": "pl-order-blocks-horizontal" if inline else "",
+            # "dropzone_layout": (
+            #     "pl-order-blocks-bottom"
+            #     if dropzone_layout is SolutionPlacementType.BOTTOM
+            #     else "pl-order-blocks-right"
+            # ),
         }
         with open("pl-order-blocks-sorted-1.mustache", "r", encoding="utf-8") as f:
             html = chevron.render(f, html_params)

@@ -98,14 +98,16 @@ $(function() {
 
 
 {{#true_answer}}
+    {{#question_solutions}}
     <div class="pl-order-blocks-answer-container {{block_layout}} {{dropzone_layout}}">
         <div class="card-header list-group-item-success">Correct answer ({{ordering_message}}{{indentation_message}}):</div>
         <ul class="card-body list-group">
-        {{#question_solutions}}
+        {{#question_solution}}
             <li class="{{block_formatting}} pl-order-block" style="margin-left: {{indent}}px">{{{inner_html}}}</li>
-        {{/question_solutions}}
+        {{/question_solution}}
         </ul>
     </div>
+    {{/question_solutions}}
 
     {{#show_distractors}}
     <br><br>
