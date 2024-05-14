@@ -788,16 +788,19 @@ def render(element_html: str, data: pl.QuestionData) -> str:
             #     }
             #     for attempt in subblock_data
             # ])
-            student_submission = [
-                {
-                    "inner_html": attempt["inner_html"],
-                    "indent": (attempt["indent"] or 0) * TAB_SIZE_PX,
-                    "badge_type": attempt.get("badge_type", ""),
-                    "icon": attempt.get("icon", ""),
-                    "distractor_feedback": attempt.get("distractor_feedback", ""),
-                }
-                for attempt in data["submitted_answers"].get(answer_name, [])[1]
-            ]
+            submissions = []
+            for i in range(data["submitted_answers"].get(answer_name, [])):
+                student_submission = [
+                    {
+                        "inner_html": attempt["inner_html"],
+                        "indent": (attempt["indent"] or 0) * TAB_SIZE_PX,
+                        "badge_type": attempt.get("badge_type", ""),
+                        "icon": attempt.get("icon", ""),
+                        "distractor_feedback": attempt.get("distractor_feedback", ""),
+                    }
+                    for attempt in data["submitted_answers"].get(answer_name, [])[i]
+                ]
+                submissions.append(student_submission)
         else:
             student_submission = [
                 {
@@ -816,22 +819,40 @@ def render(element_html: str, data: pl.QuestionData) -> str:
             score = data["partial_scores"][answer_name]["score"]
             feedback = data["partial_scores"][answer_name].get("feedback", "")
 
-        html_params = {
-            "submission": True,
-            "parse-error": data["format_errors"].get(answer_name, None),
-            "student_submission": student_submission,
-            "feedback": feedback,
-            "block_formatting": block_formatting,
-            "allow_feedback_badges": not all(
-                block.get("badge_type", "") == "" for block in student_submission
-            ),
-            "block_layout": "pl-order-blocks-horizontal" if inline else "",
-            "dropzone_layout": (
-                "pl-order-blocks-bottom"
-                if dropzone_layout is SolutionPlacementType.BOTTOM
-                else "pl-order-blocks-right"
-            ),
-        }
+        if grading_method is GradingMethodType.SORTING:
+            html_params = {
+                "submission": True,
+                "parse-error": data["format_errors"].get(answer_name, None),
+                "submissions": student_submissions,
+                "feedback": feedback,
+                "block_formatting": block_formatting,
+                "allow_feedback_badges": not all(
+                    block.get("badge_type", "") == "" for block in student_submission
+                ),
+                "block_layout": "pl-order-blocks-horizontal" if inline else "",
+                "dropzone_layout": (
+                    "pl-order-blocks-bottom"
+                    if dropzone_layout is SolutionPlacementType.BOTTOM
+                    else "pl-order-blocks-right"
+                ),
+            }
+        else:
+            html_params = {
+                "submission": True,
+                "parse-error": data["format_errors"].get(answer_name, None),
+                "student_submission": student_submission,
+                "feedback": feedback,
+                "block_formatting": block_formatting,
+                "allow_feedback_badges": not all(
+                    block.get("badge_type", "") == "" for block in student_submission
+                ),
+                "block_layout": "pl-order-blocks-horizontal" if inline else "",
+                "dropzone_layout": (
+                    "pl-order-blocks-bottom"
+                    if dropzone_layout is SolutionPlacementType.BOTTOM
+                    else "pl-order-blocks-right"
+                ),
+            } 
 
         if score is not None:
             try:
@@ -847,8 +868,12 @@ def render(element_html: str, data: pl.QuestionData) -> str:
                     f"invalid score: {data['partial_scores'][answer_name].get('score', 0)}"
                 )
 
-        with open("pl-order-blocks.mustache", "r", encoding="utf-8") as f:
-            html = chevron.render(f, html_params)
+        if grading_method is GradingMethodType.SORTING:
+            with open("pl-order-blocks-sorted-1.mustache", "r", encoding="utf-8") as f:
+                html = chevron.render(f, html_params)
+        else:
+            with open("pl-order-blocks.mustache", "r", encoding="utf-8") as f:
+                html = chevron.render(f, html_params)
         return html
 
     elif data["panel"] == "answer":
