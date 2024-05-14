@@ -933,6 +933,7 @@ def render(element_html: str, data: pl.QuestionData) -> str:
                 for solution in data["correct_answers"][answer_name][i]
             ]
             curr_anwser["question_solution"] = question_solution
+            question_solutions.append(curr_anwser)
         
         
 
