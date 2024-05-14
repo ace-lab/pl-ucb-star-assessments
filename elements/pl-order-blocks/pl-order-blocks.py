@@ -790,7 +790,7 @@ def render(element_html: str, data: pl.QuestionData) -> str:
             # ])
             #treamsubmissions = []
             #submissions = {}
-            for i in range(data["submitted_answers"].get(answer_name, [])):
+            for i in range(len(data["submitted_answers"].get(answer_name, []))):
                 student_submission = [
                     {
                         "inner_html": attempt["inner_html"],
