@@ -1154,10 +1154,10 @@ def grade(element_html: str, data: pl.QuestionData) -> None:
             for curr_iteration in true_answer_list:
                 for index, answer in enumerate(curr_iteration):
                     answer["ranking"] = index
-                curr_iteration = sorted(curr_iteration, key=lambda x: int(x["ranking"]))
-                true_answer = [answer["tag"] for answer in curr_iteration]
+                curr_iteration_trueans = sorted(curr_iteration, key=lambda x: int(x["ranking"]))
+                true_answer = [answer["tag"] for answer in curr_iteration_trueans]
                 tag_to_rank = {
-                    answer["tag"]: answer["ranking"] for answer in curr_iteration
+                    answer["tag"]: answer["ranking"] for answer in curr_iteration_trueans
                 }
                 lines_of_rank = {
                     rank: [tag for tag in tag_to_rank if tag_to_rank[tag] == rank]
@@ -1202,7 +1202,7 @@ def grade(element_html: str, data: pl.QuestionData) -> None:
                 #         )
                 #         no_feedback_yet = False
 
-                i += 1
+#                i += 1
 
             final_score = max(0, float(total_correct_answers - total_edit_distance) / total_correct_answers)
             final_score *= 2
