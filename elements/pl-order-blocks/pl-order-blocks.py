@@ -763,7 +763,7 @@ def render(element_html: str, data: pl.QuestionData) -> str:
                 "block_layout": "pl-order-blocks-horizontal" if inline else "",
             }
 
-            with open("pl-order-blocks-sorted-1.mustache", "r", encoding="utf-8") as f:
+            with open("pl-order-blocks-sorted.mustache", "r", encoding="utf-8") as f:
                 html = chevron.render(f, html_params)
             return html
             
@@ -866,7 +866,7 @@ def render(element_html: str, data: pl.QuestionData) -> str:
                 )
 
         if grading_method is GradingMethodType.SORTING:
-            with open("pl-order-blocks-sorted-1.mustache", "r", encoding="utf-8") as f:
+            with open("pl-order-blocks-sorted.mustache", "r", encoding="utf-8") as f:
                 html = chevron.render(f, html_params)
         else:
             with open("pl-order-blocks.mustache", "r", encoding="utf-8") as f:
@@ -946,7 +946,7 @@ def render(element_html: str, data: pl.QuestionData) -> str:
             #     else "pl-order-blocks-right"
             # ),
         }
-        with open("pl-order-blocks-sorted-1.mustache", "r", encoding="utf-8") as f:
+        with open("pl-order-blocks-sorted.mustache", "r", encoding="utf-8") as f:
             html = chevron.render(f, html_params)
         return html
 
