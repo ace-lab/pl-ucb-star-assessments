@@ -1,0 +1,45 @@
+.draggable-items {
+    margin-bottom: 20px;
+}
+
+.draggable {
+    padding: 5px;
+    margin: 5px;
+    display: inline-block;
+    background-color: lightgray;
+    border: 1px solid #000;
+    cursor: grab;
+}
+
+#grid-container {
+    display: flex; /* This makes sure the container is a flexbox */
+    flex-direction: column; /* Aligns the child grid-rows vertically */
+    align-items: center; /* Centers the grid rows */
+    margin: 0 auto;
+}
+
+.grid-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(50px, 1fr)); /* Adjust columns based on content width */
+    gap: 1px;
+}
+
+.grid-cell {
+    border: 1px solid #000;
+    background-color: #fff;
+    min-height: 50px;
+    min-width: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 5px; /* This should apply to all sides */
+    box-sizing: border-box; /* Include padding and border in the element's size */
+}
+
+.blocked {
+    background-color: #d9534f; /* Some color to indicate blockage */
+}
+
+.draggable.in-grid {
+    cursor: move; /* Change cursor to indicate moveability */
+}
