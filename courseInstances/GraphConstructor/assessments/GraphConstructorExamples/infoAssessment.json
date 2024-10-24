@@ -1,0 +1,19 @@
+{
+    "uuid": "7046c3d0-567a-4e1d-a352-ce82d031f7ab",
+    "type": "Homework",
+    "title": "Interactive Graph Examples",
+    "set": "Homework",
+    "number": "1",
+    "allowAccess": [],
+    "zones": [
+        {
+            "comment": "These are new questions created for the pl-interactive-graph element",
+            "questions": [
+                {
+                    "id": "Graph-Construction",
+                    "autoPoints": 1
+                }
+            ]
+        }
+    ]
+}
