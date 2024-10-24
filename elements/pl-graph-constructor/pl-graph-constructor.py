@@ -14,7 +14,8 @@ import chevron
 def render(element_html, data):
     # Render the Mustache template using chevron
     #return chevron.render(element_html, {}).strip()
-    return element_html
+    with open('pl-graph-constructor.mustache', 'r') as f:
+        return chevron.render(f).strip()
 
 
 # def parse(element_html, data):
