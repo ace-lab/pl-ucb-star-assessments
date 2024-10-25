@@ -26,6 +26,8 @@
  OTHER DEALINGS IN THE SOFTWARE.
 */
 
+var graphDataInput;
+
 function restoreBackup() {
 	if(!localStorage || !JSON) {
 		return;
@@ -255,6 +257,7 @@ function drawUsing(c) {
 
 function draw() {
 	drawUsing(canvas.getContext('2d'));
+    updateGraphData();
 	saveBackup();
 }
 
@@ -288,6 +291,8 @@ function snapNode(node) {
 
 window.onload = function() {
 	canvas = document.getElementById('fsm-canvas');
+    graphDataInput = document.getElementById('graphData');
+
 	restoreBackup();
 	draw();
 
@@ -493,6 +498,50 @@ function output(text) {
 	element.style.display = 'block';
 	element.value = text;
 }
+
+
+function updateGraphData() {
+    // Assign unique IDs to nodes
+    nodes.forEach(function(node, index) {
+        node.id = 'N' + index;
+    });
+
+    // Build the DOT string
+    var dotString = "digraph G {\n";
+    // Nodes
+    nodes.forEach(function(node) {
+        var label = node.text.replace(/"/g, '\\"'); // Escape double quotes
+        var shape = node.isAcceptState ? 'doublecircle' : 'circle';
+        dotString += '    ' + node.id + ' [label="' + label + '", shape=' + shape + '];\n';
+    });
+    // Links
+    links.forEach(function(link) {
+        var fromId, toId;
+        if (link instanceof SelfLink) {
+            fromId = link.node.id;
+            toId = link.node.id;
+        } else if (link instanceof StartLink) {
+            // Handle StartLink as a link from a virtual start node
+            fromId = 'start';
+            toId = link.node.id;
+            dotString += '    ' + fromId + ' [shape=point];\n'; // Define the start node
+        } else if (link instanceof Link) {
+            fromId = link.nodeA.id;
+            toId = link.nodeB.id;
+        } else {
+            return;
+        }
+        var label = link.text.replace(/"/g, '\\"'); // Escape double quotes
+        dotString += '    ' + fromId + ' -> ' + toId + ' [label="' + label + '"];\n';
+    });
+    dotString += '}';
+
+    // Update the hidden input field
+    if (graphDataInput) {
+        graphDataInput.value = dotString;
+    }
+}
+
 
 function saveAsPNG() {
 	var oldSelectedObject = selectedObject;
