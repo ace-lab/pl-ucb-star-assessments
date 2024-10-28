@@ -773,10 +773,12 @@ Link.prototype.draw = function(c) {
 	}
 	c.stroke();
 	// draw the head of the arrow
-	if(stuff.hasCircle) {
-		drawArrow(c, stuff.endX, stuff.endY, stuff.endAngle - stuff.reverseScale * (Math.PI / 2));
-	} else {
-		drawArrow(c, stuff.endX, stuff.endY, Math.atan2(stuff.endY - stuff.startY, stuff.endX - stuff.startX));
+	if (config.directed){
+		if(stuff.hasCircle) {
+			drawArrow(c, stuff.endX, stuff.endY, stuff.endAngle - stuff.reverseScale * (Math.PI / 2));
+		} else {
+			drawArrow(c, stuff.endX, stuff.endY, Math.atan2(stuff.endY - stuff.startY, stuff.endX - stuff.startX));
+		}
 	}
 	// draw the text
 	if(stuff.hasCircle) {
@@ -899,17 +901,21 @@ SelfLink.prototype.getEndPointsAndCircle = function() {
 };
 
 SelfLink.prototype.draw = function(c) {
-	var stuff = this.getEndPointsAndCircle();
-	// draw arc
-	c.beginPath();
-	c.arc(stuff.circleX, stuff.circleY, stuff.circleRadius, stuff.startAngle, stuff.endAngle, false);
-	c.stroke();
-	// draw the text on the loop farthest from the node
-	var textX = stuff.circleX + stuff.circleRadius * Math.cos(this.anchorAngle);
-	var textY = stuff.circleY + stuff.circleRadius * Math.sin(this.anchorAngle);
-	drawText(c, this.text, textX, textY, this.anchorAngle, selectedObject == this);
-	// draw the head of the arrow
-	drawArrow(c, stuff.endX, stuff.endY, stuff.endAngle + Math.PI * 0.4);
+	if (config.allow_loops) {
+		var stuff = this.getEndPointsAndCircle();
+		// draw arc
+		c.beginPath();
+		c.arc(stuff.circleX, stuff.circleY, stuff.circleRadius, stuff.startAngle, stuff.endAngle, false);
+		c.stroke();
+		// draw the text on the loop farthest from the node
+		var textX = stuff.circleX + stuff.circleRadius * Math.cos(this.anchorAngle);
+		var textY = stuff.circleY + stuff.circleRadius * Math.sin(this.anchorAngle);
+		drawText(c, this.text, textX, textY, this.anchorAngle, selectedObject == this);
+		// draw the head of the arrow
+		if (config.directed) {
+			drawArrow(c, stuff.endX, stuff.endY, stuff.endAngle + Math.PI * 0.4);
+		}
+	}
 };
 
 SelfLink.prototype.containsPoint = function(x, y) {
