@@ -12,8 +12,19 @@
                 {
                     "id": "Graph-Construction",
                     "autoPoints": 1
+                },
+
+                {
+                    "id": "Graph-Construction-2",
+                    "autoPoints": 1
+                },
+
+                {
+                    "id": "Graph-Construction-3",
+                    "autoPoints": 1
                 }
             ]
+
         }
     ]
 }

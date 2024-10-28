@@ -1188,3 +1188,54 @@ function ExportAsLaTeX() {
 
 	this.translate = this.save = this.restore = this.clearRect = function(){};
 }
+
+
+function restoreBackup() {
+    if (!localStorage || !JSON) {
+        return;
+    }
+
+    // Clear the previous session data to avoid carrying it over automatically
+    localStorage.removeItem('fsm');
+    graphDataInput.value = "";  // Clear hidden input as well
+
+    // Optional: Restore backup only if explicitly desired
+    // Uncomment the following code block if you want to add a "Restore" button for users to load saved data.
+    /*
+    try {
+        var backup = JSON.parse(localStorage['fsm']);
+        for (var i = 0; i < backup.nodes.length; i++) {
+            var backupNode = backup.nodes[i];
+            var node = new Node(backupNode.x, backupNode.y);
+            node.isAcceptState = backupNode.isAcceptState;
+            node.text = backupNode.text;
+            nodes.push(node);
+        }
+        for (var i = 0; i < backup.links.length; i++) {
+            var backupLink = backup.links[i];
+            var link = null;
+            if (backupLink.type == 'SelfLink') {
+                link = new SelfLink(nodes[backupLink.node]);
+                link.anchorAngle = backupLink.anchorAngle;
+                link.text = backupLink.text;
+            } else if (backupLink.type == 'StartLink') {
+                link = new StartLink(nodes[backupLink.node]);
+                link.deltaX = backupLink.deltaX;
+                link.deltaY = backupLink.deltaY;
+                link.text = backupLink.text;
+            } else if (backupLink.type == 'Link') {
+                link = new Link(nodes[backupLink.nodeA], nodes[backupLink.nodeB]);
+                link.parallelPart = backupLink.parallelPart;
+                link.perpendicularPart = backupLink.perpendicularPart;
+                link.text = backupLink.text;
+                link.lineAngleAdjust = backupLink.lineAngleAdjust;
+            }
+            if (link != null) {
+                links.push(link);
+            }
+        }
+    } catch (e) {
+        localStorage['fsm'] = '';
+    }
+    */
+}
