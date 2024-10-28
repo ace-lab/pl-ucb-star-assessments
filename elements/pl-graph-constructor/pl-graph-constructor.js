@@ -128,6 +128,11 @@ function saveBackup() {
 }
 
 var greekLetterNames = [ 'Alpha', 'Beta', 'Gamma', 'Delta', 'Epsilon', 'Zeta', 'Eta', 'Theta', 'Iota', 'Kappa', 'Lambda', 'Mu', 'Nu', 'Xi', 'Omicron', 'Pi', 'Rho', 'Sigma', 'Tau', 'Upsilon', 'Phi', 'Chi', 'Psi', 'Omega' ];
+var config = {
+	directed: true,
+	allow_loops: true,
+	multigraph: true
+}
 
 function convertLatexShortcuts(text) {
 	// html greek characters
@@ -507,7 +512,13 @@ function updateGraphData() {
     });
 
     // Build the DOT string
+	var arrow = " -> ";
     var dotString = "digraph G {\n";
+
+	if (!config.directed) {
+		arrow = " -- "
+		dotString = "graph {";
+	}
     // Nodes
     nodes.forEach(function(node) {
         var label = node.text.replace(/"/g, '\\"'); // Escape double quotes
@@ -518,6 +529,9 @@ function updateGraphData() {
     links.forEach(function(link) {
         var fromId, toId;
         if (link instanceof SelfLink) {
+			if (!config.allow_loops) {
+				return;
+			}
             fromId = link.node.id;
             toId = link.node.id;
         } else if (link instanceof StartLink) {
@@ -532,7 +546,7 @@ function updateGraphData() {
             return;
         }
         var label = link.text.replace(/"/g, '\\"'); // Escape double quotes
-        dotString += '    ' + fromId + ' -> ' + toId + ' [label="' + label + '"];\n';
+        dotString += '    ' + fromId + arrow + toId + ' [label="' + label + '"];\n';
     });
     dotString += '}';
 
