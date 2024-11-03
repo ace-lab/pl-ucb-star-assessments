@@ -2,3 +2,13 @@
     <canvas id="fsm-canvas" width="800" height="600"></canvas>
     <input type="hidden" name="graphData" id="graphData">
 </div>
+
+<script>
+    const config = {
+        directed: {{config.directed}},
+        allow_selflinks: {{config.allow_selflinks}},
+        multigraph: {{config.multigraph}}
+    };
+
+    console.log(config); 
+</script>
