@@ -340,8 +340,10 @@ window.onload = function() {
 			resetCaret();
 			draw();
 		} else if(selectedObject instanceof Node) {
-			selectedObject.isAcceptState = !selectedObject.isAcceptState;
-			draw();
+			if (config.allow_nodemarking) {
+				selectedObject.isAcceptState = !selectedObject.isAcceptState;
+				draw();
+			}
 		}
 	};
 
@@ -384,16 +386,34 @@ window.onload = function() {
 	canvas.onmouseup = function(e) {
 		movingObject = false;
 
-		if(currentLink != null) {
-			if(!(currentLink instanceof TemporaryLink)) {
-				selectedObject = currentLink;
-				links.push(currentLink);
-				resetCaret();
+		if (currentLink != null) {
+			if (!(currentLink instanceof TemporaryLink)) {
+				// Check if it's a self-link and if self-links are allowed
+				if (currentLink instanceof SelfLink && !config.allow_selflinks) {
+					currentLink = null;
+					draw();
+					return; // Skip self-links if they are not allowed
+				}
+	
+				// Prevent multiple links if multigraph is disabled
+				if (config.multigraph || !isLinkDuplicate(currentLink)) {
+					selectedObject = currentLink;
+					links.push(currentLink);
+					resetCaret();
+				}
 			}
 			currentLink = null;
 			draw();
 		}
 	};
+}
+
+function isLinkDuplicate(newLink) {
+    return links.some(link => (
+        link instanceof Link &&
+        ((link.nodeA === newLink.nodeA && link.nodeB === newLink.nodeB) ||
+         (link.nodeA === newLink.nodeB && link.nodeB === newLink.nodeA))
+    ));
 }
 
 var shift = false;
@@ -595,7 +615,13 @@ function saveAsDot() {
 
 	var dotString = "digraph {";
 	dotString += nodes.map((node) => {
-		return node.id + "[label=\"" + node.text + "\"]"
+		if (node.isAcceptState) {
+            // Customize the node for accept states
+            return `${node.id} [label="${node.text}",style=filled;`;
+        } else {
+            // Regular node representation
+            return `${node.id} [label="${node.text}"];`;
+        }
 	}).join(";");
 	dotString += links.map((link) => {
 		let nodeA, nodeB;
