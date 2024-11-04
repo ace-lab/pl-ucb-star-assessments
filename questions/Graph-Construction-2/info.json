@@ -1,7 +1,7 @@
 {
     "uuid": "2a071e87-61f7-43cc-bafe-3cd9c46ce85e",
-    "title": "Graph Constructor Playground 2",
+    "title": "Strongly Connected Components (CS170 Disc 3, Q1)",
     "topic": "Graphs",
-    "tags": ["mwest", "tpl101", "v3"],
+    "tags": ["cs170", "scc", "graph-constructor"],
     "type": "v3"
 }
