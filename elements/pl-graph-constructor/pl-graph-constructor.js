@@ -50,12 +50,7 @@ function restoreBackup() {
 				link = new SelfLink(nodes[backupLink.node]);
 				link.anchorAngle = backupLink.anchorAngle;
 				link.text = backupLink.text;
-			} else if(backupLink.type == 'StartLink') {
-				link = new StartLink(nodes[backupLink.node]);
-				link.deltaX = backupLink.deltaX;
-				link.deltaY = backupLink.deltaY;
-				link.text = backupLink.text;
-			} else if(backupLink.type == 'Link') {
+			}  else if(backupLink.type == 'Link') {
 				link = new Link(nodes[backupLink.nodeA], nodes[backupLink.nodeB]);
 				link.parallelPart = backupLink.parallelPart;
 				link.perpendicularPart = backupLink.perpendicularPart;
@@ -99,14 +94,6 @@ function saveBackup() {
 				'node': nodes.indexOf(link.node),
 				'text': link.text,
 				'anchorAngle': link.anchorAngle,
-			};
-		} else if(link instanceof StartLink) {
-			backupLink = {
-				'type': 'StartLink',
-				'node': nodes.indexOf(link.node),
-				'text': link.text,
-				'deltaX': link.deltaX,
-				'deltaY': link.deltaY,
 			};
 		} else if(link instanceof Link) {
 			backupLink = {
@@ -302,25 +289,26 @@ window.onload = function() {
 		selectedObject = selectObject(mouse.x, mouse.y);
 		movingObject = false;
 		originalClick = mouse;
-
-		if(selectedObject != null) {
-			if(shift && selectedObject instanceof Node) {
+	
+		if (selectedObject != null) {
+			// Check if we are creating a self-link and if self-links are allowed
+			if (shift && selectedObject instanceof Node) {
 				currentLink = new SelfLink(selectedObject, mouse);
 			} else {
 				movingObject = true;
 				deltaMouseX = deltaMouseY = 0;
-				if(selectedObject.setMouseStart) {
+				if (selectedObject.setMouseStart) {
 					selectedObject.setMouseStart(mouse.x, mouse.y);
 				}
 			}
 			resetCaret();
-		} else if(shift) {
+		} else if (shift) {
 			currentLink = new TemporaryLink(mouse, mouse);
 		}
-
+	
 		draw();
-
-		if(canvasHasFocus()) {
+	
+		if (canvasHasFocus()) {
 			// disable drag-and-drop only if the canvas is already focused
 			return false;
 		} else {
@@ -340,7 +328,7 @@ window.onload = function() {
 			resetCaret();
 			draw();
 		} else if(selectedObject instanceof Node) {
-			if (config.allow_nodemarking) {
+			if (config.nodemarking) {
 				selectedObject.isAcceptState = !selectedObject.isAcceptState;
 				draw();
 			}
@@ -358,8 +346,6 @@ window.onload = function() {
 
 			if(selectedObject == null) {
 				if(targetNode != null) {
-					currentLink = new StartLink(targetNode, originalClick);
-				} else {
 					currentLink = new TemporaryLink(originalClick, mouse);
 				}
 			} else {
@@ -385,17 +371,22 @@ window.onload = function() {
 
 	canvas.onmouseup = function(e) {
 		movingObject = false;
-
+	
 		if (currentLink != null) {
 			if (!(currentLink instanceof TemporaryLink)) {
-				// Check if it's a self-link and if self-links are allowed
-				if (currentLink instanceof SelfLink && !config.allow_selflinks) {
+				// Handle self-links based on allow_selflinks setting
+				if (currentLink instanceof SelfLink) {
+					if (config.allow_selflinks) {
+						selectedObject = currentLink;
+						links.push(currentLink);
+						resetCaret();
+					}
 					currentLink = null;
 					draw();
-					return; // Skip self-links if they are not allowed
+					return; // Stop further processing for self-links
 				}
 	
-				// Prevent multiple links if multigraph is disabled
+				// Handle other links based on multigraph setting
 				if (config.multigraph || !isLinkDuplicate(currentLink)) {
 					selectedObject = currentLink;
 					links.push(currentLink);
@@ -406,13 +397,14 @@ window.onload = function() {
 			draw();
 		}
 	};
+	
 }
 
 function isLinkDuplicate(newLink) {
     return links.some(link => (
         link instanceof Link &&
         ((link.nodeA === newLink.nodeA && link.nodeB === newLink.nodeB) ||
-         (link.nodeA === newLink.nodeB && link.nodeB === newLink.nodeA))
+         (!config.directed && link.nodeA === newLink.nodeB && link.nodeB === newLink.nodeA))
     ));
 }
 
@@ -545,16 +537,11 @@ function updateGraphData() {
     links.forEach(function(link) {
         var fromId, toId;
         if (link instanceof SelfLink) {
-			if (!config.allow_loops) {
+			if (!config.allow_selflinks) {
 				return;
 			}
             fromId = link.node.id;
             toId = link.node.id;
-        } else if (link instanceof StartLink) {
-            // Handle StartLink as a link from a virtual start node
-            fromId = 'start';
-            toId = link.node.id;
-            dotString += '    ' + fromId + ' [shape=point];\n'; // Define the start node
         } else if (link instanceof Link) {
             fromId = link.nodeA.id;
             toId = link.nodeB.id;
@@ -870,7 +857,9 @@ TemporaryLink.prototype.draw = function(c) {
 	c.stroke();
 
 	// draw the head of the arrow
-	drawArrow(c, this.to.x, this.to.y, Math.atan2(this.to.y - this.from.y, this.to.x - this.from.x));
+	if(config.directed) {
+		drawArrow(c, this.to.x, this.to.y, Math.atan2(this.to.y - this.from.y, this.to.x - this.from.x));
+	}
 };
 
 function SelfLink(node, mouse) {
@@ -923,7 +912,7 @@ SelfLink.prototype.getEndPointsAndCircle = function() {
 };
 
 SelfLink.prototype.draw = function(c) {
-	if (config.allow_loops) {
+	if (config.allow_selflinks) {
 		var stuff = this.getEndPointsAndCircle();
 		// draw arc
 		c.beginPath();
@@ -948,68 +937,7 @@ SelfLink.prototype.containsPoint = function(x, y) {
 	return (Math.abs(distance) < hitTargetPadding);
 };
 
-function StartLink(node, start) {
-	this.node = node;
-	this.deltaX = 0;
-	this.deltaY = 0;
-	this.text = '';
 
-	if(start) {
-		this.setAnchorPoint(start.x, start.y);
-	}
-}
-
-StartLink.prototype.setAnchorPoint = function(x, y) {
-	this.deltaX = x - this.node.x;
-	this.deltaY = y - this.node.y;
-
-	if(Math.abs(this.deltaX) < snapToPadding) {
-		this.deltaX = 0;
-	}
-
-	if(Math.abs(this.deltaY) < snapToPadding) {
-		this.deltaY = 0;
-	}
-};
-
-StartLink.prototype.getEndPoints = function() {
-	var startX = this.node.x + this.deltaX;
-	var startY = this.node.y + this.deltaY;
-	var end = this.node.closestPointOnCircle(startX, startY);
-	return {
-		'startX': startX,
-		'startY': startY,
-		'endX': end.x,
-		'endY': end.y,
-	};
-};
-
-StartLink.prototype.draw = function(c) {
-	var stuff = this.getEndPoints();
-
-	// draw the line
-	c.beginPath();
-	c.moveTo(stuff.startX, stuff.startY);
-	c.lineTo(stuff.endX, stuff.endY);
-	c.stroke();
-
-	// draw the text at the end without the arrow
-	var textAngle = Math.atan2(stuff.startY - stuff.endY, stuff.startX - stuff.endX);
-	drawText(c, this.text, stuff.startX, stuff.startY, textAngle, selectedObject == this);
-
-	// draw the head of the arrow
-	drawArrow(c, stuff.endX, stuff.endY, Math.atan2(-this.deltaY, -this.deltaX));
-};
-
-StartLink.prototype.containsPoint = function(x, y) {
-	var stuff = this.getEndPoints();
-	var dx = stuff.endX - stuff.startX;
-	var dy = stuff.endY - stuff.startY;
-	var length = Math.sqrt(dx*dx + dy*dy);
-	var percent = (dx * (x - stuff.startX) + dy * (y - stuff.startY)) / (length * length);
-	var distance = (dx * (y - stuff.startY) - dy * (x - stuff.startX)) / length;
-	return (percent > 0 && percent < 1 && Math.abs(distance) < hitTargetPadding);
-};
 
 // draw using this instead of a canvas and call toSVG() afterward
 function ExportAsSVG() {
