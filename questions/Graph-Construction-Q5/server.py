@@ -4,23 +4,20 @@ def parse_dot(dot_string):
     # Normalize line endings and whitespace
     dot_string = dot_string.replace("\r", "").replace("\n", "")
     
-    # Parse nodes and create a mapping from N identifiers to actual labels
-    node_labels = set()
-    
+    node_count = 0
+    edge_count = 0    
     # Node pattern to account for any whitespace around square brackets
-    node_pattern = re.compile(r'(\w+)\s*\[label="([^"]+)",\s*shape=circle\]')
+    node_pattern = re.compile(r'(\w+)\s*\[.*?shape=circle.*?\];')
     for match in node_pattern.finditer(dot_string):
-        node_id, label = match.groups()
-        node_labels.add(label)  # We just need the label to count nodes
+        node_count += 1
 
     edges = set()
     # Edge pattern to account for optional whitespace and positive/negative labels
-    edge_pattern = re.compile(r'(\w+)\s*->\s*(\w+)\s*\[label="(-?\d+)"\]')
+    edge_pattern = re.compile(r'(\w+)\s*->\s*(\w+)\s*(\[[^\]]*\])?;')
     for match in edge_pattern.finditer(dot_string):
-        source_id, target_id, label = match.groups()
-        edges.add((source_id, target_id))  # Track only the connections to count edges
+        edge_count += 1
     
-    return node_labels, edges
+    return node_count, edge_count
 
 def grade(data):
     # Define required number of nodes and edges
@@ -29,17 +26,15 @@ def grade(data):
     
     # Parse the student's answer
     student_dot = data['submitted_answers'].get('graphData', '')
-    student_nodes, student_edges = parse_dot(student_dot)
+    node_count, edge_count = parse_dot(student_dot)
 
-    # Count nodes and edges
-    node_count = len(student_nodes)
-    edge_count = len(student_edges)
+    # Calculate penalties for missing or extra nodes/edges
+    node_difference = abs(node_count - required_node_count)
+    edge_difference = abs(edge_count - required_edge_count)
 
-    # Check if the student's graph meets the requirements
-    if node_count == required_node_count and edge_count == required_edge_count:
-        data['score'] = 1  # Full credit if both criteria are met
-    else:
-        # Partial credit based on the proportion of correct nodes and edges
-        node_score = min(node_count / required_node_count, 1)
-        edge_score = min(edge_count / required_edge_count, 1)
-        data['score'] = 0.5 * node_score + 0.5 * edge_score  # Weighted equally
+    # Score nodes and edges separately
+    node_score = max(0, (required_node_count - node_difference) / required_node_count)
+    edge_score = max(0, (required_edge_count - edge_difference) / required_edge_count)
+    
+    # Calculate the final score as a weighted average
+    data['score'] = 0.5 * node_score + 0.5 * edge_score
