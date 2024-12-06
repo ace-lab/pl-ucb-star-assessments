@@ -2,6 +2,7 @@ import prairielearn as pl
 import json
 import chevron
 import lxml.html
+import re
 
 
 ALLOW_SELFLINKS_DEFAULT = True
@@ -22,6 +23,8 @@ def render(element_html, data):
     element = lxml.html.fragment_fromstring(element_html)
     directed = pl.get_boolean_attrib(element, "directed")
     answers_name = pl.get_string_attrib(element, "answers-name")
+    if not re.match(r'^[A-Za-z0-9_]+$', answers_name):
+        raise ValueError("answers-name can only contain alphabetic characters, numbers and underscores.")
     allow_selflinks = pl.get_boolean_attrib(element, "allow-selflinks", ALLOW_SELFLINKS_DEFAULT)
     multigraph = pl.get_boolean_attrib(element, "multigraph", ALLOW_SELFLINKS_DEFAULT)
     allow_nodemarking = pl.get_boolean_attrib(element, "allow-nodemarking", ALLOW_NODEMARKING_DEFAULT)

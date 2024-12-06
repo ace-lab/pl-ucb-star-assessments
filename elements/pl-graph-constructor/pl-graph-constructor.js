@@ -34,7 +34,7 @@ function restoreBackup() {
 	}
 
 	try {
-		var backup = JSON.parse(localStorage['fsm']);
+		var backup = JSON.parse(localStorage['fsm-' + config.answers_name]);
 
 		for(var i = 0; i < backup.nodes.length; i++) {
 			var backupNode = backup.nodes[i];
@@ -62,7 +62,7 @@ function restoreBackup() {
 			}
 		}
 	} catch(e) {
-		localStorage['fsm'] = '';
+		localStorage['fsm-' + config.answers_name] = '';
 	}
 }
 
@@ -112,7 +112,7 @@ function saveBackup() {
 		}
 	}
 
-	localStorage['fsm'] = JSON.stringify(backup);
+	localStorage['fsm-' + config.answers_name] = JSON.stringify(backup);
 }
 
 var greekLetterNames = [ 'Alpha', 'Beta', 'Gamma', 'Delta', 'Epsilon', 'Zeta', 'Eta', 'Theta', 'Iota', 'Kappa', 'Lambda', 'Mu', 'Nu', 'Xi', 'Omicron', 'Pi', 'Rho', 'Sigma', 'Tau', 'Upsilon', 'Phi', 'Chi', 'Psi', 'Omega' ];
@@ -529,7 +529,7 @@ function updateGraphData() {
 
     // Build the DOT string
 	var arrow = " -> ";
-    var dotString = "digraph G {\n";
+    var dotString = "digraph " + config.answers_name + " {\n";
 
 	if (!config.directed) {
 		arrow = " -- "
@@ -1155,14 +1155,14 @@ function restoreBackup() {
     }
 
     // Clear the previous session data to avoid carrying it over automatically
-    localStorage.removeItem('fsm');
-    graphDataInput.value = "";  // Clear hidden input as well
+    //localStorage.removeItem('fsm-' + config.answers_name);
+    //graphDataInput.value = "";  // Clear hidden input as well
 
     // Optional: Restore backup only if explicitly desired
     // Uncomment the following code block if you want to add a "Restore" button for users to load saved data.
-    /*
+    
     try {
-        var backup = JSON.parse(localStorage['fsm']);
+        var backup = JSON.parse(localStorage['fsm-' + config.answers_name]);
         for (var i = 0; i < backup.nodes.length; i++) {
             var backupNode = backup.nodes[i];
             var node = new Node(backupNode.x, backupNode.y);
@@ -1194,7 +1194,7 @@ function restoreBackup() {
             }
         }
     } catch (e) {
-        localStorage['fsm'] = '';
+        localStorage['fsm-' + config.answers_name] = '';
     }
-    */
+    
 }
