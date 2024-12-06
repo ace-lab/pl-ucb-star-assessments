@@ -66,6 +66,7 @@ function restoreBackup() {
 	}
 }
 
+
 function saveBackup() {
 	if(!localStorage || !JSON) {
 		return;
@@ -280,6 +281,13 @@ function snapNode(node) {
 window.onload = function() {
 	canvas = document.getElementById('fsm-canvas');
     graphDataInput = document.getElementById('graphData');
+
+	document.getElementById("clear-fsm").addEventListener("click", function(e) {
+		nodes = [];
+		links = [];
+		updateGraphData();
+	})
+	
 
 	restoreBackup();
 	draw();
@@ -865,6 +873,7 @@ TemporaryLink.prototype.draw = function(c) {
 function SelfLink(node, mouse) {
 	this.node = node;
 	this.anchorAngle = 0;
+	
 	this.mouseOffsetAngle = 0;
 	this.text = '';
 
