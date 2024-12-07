@@ -423,6 +423,12 @@ document.onkeydown = function(e) {
 
 	if(key == 16) {
 		shift = true;
+
+		if (canvas) {
+            canvas.style.cursor = "pointer";
+        }
+
+
 	} else if(!canvasHasFocus()) {
 		// don't read keystrokes when other things have focus
 		return true;
@@ -454,11 +460,15 @@ document.onkeydown = function(e) {
 };
 
 document.onkeyup = function(e) {
-	var key = crossBrowserKey(e);
+    var key = crossBrowserKey(e);
 
-	if(key == 16) {
-		shift = false;
-	}
+    if (key == 16) { // Shift key released
+        shift = false;
+        // Reset the cursor back to default when Shift is released
+        if (canvas) {
+            canvas.style.cursor = "default";
+        }
+    }
 };
 
 document.onkeypress = function(e) {
