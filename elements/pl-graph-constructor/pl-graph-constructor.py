@@ -65,9 +65,45 @@ def parse(element_html, data):
 
     
 
-# Helper for parse = "dict"
 def parse_dot(dot_string):
+    """
+    Parses a DOT format graph string and extracts labeled nodes and edges for both directed and undirected graphs.
+
+    The function normalizes the input string by removing extra line breaks and whitespace,
+    then uses regular expressions to extract labeled nodes and edges. 
+    It maps node identifiers to their labels and builds a set of edges using the labels.
+
+    Parameters:
+        dot_string (str): A string representing a graph in DOT format.
+
+    Returns:
+        tuple: A tuple containing:
+            - node_labels (dict_values): The labels of the nodes as a dict_values object.
+            - edges (set): A set of edges represented as tuples 
+                           (source_label, target_label, edge_label). 
+                           For undirected edges, the order of source_label and target_label is preserved as in the DOT string.
+
+    Example:
+        Input DOT string:
+            Directed:
+                "A [label=\"Node A\", shape=circle]; 
+                 B [label=\"Node B\", shape=circle]; 
+                 A -> B [label=\"1\"]"
+            Undirected:
+                "A [label=\"Node A\", shape=circle]; 
+                 B [label=\"Node B\", shape=circle]; 
+                 A -- B [label=\"1\"]"
+        
+        Output:
+            Directed:
+                (dict_values(['Node A', 'Node B']), {('Node A', 'Node B', '1')})
+            Undirected:
+                (dict_values(['Node A', 'Node B']), {('Node A', 'Node B', '1')})
+    """
+    # Normalize line endings and whitespace
     dot_string = dot_string.replace("\r", "").replace("\n", "")
+    
+    # Parse nodes and create a mapping from N identifiers to actual labels
     node_labels = {}
     node_pattern = re.compile(r'(\w+)\s*\[label="([^"]+)",\s*shape=circle\]')
     for match in node_pattern.finditer(dot_string):
@@ -75,10 +111,19 @@ def parse_dot(dot_string):
         node_labels[node_id] = label
 
     edges = set()
-    edge_pattern = re.compile(r'(\w+)\s*->\s*(\w+)\s*\[label="(\d+)"\]')
-    for match in edge_pattern.finditer(dot_string):
+    
+    # Edge pattern for directed edges
+    directed_edge_pattern = re.compile(r'(\w+)\s*->\s*(\w+)\s*\[label="(\d+)"\]')
+    for match in directed_edge_pattern.finditer(dot_string):
         source_id, target_id, label = match.groups()
         if source_id in node_labels and target_id in node_labels:
             edges.add((node_labels[source_id], node_labels[target_id], label))
     
+    # Edge pattern for undirected edges
+    undirected_edge_pattern = re.compile(r'(\w+)\s*--\s*(\w+)\s*\[label="(\d+)"\]')
+    for match in undirected_edge_pattern.finditer(dot_string):
+        source_id, target_id, label = match.groups()
+        if source_id in node_labels and target_id in node_labels:
+            edges.add((node_labels[source_id], node_labels[target_id], label))
+
     return node_labels.values(), edges
