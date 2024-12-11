@@ -1,3 +1,7 @@
+For the project progress throughout the semester, refer to the [Project Progress Slides](https://docs.google.com/presentation/d/1bWA7MSHf9N-qpFHzB5g0fXHr7cVBpWFpKgKQRTQ_HUw).
+
+This is not a new PrairieLearn element but rather a suite built on top of PrairieLearn to simplify the creation of interactive assessments. It provides general patterns and an API framework to make setting up workspaces and authoring content easier, leaving the specifics of content generation to the suite's users.
+
 This was copied from our [checkpoint](https://github.com/checkpoint-org/checkpoint) repo.
 ---
 
