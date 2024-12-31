@@ -1,0 +1,13 @@
+{
+  "image": "mcr.microsoft.com/devcontainers/universal:2", // consider "mcr.microsoft.com/devcontainers/base:ubuntu"
+  "features": {
+    // Ruby for rspec fpp and ruby fpp dev
+    "ghcr.io/devcontainers/features/ruby:1": {
+      "version" : "2.6"
+    },
+    // Python for element development
+    "ghcr.io/devcontainers/features/python:1": { },
+    // docker for running PL 
+    "ghcr.io/devcontainers/features/docker-in-docker:2": { }
+  }
+}

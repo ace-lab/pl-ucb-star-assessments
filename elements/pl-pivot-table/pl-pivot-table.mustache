@@ -1,0 +1,158 @@
+{{#question}}
+        <data hidden value="{{uuid}}"></data>
+        <data hidden value="{{num_row_dropzone_val}}"></data>
+        <data hidden value="{{num_index}}"></data>
+        <data hidden value="{{is_multicol}}"></data>
+
+        <div class="container column-box">
+            <h2>{{answer_col_text}}</h2>
+            {{#column_set}}
+            <div class="row col-set" id="{{uuid}}" data-order="{{order_col}}">
+                {{#column}}
+                <div class="col-md-{{{width}}} col-cell">{{{inner_html}}}</div>
+                {{/column}}
+                {{#is_ellipsis}}
+                <div class="col-md-{{{width}}} col-cell">...</div>
+                {{/is_ellipsis}}
+            </div>
+            {{/column_set}}
+        </div>
+
+        <div class="container index-box">
+            <h2>{{answer_index_text}}</h2>
+            <div class="row">
+                {{#indice_set}}
+                <div class="col-md-{{{width}}}">
+                    <div class="index-set" id="{{uuid}}" data-order="{{order_index}}">
+                        {{#index}}
+                        <div class="row">
+                            <div class="col-md-12 index-cell">{{{inner_html}}}</div>
+                        </div>
+                        {{/index}}
+                        {{#is_ellipsis}}
+                        <div class="row">
+                            <div class="col-md-12 index-cell">...</div>
+                        </div>
+                        {{/is_ellipsis}}
+                    </div>
+                </div>
+                {{/indice_set}}
+                {{#indice_set_for_double}}
+                <div class="col-md-1 {{{calibration}}}">
+                    <div class="index-set" id="{{uuid}}" data-order="{{order_index}}">
+                        {{#index}}
+                        <div class="row">
+                            <div class="col-md-12 index-cell">{{{inner_html}}}</div>
+                        </div>
+                        {{/index}}
+                        {{#is_ellipsis}}
+                        <div class="row">
+                            <div class="col-md-12 index-cell">...</div>
+                        </div>
+                        {{/is_ellipsis}}
+                    </div>
+                </div>
+                {{/indice_set_for_double}}
+            </div>
+
+        </div>
+
+        <div class="container row-box">
+            <h2>{{answer_row_text}}</h2>
+            
+            <div class="row">
+                {{#row_set}}
+                <div class="col-md-{{{width}}}">
+                    <div class="row-set" id="{{uuid}}" data-order="{{order_row}}">
+                        <div class="row">
+                            <div class="col-md-12 row-cell">&nbsp</div>
+                        </div>
+                        {{#row}}
+                        <div class="row">
+                            <div class="col-md-12 row-cell">{{{inner_html}}}</div>
+                        </div>
+                        {{/row}}
+                        {{#is_ellipsis}}
+                        <div class="row">
+                            <div class="col-md-12 row-cell">...</div>
+                        </div>
+                        {{/is_ellipsis}}
+                    </div>
+                </div>
+                {{/row_set}}
+            </div>
+        </div>
+
+        <div class="container drop-zone">
+            <h2>{{anwer_drop_zone}}</h2>
+            <div class="row">
+                {{#num_col}}
+                <div class="col-md-{{{width}}} drop-zone-col" col_order="0">Column</div>
+                {{/num_col}}
+            </div>
+            {{#is_multicol}}
+            <div class="row">
+                {{#num_col}}
+                <div class="col-md-{{{width}}} drop-zone-col2" col_order="1">Column</div>
+                {{/num_col}}
+            </div>
+            {{/is_multicol}}
+            {{#num_row}}
+            <div class="row">
+                <div class="col-md-{{{width}}} drop-zone-index">Index</div>
+                {{#num_row_dropzone}}
+                <div class="col-md-{{{width}}} drop-zone-row" order="{{{order_zone}}}">&nbsp</div>
+                {{/num_row_dropzone}}
+            </div>
+            {{/num_row}}
+            {{#num_row_for_double}}
+            <div class="row">
+                <div class="col-md-1 drop-zone-index1 {{{calibration}}}">Index</div>
+                <div class="col-md-1 drop-zone-index2 {{{calibration}}}">Index</div>
+                {{#num_row_dropzone}}
+                <div class="col-md-{{{width}}} drop-zone-row" order="{{{order_zone}}}">&nbsp</div>
+                {{/num_row_dropzone}}
+            </div>
+            {{/num_row_for_double}}
+        </div>
+
+        <input id="{{uuid}}-input" type="hidden" name="{{uuid}}-input" value="{&quot;column&quot;:null,&quot;index&quot;:null}"/>
+
+        <div class="container reset-button">
+            <div class="row">
+                <div class="col-md-12">
+                    <button class="bg-primary text-white" type="button" id="unique">Reset dataframe</button>
+                </div>
+            </div>
+        </div>
+{{/question}}
+
+{{#submission}}
+    {{#index}}
+        <p>Chosen index is incorrect</p>
+    {{/index}}
+
+    {{#index1}}
+        <p>First index is incorrect</p>
+    {{/index1}}
+
+    {{#index2}}
+        <p>Second index is incorrect</p>
+    {{/index2}}
+
+    {{#column}}
+        <p>Chosen column is incorrect</p>
+    {{/column}}
+    {{#column1}}
+        <p>First column is incorrect</p>
+    {{/column1}}
+    {{#column2}}
+        <p>Second column is incorrect</p>
+    {{/column2}}
+    {{#row}}
+        <p>Row arrangement is incorrect</p>
+    {{/row}}
+{{/submission}}
+
+{{#answer}}
+{{/answer}}

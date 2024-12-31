@@ -1,0 +1,112 @@
+<style>
+    table {
+        border-collapse: separate;
+        border-spacing: 0;
+        border: 1px solid #ddd;
+    }
+
+    th,
+    td {
+        text-align: left;
+        padding-left: 16px;
+        padding-right: 16px;
+    }
+
+    tr:nth-child(even) {
+        background-color: #f2f2f2;
+    }
+</style>
+<pl-question-panel>
+    <p>From the following tables <b>{{ params.table_1_name }}</b> (parent table) and <b>{{ params.table_2_name }}</b> (child table), </p>
+    <table>
+        <tr class="bg-warning">
+            <th colspan="20", style="text-align:center">{{ params.table_1_name }}</th>
+        </tr>
+        <tr>
+            {{ #params.columns_1 }}
+            <th>{{ . }}</th>
+            {{ /params.columns_1 }}
+        </tr>
+        {{ #params.table_1_data }}
+        <tr>
+            {{ #data }}
+            <td>{{ . }}</td>
+            {{ /data }}
+        </tr>
+        {{ /params.table_1_data }}
+    </table>
+    <br />
+    <table>
+        <tr class="bg-warning">
+            <th colspan="20", style="text-align:center">{{ params.table_2_name }}</th>
+        </tr>
+        <tr>
+            {{ #params.columns_2 }}
+            <th>{{ . }}</th>
+            {{ /params.columns_2 }}
+        </tr>
+        {{ #params.table_2_data }}
+        <tr>
+            {{ #data }}
+            <td>{{ . }}</td>
+            {{ /data }}
+        </tr>
+        {{ /params.table_2_data }}
+    </table>
+    <br>
+    <p>write an SQL query that retrieves the following rows and columns.</p>
+    <table>
+        <tr class="bg-warning">
+            <th colspan="20", style="text-align:center">Expected Result</th>
+        </tr>
+        <tr>
+            {{ #params.columns_q }}
+            <th>{{ . }}</th>
+            {{ /params.columns_q }}
+        </tr>
+        {{ #params.table_data_q }}
+        <tr>
+            {{ #data }}
+            <td>{{ . }}</td>
+            {{ /data }}
+        </tr>
+        {{ /params.table_data_q }}
+    </table>
+    <br />
+    <p>The primary key of <b>{{ params.table_1_name }}</b> is <b>{{ params.primary_key }}</b> and the associated foreign key of <b>{{ params.table_2_name }}</b> is <b>{{ params.foreign_key }}</b>.</p>
+    <p>Note that there may be multiple correct answers. The order in which the columns are selected does not matter.</p>
+    <p><pl-string-input answers-name="columns", label="SELECT ", placeholder="column(s) to retrieve" size=10000 /></p>
+    <p><pl-string-input answers-name="on", label=" FROM {{ params.table_1_name }} JOIN {{ params.table_2_name }} ON ", placeholder="condition(s) to join tables", size=10000 /></p>
+    <pl-string-input answers-name="condition", label="WHERE ", placeholder="condition(s) for rows retrieved" size=10000 />
+</pl-question-panel>
+<pl-submission-panel>
+    <p>{{ format_errors.student_feedback }}</p>
+    <p>{{ feedback.message }}</p>
+    <table>
+        <script>
+            var flag={{ correct_answers.flag }};
+            if (flag) {
+                document.write("<tr class=\"bg-warning\"><th colspan=\"20\", style=\"text-align:center\">Your Results</th></tr>")
+            }
+            else {
+                document.write("")
+            }
+        </script>
+        <tr>
+            {{ #feedback.columns_s }}
+            <th>{{ . }}</th>
+            {{ /feedback.columns_s }}
+        </tr>
+        {{ #feedback.student_results }}
+        <tr>
+            {{ #data }}
+            <td>{{ . }}</td>
+            {{ /data }}
+        </tr>
+        {{ /feedback.student_results }}
+        <p>{{ feedback.o }}</p>
+    </table>
+</pl-submission-panel>
+<pl-answer-panel>
+    {{ params.solution }}
+</pl-answer-panel>

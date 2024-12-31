@@ -1,0 +1,77 @@
+[
+	[
+		{
+			"table_name": "cars",
+			"columns": ["id", "make", "model", "year", "type"],
+			"create": "CREATE TABLE cars (id INTEGER PRIMARY KEY, make TEXT, model TEXT, year INTEGER, type TEXT)",
+			"rows": [
+				[1, "Ford", "F-250", "Fake <year>", "Truck"], 
+				[2, "Dodge", "Ram 3500", "Fake <year>", "Truck"], 
+				[3, "Chevrolet", "Suburban", "Fake <year>", "SUV"],
+				[4, "Ford", "Fusion", "Fake <year>", "Sedan"],
+				[5, "Chevrolet", "Impala", "Fake <year>", "Sedan"],
+				[6, "Dodge", "Caravan", "Fake <year>", "Minivan"]
+			],
+			"conditions": ["WHERE make = 'Ford'", "WHERE type = 'Sedan'",
+				"WHERE year = Fake <year>", "WHERE make = 'Dodge'"]
+		},
+		{
+			"table_name": "features",
+			"columns": ["id", "car_id", "feature", "value"],
+			"create": "CREATE TABLE features (id INTEGER PRIMARY KEY, car_id INTEGER, feature TEXT, value TEXT, FOREIGN KEY(car_id) REFERENCES cars(id))",
+			"rows": [
+				[1, 1, "Color", "Blue"], [2, 1, "Interior", "Leather"], [3, 1, "Transmission", "Manual, 4x4"],
+				[4, 2, "Color", "Gray"], [5, 2, "Transmission", "Manual, 4x4"], [6, 2, "Interior", "Cloth"],
+				[7, 4, "Color", "Black"], [8, 6, "Transmission", "Automatic"], [9, 6, "Interior", "Leather"]
+			],
+			"conditions": ["WHERE feature='Interior' AND value='Leather'"]
+		},
+		{
+			"table_name": "mileages",
+			"columns": ["id", "car_id", "mileage", "mpg"],
+			"create": "CREATE TABLE mileages (id INTEGER PRIMARY KEY, car_id INTEGER, mileage INTEGER, mpg REAL, FOREIGN KEY(car_id) REFERENCES cars(id))",
+			"rows": [[1, 1, 120, 15.7], [2, 2, 150, 19.5], [3, 4, 25064, 19.5], [4, 6, 100234, 18.5], [5, 6, 26700, 23.0]],
+			"conditions": ["WHERE mileage > 20000", "WHERE mpg < 19"]
+		},
+		{
+			"table_name": "registration",
+			"columns": ["id", "car_id", "state", "license_plate"],
+			"create": "CREATE TABLE registration (id INTEGER PRIMARY KEY, car_id INTEGER, state TEXT, license_plate INTEGER, FOREIGN KEY(car_id) REFERENCES cars(id))",
+			"rows": [[1, 1, "Fake <state>", "Fake <license_plate>"], [2, 2, "Fake <state>", "Fake <license_plate>"], [3, 3, "Fake <state>", "Fake <license_plate>"],
+			[4, 3, "Fake <state>", "Fake <license_plate>"], [5, 5, "Fake <state>", "Fake <license_plate>"], [6, 6, "Fake <state>", "Fake <license_plate>"]],
+			"conditions": ["WHERE state = 'Fake <state>'", "WHERE license_plate = 'Fake <license_plate>'"]
+		}
+	],
+	[
+		{
+			"table_name": "students",
+			"columns": ["id", "first_name", "last_name", "snum"],
+			"create": "CREATE TABLE students (id INTEGER PRIMARY KEY, first_name TEXT, last_name TEXT, snum INTEGER UNIQUE)",
+			"rows": [
+				[1, "Fake <first_name>", "Fake <last_name>", 334569203], [2, "Fake <first_name>", "Fake <last_name>", 331482394], 
+				[3, "Fake <first_name>", "Fake <last_name>", 459348209], [4, "Fake <first_name>", "Fake <last_name>", 432920198],
+				[5, "Fake <first_name>", "Fake <last_name>", 234981890], [6, "Fake <first_name>", "Fake <last_name>", 492304957]],
+			"conditions": ["WHERE first_name = 'Fake <first_name>'", "WHERE last_name = 'Fake <last_name>'"]
+		},
+		{
+			"table_name": "details",
+			"columns": ["id", "student_id", "state", "birth_year"],
+			"create": "CREATE TABLE details (id INTEGER PRIMARY KEY, student_id INTEGER, state TEXT, birth_year INTEGER, FOREIGN KEY(student_id) REFERENCES students(id))",
+			"rows": [
+				[1, 1, "Fake <state>", "Fake <birth_year>"], [2, 2, "Fake <state>", "Fake <birth_year>"],
+				[3, 4, "Fake <state>", "Fake <birth_year>"], [4, 5, "Fake <state>", "Fake <birth_year>"],
+				[5, 6, "Fake <state>", "Fake <birth_year>"], [6, 6, "Fake <state>", "Fake <birith_year>"]],
+			"conditions": ["WHERE state = 'Fake <state>'", "WHERE birth_year = Fake <birth_year>"]
+		},
+		{
+			"table_name": "majors",
+			"columns": ["id", "student_id", "major", "grad_year"],
+			"create": "CREATE TABLE majors (id INTEGER PRIMARY KEY, student_id INTEGER, major TEXT, grad_year INTEGER, FOREIGN KEY(student_id) REFERENCES students(id))",
+			"rows": [
+				[1, 1, "EECS", "Fake <grad_year>"], [2, 1, "Business", "Fake <grad_year>"],
+				[3, 3, "Business", "Fake <grad_year>"], [4, 6, "PoliSci", "Fake <grad_year>"],
+				[5, 6, "Economics", "Fake <grad_year>"]],
+			"conditions": ["WHERE grad_year = Fake <grad_year>"]
+		}
+	]
+]

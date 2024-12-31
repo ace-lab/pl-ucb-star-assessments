@@ -1,0 +1,18 @@
+{
+    "uuid": "51d6b0ae-ddff-4877-865f-7687404a5cf4",
+    "longName": "CS61B",
+    "allowAccess": [
+        {
+            "institution": "LTI",
+            "startDate": "2023-03-24T00:00:01",
+            "endDate": "2023-06-01T23:59:59"
+        },
+        {
+            "institution": "Any",
+            "startDate": "2023-03-24T00:00:01",
+            "endDate": "2023-06-01T23:59:59",
+            "uids": [
+            ]
+        }
+    ]
+}

@@ -1,0 +1,24 @@
+{
+    "uuid": "2c3e9a3a-328f-48d6-a942-955b73da0623",
+    "type": "Homework",
+    "title": "Pivot Table Questions",
+    "set": "Homework",
+    "shuffleQuestions": false,
+    "number": "1",
+    "allowAccess": [
+        {
+            "startDate": "1800-01-19T00:00:01",
+            "endDate": "2400-05-13T23:59:59"
+        }
+    ],
+    "zones": [{
+        "title": "Practice",
+        "questions": [
+            {"id": "Data100/pivot-table-question1", "points": 10, "triesPerVariant":99999, "maxPoints":10},
+            {"id": "Data100/pivot-table-question2", "points": 10, "triesPerVariant":99999, "maxPoints":10},
+            {"id": "Data100/pivot-table-question3", "points": 10, "triesPerVariant":99999, "maxPoints":10},
+            {"id": "Data100/pivot-table-question4", "points": 10, "triesPerVariant":99999, "maxPoints":10},
+            {"id": "Data100/pivot-table-question5", "points": 10, "triesPerVariant":99999, "maxPoints":10}
+        ]
+    }]
+}

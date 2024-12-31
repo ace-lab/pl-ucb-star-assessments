@@ -1,0 +1,61 @@
+<style>
+    table {
+        border-collapse: separate;
+        border-spacing: 0;
+        border: 1px solid #ddd;
+    }
+
+    th,
+    td {
+        text-align: left;
+        padding-left: 16px;
+        padding-right: 16px;
+    }
+
+    tr:nth-child(even) {
+        background-color: #f2f2f2;
+    }
+
+</style>
+<pl-question-panel>
+    <p>Write a SQL statement to create the structure of the following table, <b>{{ params.table_name }}</b>. The datatype of each column is listed directly below the column name. The first column, "id", is the primary key of the table.</p>
+    <table>
+    	<tr class="bg-warning">
+            <th colspan="20", style="text-align:center">{{ params.table_name }}</th>
+        </tr>
+        <tr>
+            {{ #params.columns }}
+            <th>{{ . }}</th>
+            {{ /params.columns }}
+        </tr>
+        <tr>
+            {{ #params.display_types }}
+            <td>{{ . }}</td>
+            {{ /params.display_types }}
+        </tr>
+    </table>
+    <br>
+    <pl-string-input answers-name="student_query" display="block" size=100 />
+</pl-question-panel>
+<pl-submission-panel>
+    {{ feedback.message }}
+    <p>{{ format_errors.student_query }}</p>
+    {{ #feedback.student_query.length }}
+    <table>
+        <tr class="bg-warning"><th colspan="20", style="text-align:center">Your Results</th></tr>
+        <tr>
+            {{ #feedback.student_query }}
+            <th>{{ 0 }}</th>
+            {{ /feedback.student_query }}
+        </tr>
+        <tr>
+            {{ #feedback.student_query }}
+            <td>{{ 1 }}</td>
+            {{ /feedback.student_query }}
+        </tr>
+    </table>
+    {{ /feedback.student_query.length }}
+</pl-submission-panel>
+<pl-answer-panel>
+    <pl-code language="SQL">{{ params.solution }}</pl-code>
+</pl-answer-panel>

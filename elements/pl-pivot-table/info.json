@@ -1,0 +1,12 @@
+{
+  "controller": "pl-pivot-table.py",
+  "dependencies": {
+    "elementScripts": [
+        "jquery-ui.js",
+        "pl-pivot-table.js"
+      ],
+    "elementStyles": [
+      "pl-pivot-table.css"
+    ]
+  }
+}

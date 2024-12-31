@@ -1,0 +1,24 @@
+<pl-dataframe params-name="df" show-index="true" show-dimensions="false" digits="4"></pl-dataframe>
+<p>What will dataframe "table" looks like after pivot? Drag and drop your answer below</p>
+<pl-code language="python"> table = pd.pivot_table(df, values='F', index=['A', 'B'],
+    columns='C', aggfunc='max') </pl-code>
+<pl-pivot-table col="3" row="4" index="2" multi-col="false" ellipsis="false">
+    <pl-column>
+        <pl-choice correct="false">C small small</pl-choice>
+        <pl-choice correct="false">E small large</pl-choice>
+        <pl-choice correct="true">C large small</pl-choice>
+        <pl-choice correct="false">C large large</pl-choice>
+    </pl-column>
+    <pl-index>
+        <pl-choice correct="true" place="2">B one two one two</pl-choice>
+        <pl-choice correct="false">A foo &nbsp; bar &nbsp;</pl-choice>
+        <pl-choice correct="false">B two one two one</pl-choice>
+        <pl-choice correct="true" place="1">A bar &nbsp; foo &nbsp;</pl-choice>
+    </pl-index>
+    <pl-row>
+        <pl-choice correct="false">a a aa NaN</pl-choice>
+        <pl-choice correct="false">b c a aa</pl-choice>
+        <pl-choice correct="true" place="1">6.0 9.0 5.0 NaN</pl-choice>
+        <pl-choice correct="true" place="2">8.0 9.0 2.0 6.0</pl-choice>
+    </pl-row>
+</pl-pivot-table>

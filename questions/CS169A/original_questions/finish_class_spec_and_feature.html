@@ -1,0 +1,149 @@
+
+<div class="section">
+<h1>Open Response: Ruby, RSpec, Cucumber (20 pts) (from F17 Midterm)</h1>
+
+<p><b>Write your answers directly on these sheets.</b></p>
+
+<p>
+This set of questions is based on the following code, which
+shows a partial implementation of classes that manage a passenger's
+experience with a self-driving car.
+</p>
+
+<p> First, fill in the blanks to complete
+the <code>Trip#go</code> method so that a successful start of the car
+then directs the car to start driving to the trip's destination.
+
+<div class="code">
+<pre>
+class Trip
+  attr_accessor :destination, :car
+  def initialize(destination)
+    @destination = destination
+    @car = Car.new
+  end
+  def message_to_passenger(message)
+    #  ...send error message to passenger's mobile device
+  end
+  def go
+    # try to start the car...
+
+
+    if ____________________
+
+      # If success, drive car towards destination
+
+
+      ____________________
+    else
+      # If fail, send message "Motor won't start" to passenger.
+      message_to_passenger("Car won't start")
+    end
+  end
+end
+
+class Car
+  def initialize() ; ... ; end
+  def start
+    # ...start motor...returns true if success, else nil
+  end
+  def drive_to(destination)
+    #  ...drive to destination
+  end
+end
+</pre>
+</div>
+<p>  Fill in the code for the two specs "It messages the user if car won't
+  start", using stubs, doubles, or
+  expectations as appropriate.  On the last
+  page of the exam is an Rspec and Cucumber cheat sheet to 
+remind you of some of the relevant mechanisms available. </p>
+<ul>
+<li> <B>HINT 1:</B>
+  Somewhere in your code for each spec should be a call
+  to <code>@trip.go</code>.</li>
+<li><b>HINT 2:</B> You may find yourself
+  creating seams related to the <code>Car</code> class.</li>
+<li><b>HINT 3:</b> Remember that the general "template" for unit/module
+  tests is: setup any necessary preconditions; stimulate the action to
+  be tested; check for expected postconditions.
+</ul>
+
+<div class="code">
+<pre>
+describe Trip do
+  before(:each) do
+    @trip = Trip.new("Greek Theater")
+  end
+  it "messages the user if car won't start" do
+
+    # 49. (6) YOUR CODE HERE (may be multiple lines)
+    ____________________
+    ____________________
+    ____________________
+
+
+  end
+
+  it "tries to drive to the destination if car starts successfully" do
+     # 50. (6) - YOUR CODE HERE (may be multiple lines)
+
+    ____________________
+    ____________________
+    ____________________
+
+
+  end
+end
+</pre>
+</div>
+</li>
+
+<li>
+The following Cucumber feature is intended to serve as an integration
+test for the above code.  Line numbers are provided for convenience.
+</p>
+
+<div class="code">
+<pre>
+1   Feature: Self driving car takes me to Stanford
+2 
+3   Scenario: successful trip
+4
+5     Given I request a trip to "Stanford"
+6     When  the car starts successfully
+7     Then I should be on my way to "Stanford"
+</pre>
+</div>
+
+Fill in this step def to handle line 5 of the scenario, in such a
+way that the same step def could be reused by another scenario that had
+a different destination.
+
+<div class="code">
+<pre>
+Given /^____________________$/ do |destination|  # 51. (2 pts)
+  #  try to start a trip to the destination
+
+
+  @trip =  ____________________     # 52. (3 pts)
+end
+</pre>
+</div>
+
+Fill in this step def to handle line 7 of the scenario, again in
+such a way that the same step def could be reused by another scenario
+that had a different destination.
+
+<div class="code">
+<pre>
+Then /^____________________$/ do |destination|   #  53. (2 pts)
+  # Check that the trip destination is correct
+
+
+  ____________________      # 54. (3 pts)
+end
+</pre>
+</div>
+
+</div>

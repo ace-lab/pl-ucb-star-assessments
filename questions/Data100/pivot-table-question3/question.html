@@ -1,0 +1,30 @@
+<pl-dataframe params-name="df" show-index="true" show-dimensions="false" digits="4"></pl-dataframe>
+<p>What will dataframe "table" looks like after pivot? Drag and drop your answer below</p>
+<pl-code language="python"> table = pd.pivot_table(df, values=['E', 'F','G'], index=['A'],
+    aggfunc={'E': "mean",
+             'F': ["min", "max", "mean"],
+             'G': np.median}) </pl-code>
+<pl-pivot-table col="6" row="2" index="1" multi-col="true" ellipsis="false">
+    <pl-column>
+        <pl-choice correct="true" place="1">&nbsp; E F &nbsp; &nbsp; G</pl-choice>
+        <pl-choice correct="false">&nbsp; F G &nbsp; &nbsp; A</pl-choice>
+        <pl-choice correct="false">&nbsp; E A &nbsp; &nbsp; G</pl-choice>
+        <pl-choice correct="true" place="2">&nbsp; mean max mean min median</pl-choice>
+        <pl-choice correct="false">&nbsp; min max mean min mean</pl-choice>
+    </pl-column>
+    <pl-index>
+        <pl-choice correct="true">A bar foo</pl-choice>
+        <pl-choice correct="false">A bar bar</pl-choice>
+        <pl-choice correct="false">A foo bar</pl-choice>
+        <pl-choice correct="false">A foo foo</pl-choice>
+    </pl-index>
+    <pl-row>
+        <pl-choice correct="false">1 2</pl-choice>
+        <pl-choice correct="true" place="1">5.5 2.2</pl-choice>
+        <pl-choice correct="true" place="4">6 2</pl-choice>
+        <pl-choice correct="true" place="2">9 6</pl-choice>
+        <pl-choice correct="true" place="5">7.0 3.0</pl-choice>
+        <pl-choice correct="true" place="3">8.0 4.4</pl-choice>
+    </pl-row>
+</pl-pivot-table>
+
