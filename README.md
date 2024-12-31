@@ -1,53 +1,37 @@
-# STAR Assessments course repo
+# Welcome!  New here?
 
-Please check out the [csxxx wiki](https://github.com/ace-lab/pl-ucb-csxxx/wiki)
-for basic PrairieLearn mechanics etc.
+If you're new, please use [this repo's wiki](https://github.com/ace-lab/pl-ucb-csxxx/wiki)
+to get started!
 
-Here's where to put your stuff.  In the examples below, substitute a
-name/moniker for your course in place of `PROJECT`.
+# Did you just have a course created for  you?
 
-**Remember:** it's fine to copy boilerplate files from other
-directories, but **every PL item has a unique UID (uuid)** and you
-have to change those.  You can generate UUIDs with the shell command `uuidgen`.
+If so, this repo was used as a template, and your course repo's name should be `pl-SSS-CCC`, 
+where `SSS` is your project
+institution name (`ucb`, `csulb`, `ecc`) and `CCC` is the lowercase course
+number at your institution (eg `pl-ucb-cs169a`, `pl-ecc-csci8`, etc).
+    
+We (UCB PL admins) should already have created a team
+`pl-dev-SSS-CCC` that has write access to your repo; email us the
+names of any course staff who should have access.  **WARNING:** your
+repo will likely contain sensitive content such as exam questions.  Be
+careful who has access.  **All access to PL repos is by teams**, not
+by adding individuals, to keep access control manageable.
 
-## Develop on a branch
+* Delete (meaning `git rm`) the `elements` subdirectory, unless you specifically want to use
+the custom elements in here (see below for some documentation)
+* Delete the contents of `serverFilesCourse` and `clientFilesCourse`
+* Delete the contents of `courseInstances` (you'll add your own
+later)
+* Delete the contents of `questions/`, which will be replaced with
+your course's questions
+* Immediately update this `README.md` and `infoCourse.json` to
+reflect the info for your course, including inserting a valid UUID for
+the course.  You can run `uuidgen` at a shell prompt to make one.
+**Important.** Just about every type of thing in PL -- course, question, element, etc. -- has a UUID (Universally Unique ID).  You can generate one by typing `uuidgen` at a terminal window or by using the [UUID generator](https://www.uuidgenerator.net). For safety, in the template repo all UUID values have been set to "9999...".  **In your new repo, immediately `git rm` any files you do not need, and in the files that remain, replace every UUID with a fresh one.**
 
-To avoid lots of merge collisions, it's best to do all of the below on a branch
-and use that branch for local testing.  When ready, open a pull request to merge
-your branch to `master` and we will do the merge.  Note that the PR
-should **only** result in changes to `questions/PROJECT/`, `courseInstances/PROJECT/`, and possibly
-adding a new directory under `elements/`.  PRs that make other changes besides
-those will be rejected unless accompanied by an explanation.
 
-## Create and git add the directory `courseInstances/PROJECT`
+**Note:** Although it has become customary to name the primary Git
+branch `main` rather than `master`, **do not do so for PL repos** as
+the server will not be able to sync them.  The server will only sync
+to the `master` branch.
 
-In it you'll need a minimal `infoCourseInstance.json`, which you can
-base on an existing one, but don't forget to change the uuid's.
-
-## Create and add `questions/PROJECT/`
-
-This is where your example question(s) will go.
-
-## If you're building an element, create and add `elements/pl-*`....
-
-...where * is whatever your element name is.
-
-**At this point**, all of your work should be able to go into either a
-question subdirectory or the element subdirectory.  If you find
-yourself in a situation where you have code that doesn't belong in
-either of those places, ask us.  The reason is to keep each project
-standalone: it should be possible for an instructor to use the project
-simply by copying any `questions/CS999/` subdirectories and optionally
-any element subdirectories, nothing else.
-
-## Ideally, add an Assessment in your course instance
-
-Add at least one `courseInstances/PROJECT/assessments/example/infoAssessment.json` that 
-sequences your demo question(s), providing an easy way to preview multiple questions in your 
-project at once.  You can setup the assessment as  "homework" allowing unlimited attempts and so forth. [Here's the documentation](https://prairielearn.readthedocs.io/en/latest/assessment/) for doing that.
-
-## Packaging milestone
-
-You've achieved the packaging milestone when you can render one
-question (even if grading doesn't fully work yet) that has its files
-placed as described above.
