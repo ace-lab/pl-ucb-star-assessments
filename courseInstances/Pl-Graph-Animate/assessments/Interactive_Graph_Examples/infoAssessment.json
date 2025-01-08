@@ -1,0 +1,28 @@
+{
+    "uuid": "6668ECAC-0113-4712-B135-94E0BF6921BD",
+    "type": "Homework",
+    "title": "PL-GRAPH_ANIMATE Examples",
+    "set": "Homework",
+    "number": "1",
+    "allowAccess": [],
+    "zones": [
+        {
+            "comment": "These are new questions created for the pl-graph-animate element",
+            "questions": [
+                {
+                    "id": "pl-graph-animate-examples/README-Example1-DFS",
+                    "autoPoints": 1
+                },
+
+                {
+                    "id": "pl-graph-animate-examples/README-Example1-DOTDictionary",
+                    "autoPoints": 1
+                },
+                {
+                    "id": "pl-graph-animate-examples/README-Example2-DOTDictionary",
+                    "autoPoints": 1
+                }
+            ]
+        }
+    ]
+}

@@ -1,0 +1,6 @@
+{"controller": "graph-animate.py",
+"dependencies": {
+    "elementStyles": ["graph-animate-css.css"]
+  }
+
+}

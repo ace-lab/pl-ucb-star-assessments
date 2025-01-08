@@ -1,0 +1,8 @@
+/* Style for the video element */
+video {
+    width: 400px;  /* Set the width of the video */
+    height: 800px;  /* Set a fixed height */
+    aspect-ratio: auto; /* Keep the aspect ratio intact */
+    display: block;  /* Make sure it is a block element */
+    margin: 0 auto;  /* Center the video on the page */
+}

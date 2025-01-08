@@ -1,0 +1,18 @@
+{
+    "uuid": "4B4DC181-95AA-4CA8-B0E3-240E080ACE13",
+    "longName": "Animation of Graphs (pl-graph-animate)",
+    "allowAccess": [
+        {
+            "institution": "LTI",
+            "startDate": "2024-10-23T00:00:01",
+            "endDate": "2025-06-01T23:59:59"
+        },
+        {
+            "institution": "Any",
+            "startDate": "2024-10-23T00:00:01",
+            "endDate": "2025-06-01T23:59:59",
+            "uids": [
+            ]
+        }
+    ]
+}
