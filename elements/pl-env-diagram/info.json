@@ -1,0 +1,7 @@
+{
+    "controller": "pl-env-diagram.py",
+    "dependencies": {
+      "elementScripts": ["pl-env-diagram.js"],
+      "elementStyles": ["pl-env-diagram.css"]
+    }
+  }
