@@ -1,0 +1,6 @@
+{
+    "controller": "drag-and-drop.py",
+    "dependencies": {
+      "elementStyles": ["drag-and-drop-grid.css"]
+    }
+}
