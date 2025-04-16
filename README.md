@@ -36,12 +36,18 @@ and those used to demo your element, etc.
 
 ### 3. If you're building an element, create and add `elements/pl-*`....
 
-...where * is whatever your element name is.
+...where * is whatever your element name is.  Note that this is at the
+"top level" of the course, not inside your course instance.
 
-### 4. Add `courseInstances/PROJECT/assessments/infoAssessment.json`
+### 4. Add `courseInstances/PROJECT/assessments/STUDY/infoAssessment.json`
 
-This file specifies and sequences the PL question(s) in your study
-task.  Take a look at existing ones for the relatively straightforward
+(Replace `STUDY` with a descriptive name of your study, such as
+`2025-sp-pilot-study` or something like that.  Please don't just call
+it `study` as that is not descriptive.)
+
+This .json file specifies and sequences the PL question(s) in your study
+task.  Take a look at existing ones in other course instances'
+`assessments` directories for the relatively straightforward
 syntax.  Be very careful of punctuation and closing your braces, or
 the course won't load in PL.
 
