@@ -1,0 +1,29 @@
+{
+    "uuid": "8E7E9B9D-F0A0-4B87-A727-8416E2C087B4",
+    "type": "Homework",
+    "title": "Interactive Grid Examples",
+    "set": "Homework",
+    "number": "4",
+    "allowAccess": [
+        {
+            "startDate": "1800-01-19T00:00:01",
+            "endDate": "2400-05-13T23:59:59"
+        }
+    ],
+    
+    "zones": [
+        {
+            "title" : "Study Questions",
+            "questions": [
+                {
+                    "id": "ParallelismSandbox/Question 1",
+                    "autoPoints": 1
+                },
+                {
+                    "id": "ParallelismSandbox/Question 2",
+                    "autoPoints": 1
+                }
+            ]
+        }
+    ]
+}

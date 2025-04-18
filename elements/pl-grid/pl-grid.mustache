@@ -1,0 +1,41 @@
+{{#question}}
+
+  <div class="d-flex flex-wrap list-group">
+    <div class="card-header pl-grid-header list-group-item-primary">
+      <span class="me-2">Drag from here:</span>
+      <button type="button" style="vertical-align:middle;" class="btn btn-light btn-sm" data-bs-toggle="popover" data-bs-html="true" title="Grid" data-bs-content="Random text">
+        <i class="fa fa-question-circle" aria-hidden="true"></i>
+      </button>
+    </div>
+    <div class="grid-stack source-grid" id="grid1"></div>
+    
+    <div class="card-header pl-grid-header list-group-item-primary">
+      <span class="me-2">Construct your solution here</span>
+    </div>
+    <div class="grid-stack dest-grid" id="grid2"></div>
+  </div>
+
+  <input id="answer-input" type="hidden" name="test-input" value=""/>
+  <input id="load-data" type="hidden" name="test-load-data" value='{{{load_data}}}'/>
+
+{{/question}}
+{{#submission}}
+
+  <div class="card-header pl-grid-header list-group-item-primary">
+    <span class="me-2">Your solution here</span>
+  </div>
+  <div class="grid-stack sub-grid" id="grid3"></div>
+
+  <input id="load-data-sub" type="hidden" name="test-load-data-sub" value='{{{load_data_sub}}}'/>
+
+{{/submission}}
+{{#true_answer}}
+
+  <div class="card-header pl-grid-header list-group-item-primary">
+    <span class="me-2">Your solution here</span>
+  </div>
+  <div class="grid-stack sol-grid" id="grid4"></div>
+
+  <input id="load-data-sol" type="hidden" name="test-load-data-sol" value='{{{load_data_sol}}}'/>
+
+{{/true_answer}}

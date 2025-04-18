@@ -1,0 +1,114 @@
+<pl-question-panel>
+    <p>
+        Do not include any block for the iteration if it does not pass the while statement. 
+        If there is no interleaving, do not leave empty blocks between instructions.
+        To remove a block from your solution, drag it back into the grid of origin.
+    </p>
+    <p> What is the largest possible value of total after running this execution on 3 threads? </p>
+    <pl-code language="c">
+    int n = 4;
+    int total = 0;
+
+    #pragma omp parallel num_threads(3)
+    {
+        while (n > 0)
+        {
+            total = total + 3;
+            n = n - 2;
+        }
+    }
+
+    </pl-code>
+
+</pl-question-panel>
+
+
+
+<pl-grid>
+    <pl-source> <!-- elements in source grid -->
+        <pl-element x = 0 y = 0 color = "#ffffff">read total</pl-element>
+        <pl-element x = 2 y = 0 color = "#ffffff">total++3</pl-element>
+        <pl-element x = 4 y = 0 color = "#ffffff">write total</pl-element>
+        <pl-element x = 6 y = 0 color = "#ffffff">read n</pl-element>
+        <pl-element x = 8 y = 0 color = "#ffffff">n--</pl-element>
+        <pl-element x = 10 y = 0 color = "#ffffff">write n</pl-element>
+    </pl-source>
+
+    <pl-destination> <!-- Define how destination grid is prepopulated -->
+        <pl-element x = 0 y = 0 color = "#d8bfd8">main</pl-element>
+        <pl-element x = 0 y = 1 color = "#d8bfd8">init n</pl-element>
+        <pl-element x = 0 y = 2 color = "#d8bfd8">init total</pl-element>
+        <pl-element x = 0 y = 3 color = "#d8bfd8">#pragma omp parallel num_threads(3)</pl-element>
+        <pl-element x = 2 y = 3 color = "#f08080">thread 1</pl-element>
+        <pl-element x = 4 y = 3 color = "#e0ffff">thread 2</pl-element>  
+        <pl-element x = 6 y = 3 color = "#e0ffff">thread 3</pl-element>  
+    </pl-destination>
+    
+    <pl-answer-grid> <!-- Define solution grid (not shown to student) -->
+        <pl-element x = 0 y = 0 color = "#d8bfd8">main</pl-element>
+        <pl-element x = 0 y = 1 color = "#d8bfd8">init n</pl-element>
+        <pl-element x = 0 y = 2 color = "#d8bfd8">init total</pl-element>
+        <pl-element x = 0 y = 3 color = "#d8bfd8">#pragma omp parallel num_threads(3)</pl-element>
+        <pl-element x = 2 y = 3 color = "#f08080">thread 1</pl-element>
+
+        <pl-element x = 2 y = 4 color = "#ffffff">read n</pl-element>
+        
+        <pl-element x = 2 y = 5 color = "#ffffff">read total</pl-element>
+        <pl-element x = 2 y = 6 color = "#ffffff">total++3</pl-element>
+        <pl-element x = 2 y = 7 color = "#ffffff">write total</pl-element>
+        <pl-element x = 2 y = 8 color = "#ffffff">read n</pl-element>
+        <pl-element x = 2 y = 9 color = "#ffffff">n--</pl-element>
+        <pl-element x = 2 y = 10 color = "#ffffff">write n</pl-element>
+
+        <pl-element x = 2 y = 11 color = "#ffffff">read n</pl-element>
+        
+        <pl-element x = 2 y = 12 color = "#ffffff">read total</pl-element>
+        <pl-element x = 2 y = 13 color = "#ffffff">total++3</pl-element>
+        <pl-element x = 2 y = 14 color = "#ffffff">write total</pl-element>
+        <pl-element x = 2 y = 15 color = "#ffffff">read n</pl-element>
+        <pl-element x = 2 y = 16 color = "#ffffff">n--</pl-element>
+        <pl-element x = 2 y = 17 color = "#ffffff">write n</pl-element>
+
+        <pl-element x = 4 y = 3 color = "#f08080">thread 2</pl-element>
+
+        <pl-element x = 4 y = 4 color = "#ffffff">read n</pl-element>
+        
+        <pl-element x = 4 y = 18 color = "#ffffff">read total</pl-element>
+        <pl-element x = 4 y = 19 color = "#ffffff">total++3</pl-element>
+        <pl-element x = 4 y = 20 color = "#ffffff">write total</pl-element>
+        <pl-element x = 4 y = 21 color = "#ffffff">read n</pl-element>
+        <pl-element x = 4 y = 22 color = "#ffffff">n--</pl-element>
+        <pl-element x = 4 y = 23 color = "#ffffff">write n</pl-element>
+
+        <pl-element x = 4 y = 24 color = "#ffffff">read n</pl-element>
+        
+        <pl-element x = 4 y = 25 color = "#ffffff">read total</pl-element>
+        <pl-element x = 4 y = 26 color = "#ffffff">total++3</pl-element>
+        <pl-element x = 4 y = 27 color = "#ffffff">write total</pl-element>
+        <pl-element x = 4 y = 28 color = "#ffffff">read n</pl-element>
+        <pl-element x = 4 y = 29 color = "#ffffff">n--</pl-element>
+        <pl-element x = 4 y = 30 color = "#ffffff">write n</pl-element>
+
+        <pl-element x = 6 y = 3 color = "#f08080">thread 3</pl-element>
+
+        <pl-element x = 6 y = 4 color = "#ffffff">read n</pl-element>
+        
+        <pl-element x = 6 y = 31 color = "#ffffff">read total</pl-element>
+        <pl-element x = 6 y = 32 color = "#ffffff">total++3</pl-element>
+        <pl-element x = 6 y = 33 color = "#ffffff">write total</pl-element>
+        <pl-element x = 6 y = 34 color = "#ffffff">read n</pl-element>
+        <pl-element x = 6 y = 35 color = "#ffffff">n--</pl-element>
+        <pl-element x = 6 y = 36 color = "#ffffff">write n</pl-element>
+
+        <pl-element x = 6 y = 37 color = "#ffffff">read n</pl-element>
+        
+        <pl-element x = 6 y = 38 color = "#ffffff">read total</pl-element>
+        <pl-element x = 6 y = 39 color = "#ffffff">total++3</pl-element>
+        <pl-element x = 6 y = 40 color = "#ffffff">write total</pl-element>
+        <pl-element x = 6 y = 41 color = "#ffffff">read n</pl-element>
+        <pl-element x = 6 y = 42 color = "#ffffff">n--</pl-element>
+        <pl-element x = 6 y = 43 color = "#ffffff">write n</pl-element>
+        
+    </pl-answer-grid>
+</pl-grid>
+
