@@ -1,5 +1,11 @@
 {
     "uuid": "B5450F5F-F4A2-4228-9A0A-54703D907F88",
     "longName" : "ParallelismSandbox",
-    "allowAccess": []
+    "allowAccess": [
+            {
+              "institution": "Any",
+              "startDate": "2023-03-24T00:00:01",
+              "endDate": "2026-06-01T23:59:59"
+            }
+    ]
   }
