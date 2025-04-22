@@ -1,0 +1,63 @@
+.interactive-visualizer {
+    font-family: Arial, sans-serif;
+    text-align: left;
+    padding: 10px;
+}
+
+.iv-instructions {
+    font-size: 0.95em;
+    margin-bottom: 1rem;
+    text-align: left;
+    display: inline-block;
+    max-width: 800px;
+}
+
+.iv-instructions ul {
+    margin-top: 0.5em;
+    padding-left: 1.2em;
+}
+
+#colormap-selector {
+    margin-bottom: 12px;
+}
+
+.colormap-link {
+    padding: 8px 12px;
+    background: #eee;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    text-decoration: none;
+    font-size: 0.9em;
+    display: inline-block;
+    margin-right: 8px;
+    margin-bottom: 6px;
+    cursor: pointer;
+}
+
+.colormap-link:hover {
+    background-color: #ddd;
+}
+
+#clear-point-button {
+    margin-top: 12px;
+}
+
+#clearPointLink {
+    padding: 8px 12px;
+    background: #eee;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    text-decoration: none;
+    font-size: 0.9em;
+    display: inline-block;
+    cursor: pointer;
+}
+
+#clearPointLink:hover {
+    background-color: #ddd;
+}
+
+#point-coordinates {
+    margin-top: 10px;
+    font-size: 0.9em;
+}

@@ -1,0 +1,12 @@
+{
+    "controller": "pl-interactive-visualizer.py",
+    "dependencies": {
+        "elementScripts": [
+            "plotly-3.0.1.min.js",
+            "pl-interactive-visualizer.js"
+        ],
+        "elementStyles": [
+            "pl-interactive-visualizer.css"
+        ]
+    }
+}
