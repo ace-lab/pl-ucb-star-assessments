@@ -23,8 +23,8 @@ $(function () {
         z.push(zRow);
     }
 
-    // now allow up to 4 points
-    let points = [];        // array of {x,y,z}
+    // allow up to 4 points
+    let points = []; // array of {x,y,z}
     const maxPoints = 4;
 
     let selectedColormap = "Color Palette 1";
@@ -64,7 +64,7 @@ $(function () {
             opacity: 0.9
         };
 
-        // points trace (could be empty)
+        // points trace
         const pointTrace = {
             type: 'scatter3d',
             mode: 'markers',
@@ -86,13 +86,6 @@ $(function () {
                 updateCoordsDisplay();
                 renderPlot();
             });
-
-            // double‐click to clear all
-            plotDiv.on('plotly_doubleclick', () => {
-                points = [];
-                updateCoordsDisplay();
-                renderPlot();
-            });
         });
     }
 
@@ -110,7 +103,6 @@ $(function () {
         if (points.length === 0) {
             display.innerText = '';
         } else {
-            // list them "1: x=…, y=…, z=…; 2: …"
             display.innerText = points
               .map((p,i) =>
                   `Point ${i+1}: x=${p.x.toFixed(2)}, y=${p.y.toFixed(2)}, z=${p.z.toFixed(2)}`

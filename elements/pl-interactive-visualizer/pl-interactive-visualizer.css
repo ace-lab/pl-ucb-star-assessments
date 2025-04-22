@@ -27,7 +27,7 @@
 .controls {
     display: flex;
     align-items: left;
-    gap: 8px;           /* space between button and dropdown */
+    gap: 8px;
   }
 
 #clear-point-button {
@@ -78,7 +78,6 @@
     margin-left: 8px;
   }  
 
-/* Point coordinates below controls */
 #point-coordinates {
     display: block;
     margin-top: 12px;
