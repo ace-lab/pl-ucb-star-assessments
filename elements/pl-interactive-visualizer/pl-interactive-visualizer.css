@@ -2,6 +2,13 @@
     font-family: Arial, sans-serif;
     text-align: left;
     padding: 10px;
+    display: grid;
+    grid-template-columns: auto auto;
+    grid-template-rows: auto auto;
+    grid-template-areas:
+        "clear palette"
+        "coords coords";
+    grid-gap: 12px;
 }
 
 .iv-instructions {
@@ -17,37 +24,21 @@
     padding-left: 1.2em;
 }
 
-#colormap-selector {
-    margin-bottom: 12px;
-}
-
-.colormap-link {
-    padding: 8px 12px;
-    background: #eee;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-    text-decoration: none;
-    font-size: 0.9em;
-    display: inline-block;
-    margin-right: 8px;
-    margin-bottom: 6px;
-    cursor: pointer;
-}
-
-.colormap-link:hover {
-    background-color: #ddd;
-}
+.controls {
+    display: flex;
+    align-items: left;
+    gap: 8px;           /* space between button and dropdown */
+  }
 
 #clear-point-button {
-    margin-top: 12px;
+    margin-top: 0px;
 }
 
 #clearPointLink {
-    padding: 8px 12px;
+    padding: 6px 8px;
     background: #eee;
-    border-radius: 5px;
+    border-radius: 4px;
     border: 1px solid #ccc;
-    text-decoration: none;
     font-size: 0.9em;
     display: inline-block;
     cursor: pointer;
@@ -57,7 +48,39 @@
     background-color: #ddd;
 }
 
+#colormap-selector,
+#clear-point-button {
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: 12px;
+}
+
+#colormap-select {
+    padding: 6px 8px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    font-size: 0.9em;
+}
+
+#colormap-select:hover,
+#colormap-select:focus {
+    border-color: #888;
+    outline: none;
+}
+
+#colormap-selector {
+    margin-bottom: 12px;
+}
+
+.colormap-note {
+    font-size: 0.85em;
+    color: #555;
+    margin-left: 8px;
+  }  
+
+/* Point coordinates below controls */
 #point-coordinates {
-    margin-top: 10px;
+    display: block;
+    margin-top: 12px;
     font-size: 0.9em;
 }

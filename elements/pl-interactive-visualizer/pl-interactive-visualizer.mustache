@@ -2,26 +2,39 @@
     <div class="iv-instructions">
         <p><strong>How to use the visualization:</strong></p>
         <ul>
-            <li>Click on the surface below to add a red point to the landscape.</li>
+            <li>Click on the surface below to add up to <strong>4</strong> points to the landscape.</li>
+            <li>Click the <strong>Clear Point</strong> button to reset the added point(s).</li>
             <li>Use your mouse to rotate, pan, and zoom around the 3D space.</li>
-            <li>Click <strong>“Clear Point”</strong> to reset the selected point.</li>
-            <li>Use the toolbar at the upper right to reset view, take screenshots, and more.</li>
+            <li>Use the toolbar at the upper right of the plot to toggle different actions.</li>
         </ul>
-        <p><strong>Colour Palette:</strong> You can switch between different colour schemes below.</p>
     </div>
 
-    <div id="colormap-selector">
-        <a href="#" class="colormap-link" data-map="Colour Palette 1">Colour Palette 1</a>
-        <a href="#" class="colormap-link" data-map="Colour Palette 2">Colour Palette 2</a>
-        <a href="#" class="colormap-link" data-map="Colour Palette 3">Colour Palette 3</a>
-        <a href="#" class="colormap-link" data-map="Colour Palette 4">Colour Palette 4</a>
+    <br>
+
+    <div class="controls">
+        <div id="clear-point-button">
+            <a href="#" id="clearPointLink">Clear Point</a>
+        </div>
+
+        <div id="colormap-selector">
+            <label for="colormap-select" class="visually-hidden">Colour Palette</label>
+            <select id="colormap-select">
+                <option value="Color Palette 1">Color Palette 1</option>
+                <option value="Color Palette 2">Color Palette 2</option>
+                <option value="Color Palette 3">Color Palette 3</option>
+                <option value="Color Palette 4">Color Palette 4</option>
+                <option value="Color Palette 5">Color Palette 5</option>
+            </select>
+            <span class="colormap-note">(for visual aid / accessibility only)</span>
+        </div>
     </div>
+
+    <br>
+
+    <div id="point-coordinates"></div>
+
+    <br>
 
     <div id="surfacePlot"></div>
 
-    <div id="clear-point-button">
-        <a href="#" id="clearPointLink">Clear Point</a>
-    </div>
-
-    <div id="point-coordinates"></div>
 </div>

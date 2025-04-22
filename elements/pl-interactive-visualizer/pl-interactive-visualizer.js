@@ -1,5 +1,3 @@
-// pl-interactive-visualizer.js
-
 $(function () {
     const container = $('.interactive-visualizer');
 
@@ -25,15 +23,25 @@ $(function () {
         z.push(zRow);
     }
 
-    let currentPoint = null;
-    let selectedColormap = "Colour Palette 2";
+    // now allow up to 4 points
+    let points = [];        // array of {x,y,z}
+    const maxPoints = 4;
 
+    let selectedColormap = "Color Palette 1";
     const colormapMap = {
-        "Colour Palette 1": 'Viridis',
-        "Colour Palette 2": 'Cividis',
-        "Colour Palette 3": 'Inferno',
-        "Colour Palette 4": 'Jet'
+        "Color Palette 1": 'Blackbody',
+        "Color Palette 2": 'Electric',
+        "Color Palette 3": 'Jet',
+        "Color Palette 4": 'Hot',
+        "Color Palette 5": 'Greys'
     };
+    
+    // dropdown handler
+    document.getElementById('colormap-select')
+    .addEventListener('change', e => {
+        selectedColormap = e.target.value;
+        renderPlot();
+    });
 
     const layout = {
         scene: {
@@ -42,7 +50,7 @@ $(function () {
             camera: { eye: { x: 1.5, y: 1.5, z: 1.5 } }
         },
         height: 600,
-        width: 800,
+        width: 600,
         margin: { l: 0, r: 0, b: 0, t: 50 }
     };
 
@@ -56,58 +64,61 @@ $(function () {
             opacity: 0.9
         };
 
-        const pointTrace = currentPoint
-            ? {
-                type: 'scatter3d',
-                mode: 'markers',
-                x: [currentPoint.x],
-                y: [currentPoint.y],
-                z: [currentPoint.z],
-                marker: { size: 5, color: 'red' },
-                name: 'Selected Point'
-            }
-            : {
-                type: 'scatter3d',
-                mode: 'markers',
-                x: [],
-                y: [],
-                z: [],
-                marker: { size: 5, color: 'red' },
-                name: 'Selected Point'
-            };
+        // points trace (could be empty)
+        const pointTrace = {
+            type: 'scatter3d',
+            mode: 'markers',
+            x: points.map(p=>p.x),
+            y: points.map(p=>p.y),
+            z: points.map(p=>p.z),
+            marker: { size:6, color:'red' },
+            name: 'Selected Points'
+        };
 
+        // render
         Plotly.newPlot('surfacePlot', [surface, pointTrace], layout).then(() => {
             const plotDiv = document.getElementById('surfacePlot');
-            plotDiv.on('plotly_click', function (data) {
-                if (currentPoint !== null) return;
+            plotDiv.on('plotly_click', data => {
+                if (points.length >= maxPoints) return;  // already 4
                 const pt = data.points[0];
-                if (!pt || pt.x === undefined || pt.y === undefined || pt.z === undefined) return;
-                currentPoint = { x: pt.x, y: pt.y, z: pt.z };
-                document.getElementById('point-coordinates').innerText =
-                    `Selected Point: x = ${pt.x.toFixed(2)}, y = ${pt.y.toFixed(2)}, z = ${pt.z.toFixed(2)}`;
+                if (!pt || pt.x===undefined) return;
+                points.push({ x:pt.x, y:pt.y, z:pt.z });
+                updateCoordsDisplay();
+                renderPlot();
+            });
+
+            // double‐click to clear all
+            plotDiv.on('plotly_doubleclick', () => {
+                points = [];
+                updateCoordsDisplay();
                 renderPlot();
             });
         });
     }
 
-    document.querySelectorAll('.colormap-link').forEach((el) => {
-        el.addEventListener('click', function (event) {
-            event.preventDefault();
-            const label = el.getAttribute('data-map');
-            if (label in colormapMap) {
-                selectedColormap = label;
-                renderPlot();
-            }
-        });
-    });
-    
-
+    // clear point button
     document.getElementById('clearPointLink').addEventListener('click', function (event) {
         event.preventDefault();
-        currentPoint = null;
-        document.getElementById('point-coordinates').innerText = '';
+        points = [];
+        updateCoordsDisplay();
         renderPlot();
     });
 
+    // show all coords below
+    function updateCoordsDisplay() {
+        const display = document.getElementById('point-coordinates');
+        if (points.length === 0) {
+            display.innerText = '';
+        } else {
+            // list them "1: x=…, y=…, z=…; 2: …"
+            display.innerText = points
+              .map((p,i) =>
+                  `Point ${i+1}: x=${p.x.toFixed(2)}, y=${p.y.toFixed(2)}, z=${p.z.toFixed(2)}`
+              )
+              .join('\n');
+        }
+    }
+
     renderPlot();
+    updateCoordsDisplay();
 });
