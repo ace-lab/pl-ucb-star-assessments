@@ -1,11 +1,14 @@
 <div class="interactive-visualizer">
     <div id="function-data" style="display: none;">{{function}}</div>
+    <div id="place-data" style="display: none;">{{place}}</div>
     
     <div class="iv-instructions">
         <p><strong>How to use the visualization:</strong></p>
         <ul>
+            {{#place}}
             <li>Click on the surface below to add up to <strong>4</strong> points to the landscape.</li>
             <li>Click the <strong>Clear Point</strong> button to reset the added point(s).</li>
+            {{/place}}
             <li>Use your mouse to rotate, pan, and zoom around the 3D space.</li>
             <li>Use the toolbar at the upper right of the plot to toggle different actions.</li>
         </ul>
@@ -14,9 +17,11 @@
     <br>
 
     <div class="controls">
+        {{#place}}
         <div id="clear-point-button">
             <a href="#" id="clearPointLink">Clear Point</a>
         </div>
+        {{/place}}
 
         <div id="colormap-selector">
             <label for="colormap-select" class="visually-hidden">Colour Palette</label>
@@ -33,9 +38,10 @@
 
     <br>
 
+    {{#place}}
     <div id="point-coordinates"></div>
-
     <br>
+    {{/place}}
 
     <div id="surfacePlot"></div>
 
