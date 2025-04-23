@@ -1,0 +1,11 @@
+{
+    "uuid": "88941569-b79d-4daa-85b1-19e1d6f05b0c",
+    "longName" : "Interactive Visualizer",
+    "allowAccess": [
+            {
+              "institution": "Any",
+              "startDate": "2025-01-01T00:00:01",
+              "endDate": "2025-12-31T23:59:59"
+            }
+    ]
+  }
