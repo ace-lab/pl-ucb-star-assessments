@@ -1,9 +1,12 @@
 $(function () {
-    const container = $('.interactive-visualizer');
-
-    const coeffX = 1.0;
-    const expX = 2.0;
-    const coeffY = 1.0;
+    // Get the function from the hidden div
+    const functionString = $('#function-data').text().trim();
+    
+    // Create a function with access to Math functions
+    const userFunction = new Function('x', 'y', `
+        const { sin, cos, tan, exp, log, sqrt, pow, abs, min, max } = Math;
+        return ${functionString};
+    `);
 
     let size = 30;
     let x = [], y = [], z = [];
@@ -13,7 +16,7 @@ $(function () {
         let xRow = [], yRow = [], zRow = [];
         for (let j = -size; j <= size; j++) {
             let yVal = j / 10;
-            let zVal = coeffX * xVal + Math.pow(xVal, expX) * yVal + coeffY * yVal;
+            let zVal = userFunction(xVal, yVal);
             xRow.push(xVal);
             yRow.push(yVal);
             zRow.push(zVal);
@@ -47,7 +50,19 @@ $(function () {
         scene: {
             aspectmode: "manual",
             aspectratio: { x: 1, y: 1, z: 0.7 },
-            camera: { eye: { x: 1.5, y: 1.5, z: 1.5 } }
+            camera: { eye: { x: 1.5, y: 1.5, z: 1.5 } },
+            xaxis: { title: {
+                text: 'θ<sub>0</sub>',
+                font: { size: 14 }
+            } },
+            yaxis: { title: {
+                    text: 'θ<sub>1</sub>',
+                    font: { size: 14 }
+            } },
+            zaxis: { title: {
+                text: 'L(θ)',
+                font: { size: 14 } 
+            } }
         },
         height: 600,
         width: 600,
