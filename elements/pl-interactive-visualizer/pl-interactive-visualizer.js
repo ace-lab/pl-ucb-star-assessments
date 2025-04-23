@@ -126,7 +126,7 @@ $(function () {
         } else {
             display.innerText = points
               .map((p,i) =>
-                  `Point ${i+1}: x=${p.x.toFixed(2)}, y=${p.y.toFixed(2)}, z=${p.z.toFixed(2)}`
+                  `Point ${i+1}: θ_0=${p.x.toFixed(2)}, θ_1=${p.y.toFixed(2)}, L(θ)=${p.z.toFixed(2)}`
               )
               .join('\n');
         }
