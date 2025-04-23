@@ -22,6 +22,10 @@
                 {
                     "id": "InteractiveVisualizer/question2",
                     "autoPoints": 1
+                },
+                {
+                    "id": "InteractiveVisualizer/question3",
+                    "autoPoints": 1
                 }
             ]
         }
