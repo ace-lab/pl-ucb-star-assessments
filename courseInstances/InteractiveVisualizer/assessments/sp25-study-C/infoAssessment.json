@@ -1,7 +1,7 @@
 {
     "uuid": "41ac2246-9efe-4bf8-ad23-5951b1d8a033",
     "type": "Homework",
-    "title": "Interactive Visualizer User Study",
+    "title": "Interactive Visualizer User Study (C)",
     "set": "Homework",
     "number": "1",
     "allowAccess": [
@@ -16,15 +16,7 @@
             "title" : "User Study Learning Phase",
             "questions": [
                 {
-                    "id": "InteractiveVisualizer/question1",
-                    "autoPoints": 1
-                },
-                {
-                    "id": "InteractiveVisualizer/question2",
-                    "autoPoints": 1
-                },
-                {
-                    "id": "InteractiveVisualizer/question3",
+                    "id": "InteractiveVisualizer/questionC",
                     "autoPoints": 1
                 }
             ]

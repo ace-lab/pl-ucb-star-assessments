@@ -1,0 +1,25 @@
+{
+    "uuid": "7bb85054-297d-4d2b-b3b1-c251152b8b1a",
+    "type": "Homework",
+    "title": "Interactive Visualizer User Study (A)",
+    "set": "Homework",
+    "number": "1",
+    "allowAccess": [
+        {
+            "startDate": "2025-01-01T00:00:01",
+            "endDate": "2025-12-31T23:59:59"
+        }
+    ],
+    
+    "zones": [
+        {
+            "title" : "User Study Learning Phase",
+            "questions": [
+                {
+                    "id": "InteractiveVisualizer/questionA",
+                    "autoPoints": 1
+                }
+            ]
+        }
+    ]
+}
