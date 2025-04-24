@@ -3,8 +3,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 import io
 
-import random
-
 def generate(data):
     # theta0 and theta1 values at time step 0
     data["params"]["i"] = 1 #random.randint(-2, 2)

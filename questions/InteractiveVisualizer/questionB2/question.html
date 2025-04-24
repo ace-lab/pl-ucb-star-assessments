@@ -1,0 +1,29 @@
+<pl-question-panel>
+  
+    <p>
+        We define a loss function, $L$, based on the two model parameters $\theta_0$ and $\theta_1$. We are also given one data point $(x,y) = ({{params.x}},{{params.y}})$.
+        
+        $$
+            L(\theta_0, \theta_1) = (y-(\theta_0 + \theta_1x))^2
+        $$
+
+        We can compute the partial derivatives of $L$ with respect to $\theta_0$ and $\theta_1$ as follows:
+            
+        $$
+            \frac{\partial L}{\partial \theta_0} = -2 \cdot \left( y - (\theta_0 + \theta_1 x) \right)
+        $$
+
+        $$
+            \frac{\partial L}{\partial \theta_1} = -2 \cdot \left( y - (\theta_0 + \theta_1 x) \right) \cdot x
+        $$
+    
+        Rendered below is a visual representation of the loss function's loss landscape, given our data point $(x,y) = ({{params.x}},{{params.y}})$.
+    
+        <pl-interactive-visualizer function="(3-(x+y*-2))**2" place="false"></pl-interactive-visualizer>
+    
+        We start with $\theta_0^{(0)} = {{params.i}}$ and $\theta_1^{(0)} = {{params.j}}$. We run one time step of gradient descent to get that $\theta_0^{(1)} = {{params.k}}$ and $\theta_1^{(1)} = {{params.l}}$. Calculate the learning rate $a$ used in this time step.
+    </p>    
+  
+</pl-question-panel>
+  
+<pl-number-input answers-name="number" label="$a =$" show-correct-answer="false"></pl-number-input>
