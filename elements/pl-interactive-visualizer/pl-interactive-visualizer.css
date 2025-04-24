@@ -1,6 +1,6 @@
 .interactive-visualizer {
     font-family: Arial, sans-serif;
-    text-align: left;
+    text-align: center;
     padding: 10px;
     display: grid;
     grid-template-columns: auto auto;
@@ -8,7 +8,7 @@
     grid-template-areas:
         "clear palette"
         "coords coords";
-    grid-gap: 12px;
+    justify-items: center;
 }
 
 .iv-instructions {

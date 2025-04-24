@@ -16,7 +16,11 @@
             "title" : "User Study Learning Phase",
             "questions": [
                 {
-                    "id": "InteractiveVisualizer/questionB",
+                    "id": "InteractiveVisualizer/questionB1",
+                    "autoPoints": 1
+                },
+                {
+                    "id": "InteractiveVisualizer/questionB2",
                     "autoPoints": 1
                 }
             ]
