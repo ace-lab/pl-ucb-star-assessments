@@ -3,5 +3,6 @@
     "title": "Gradient Descent Practice",
     "topic": "Gradient Descent",
     "tags": ["mwest", "tpl101", "v3"],
-    "type": "v3"
+    "type": "v3",
+    "singleVariant": true
 }
