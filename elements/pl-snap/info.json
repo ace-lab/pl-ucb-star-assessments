@@ -1,0 +1,32 @@
+{
+    "controller": "pl-snap.py",
+    "dependencies" : {
+        "elementScripts" : [
+            "pl-snap.js", 
+            "Snap/src/morphic.js",
+            "Snap/src/symbols.js",
+            "Snap/src/widgets.js",
+            "Snap/src/blocks.js",
+            "Snap/src/threads.js",
+            "Snap/src/objects.js",
+            "Snap/src/scenes.js",
+            "Snap/src/gui.js",
+            "Snap/src/paint.js",
+            "Snap/src/lists.js",
+            "Snap/src/byob.js",
+            "Snap/src/tables.js",
+            "Snap/src/sketch.js",
+            "Snap/src/video.js",
+            "Snap/src/maps.js",
+            "Snap/src/extensions.js",
+            "Snap/src/xml.js",
+            "Snap/src/store.js",
+            "Snap/src/locale.js",
+            "Snap/src/cloud.js",
+            "Snap/src/api.js",
+            "Snap/src/sha512.js",
+            "Snap/src/FileSaver.min.js"
+        ]
+    }
+}
+  

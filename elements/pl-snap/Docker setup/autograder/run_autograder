@@ -1,0 +1,9 @@
+#!/bin/sh
+start=`date +%s`  # Get the current time in seconds
+SUBMISSION=`find /grade/student -regex ".*\.xml"`
+cp "$SUBMISSION" /usr/src/cache/submission.xml
+cd /usr/src/cache
+node autograder.js 
+end=`date +%s`  # Get the current time in seconds
+runtime=$((end-start))  # Calculate the difference
+echo "Script runtime: $runtime seconds"

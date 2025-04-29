@@ -1,0 +1,16 @@
+    {
+    "uuid": "128046a8-5182-49cb-ab73-ad8df504c7cb",
+    "title": "Snap! Fractal",
+    "topic": "Fractal",
+    "tags": ["snap"],
+    "type": "v3",
+    "singleVariant": true,
+    "gradingMethod": "External",
+    "externalGradingOptions": {
+    "enabled": true,
+    "image": "localhost:5000/snap-test-new",
+    "entrypoint": "/usr/src/cache/run_autograder",
+    "timeout": 600,
+    "enableNetworking": true
+    }
+}
