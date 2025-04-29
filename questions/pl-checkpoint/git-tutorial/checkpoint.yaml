@@ -1,0 +1,84 @@
+uuid: 07173abe-b9d9-4b8a-94f6-6b6ded343882
+title: Git Basics Tutorial
+topic: Version Control
+tags:
+- git
+- terminal
+
+image:
+  registry: andylizf
+  name: git-tutorial
+  base: ubuntu:22.04
+
+runtime:
+  program: bash
+  program_args: []
+  packages:
+    - git
+    - nano
+    - openssh-client
+  setup_commands:
+    - git config --global user.email "student@example.com"
+    - git config --global user.name "Student"
+    - git config --global init.defaultBranch main
+    - mkdir -p ~/workspace
+    - cd ~/workspace
+
+flags:
+  - title: Initialize Git Repository
+    prompt: "Mission 1: Create Your First Git Repository"
+    description: |
+      Let's start by creating a new Git repository:
+      1. Use 'git init' to initialize a new repository
+      2. This will create a hidden .git directory to store your repository data
+    listener:
+      target: output
+      type: regex
+      match: "(?s).*Initialized empty Git repository in .*/\\.git.*"
+
+  - title: Create and Add Files
+    prompt: "Mission 2: Stage Your First Changes"
+    description: |
+      Now let's create and stage some files:
+      1. Use 'echo "Hello, Git!" > hello.txt' to create a new file
+      2. Use 'git add hello.txt' to stage the file
+    listener:
+      target: command
+      type: exact
+      match: "git add hello.txt"
+
+  - title: Make Your First Commit
+    prompt: "Mission 3: Commit Your Changes"
+    description: |
+      Time to commit your changes:
+      1. Use 'git commit -m "Initial commit"'
+      2. This will create a permanent record of your changes
+    listener:
+      target: output
+      type: regex
+      match: "\\[main .+\\] Initial commit"
+    files: []
+
+  - title: Check Repository Status
+    prompt: "Mission 4: View Repository Status"
+    description: |
+      Let's check the status of your repository:
+      1. Use 'git status' to see the current state
+      2. You should see that everything is up to date
+    listener:
+      target: output
+      type: regex
+      match: "On branch main\\nnothing to commit, working tree clean"
+    files: []
+
+  - title: View Commit History
+    prompt: "Mission 5: View Git Log"
+    description: |
+      Finally, let's look at your commit history:
+      1. Use 'git log' to see your commits
+      2. You should see your initial commit
+    listener:
+      target: output
+      type: regex
+      match: "commit\\s+[a-f0-9]+.*\\nAuthor:\\s+Student\\s+<student@example\\.com>\\n.*\\n\\s*Initial commit"
+    files: []
