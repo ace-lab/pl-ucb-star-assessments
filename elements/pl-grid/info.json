@@ -2,18 +2,16 @@
     "controller": "pl-grid.py",
     "dependencies": {
         "clientFilesCourseScripts": [
-            
-        ],
-        "clientFilesCourseStyles": [
-            
-        ],
-        "elementScripts": [
-            "pl-grid.js",
             "gridstack-all.js"
         ],
-        "elementStyles": [
-            "pl-grid.css",
+        "clientFilesCourseStyles": [
             "gridstack.min.css"
+        ],
+        "elementScripts": [
+            "pl-grid.js"
+        ],
+        "elementStyles": [
+            "pl-grid.css"
         ]
     }
 }
