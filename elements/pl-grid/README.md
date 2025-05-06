@@ -1,8 +1,10 @@
 # PrairieLearn OER Element: Grid
 
-This element was developed by Kiriratanak Vong, Runjeet Narula, and Anika Sikka. Please carefully test the element and understand its features and limitations before deploying it in a course. It is provided as-is and not officially maintained by PrairieLearn, so we can only provide limited support for any issues you encounter!
+This element was developed by Kiriratanak Vong, Runjeet Narula, and Anika Sikka from UC Berkeley. The project was advised by Narges Norouzi, Dan Garcia, and Armando Fox. Please carefully test the element and understand its features and limitations before deploying it in a course. It is provided as-is and not officially maintained by PrairieLearn, so we can only provide limited support for any issues you encounter!
 
 If you like this element, you can use it in your own PrairieLearn course by copying the contents of the `elements` folder into your own course repository. After syncing, the element can be used as illustrated by the example question that is also contained in this repository.
+
+📌 [View our Poster](https://drive.google.com/file/d/1FD4UtBeP9UojvrOG4pM8g-qexHHTPeLa/view?usp=sharing)
 
 ## `pl-grid` element
 
@@ -18,7 +20,7 @@ The table supports partial grading based on the number of blocks that match the 
 
 ### Example
 
-![Screenshot 2025-05-05 at 2.21.45 PM.png](PrairieLearn%20OER%20Element%20Grid%201e6f365af52380d386c4f7f64dbf48e1/Screenshot_2025-05-05_at_2.21.45_PM.png)
+![Screenshot 2025-05-05 at 2.21.45 PM.png](screenshot0.png)
 
 ```html
 <pl-grid color-column = "true">
