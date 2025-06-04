@@ -1,0 +1,25 @@
+{
+  "uuid": "ee63e934-b540-4198-901e-67ddd472407d",
+  "type": "Homework",
+  "title": "Prototype language learning exercises",
+  "set": "Homework",
+  "number": "1",
+  "allowAccess": [
+    {
+      "startDate": "2023-03-24T00:00:01",
+      "endDate": "2026-06-01T23:59:59"
+    }
+  ],
+  
+  "zones": [
+    {
+      "title" : "Aural Comprehension",
+      "questions": [
+        {
+          "id": "LanguageSandbox/aural_1",
+          "autoPoints": 1
+        }
+      ]
+    }
+  ]
+}
