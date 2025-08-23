@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+    <div class="ExecutionVisualizer {{#show_controls}}ExecutionVisualizerActive{{/show_controls}} {{^show_controls}}ExecutionVisualizerInactive{{/show_controls}}">
+        <!-- source: https://developer.mozilla.org/en-US/docs/Web/SVG/Element/marker -->
+    <svg xmlns="http://www.w3.org/2000/svg" class="pointerArrowHeadDefSvg">
+    <defs>
+      <!-- A marker to be used as an arrowhead -->
+      <marker
+        id="pointerArrowHead"
+        viewBox="0 0 10 10"
+        refX="10"
+        refY="5"
+        markerWidth="10"
+        markerHeight="10"
+        orient="auto-start-reverse">
+        <path d="M 0 0 L 10 5 L 0 10 z" />
+      </marker>
+    </defs>
+    </svg>
+    <datalist id="frame-indices">
+      <option value="Global"></option>
+      {{#frame}}
+      {{^parent}}
+      <option value="f{{frameIndex}}"></option>
+      {{/parent}}
+      {{/frame}}
+    </datalist>
+    <div class="vizLayoutTd" id="vizLayoutTdSecond">
+    <div id="dataViz">
+        <table id="stackHeapTable">
+          <tbody>
+          <tr>
+            <td id="stack_td">
+              <div id="globals_area">
+                <div id="stackHeader">Frames</div>
+                {{#frame}}
+                  <div class="stackFrame removable removablePrimary" id="frame-{{frameIndex}}">
+                    {{#return}}
+                    <button class="btn removeButton removeButtonPrimary" type="button" {{^show_controls}}disabled{{/show_controls}}></button>
+                    <label class="frameHeader">f{{frameIndex}}: </label><input class="frameHeader varLengthInput" id="frame-{{frameIndex}}-name" name="frame-{{frameIndex}}-name" value="{{name}}" {{^show_controls}}disabled{{/show_controls}} style="min-width: {{nameWidth}}ch">
+                    <label> [Parent = <input class="frameParentHeader" id="frame-{{frameIndex}}-parent" name="frame-{{frameIndex}}-parent" value="{{parent}}" {{^show_controls}}disabled{{/show_controls}} list="frame-indices">]</label>
+                    {{/return}}
+                    {{^return}}
+                    <label class="frameHeader">Global frame</label>
+                    {{/return}}
+                    <table class="stackFrameVarTable"><tbody>
+                    {{#var}}
+                      <tr class="variableTr removable removableSecondary" id="frame-{{frameIndex}}-var-{{varIndex}}">
+                        <td class=""><button class="btn removeButton removeButtonSecondary" type="button" {{^show_controls}}disabled{{/show_controls}}></button></td><td class="stackFrameVar"><input class="stackFrameVarInput varLengthInput" id="frame-{{frameIndex}}-var-{{varIndex}}-name" name="frame-{{frameIndex}}-var-{{varIndex}}-name" value="{{name}}" {{^show_controls}}disabled{{/show_controls}} style="min-width: {{nameWidth}}ch"></td>
+                        <td class="stackFrameValue">
+                          <div class="valueContainer">
+                            <input class="stackFrameValueInput varLengthInput {{^valWidth}}varLengthInputPointer{{/valWidth}}" id="frame-{{frameIndex}}-var-{{varIndex}}-val" name="frame-{{frameIndex}}-var-{{varIndex}}-val" value="{{val}}" {{^show_controls}}disabled{{/show_controls}} {{#valWidth}}style="min-width: {{valWidth}}ch"{{/valWidth}}>
+                            <button class="btn pointerValueButton pointerButton" type="button" {{^show_controls}}disabled{{/show_controls}}></button>
+                          </div>
+                        </td>
+                      </tr>
+                    {{/var}}
+                    {{#return}}
+                    <tr class="variableTr returnValueTr">
+                    <td class=""></td>
+                    <td class="stackFrameVar"><span>Return Value</span></td>
+                    <td class="stackFrameValue">
+                      <div class="valueContainer">
+                        <input class="stackFrameValueInput varLengthInput {{^valWidth}}varLengthInputPointer{{/valWidth}}" id="frame-{{frameIndex}}-return-val" name="frame-{{frameIndex}}-return-val" value="{{val}}" {{^show_controls}}disabled{{/show_controls}} {{#valWidth}}style="min-width: {{valWidth}}ch"{{/valWidth}}>
+                        <button class="btn pointerValueButton pointerButton" type="button" {{^show_controls}}disabled{{/show_controls}}></button>
+                      </div>
+                    </td>
+                    {{/return}}
+                    </tr></tbody></table><button class="btn addVarButton" type="button" {{^show_controls}}disabled{{/show_controls}}>Add Variable</button></div>
+                {{/frame}}
+            </div>
+            <button type="button" class="btn" id="addFrameButton" {{^show_controls}}disabled{{/show_controls}}>Add Frame</button>
+            </td>
+            <td id="heap_td">
+              <div id="heap">
+                <div id="heapHeader">Objects</div>
+                {{#heap}}
+                  {{#func}}
+                    <div class="topLevelHeapObject removable removablePrimary" id="heap-func-{{funcIndex}}">
+                      <div class="heapObject">
+                        <div><div class="typeLabel">function</div><button class="btn removeButton removeButtonPrimary" type="button"></button></div>
+                        <div class="funcObj">
+                          func 
+                          <input class="funcNameInput varLengthInput" id="heap-func-{{funcIndex}}-name" name="heap-func-{{funcIndex}}-name" value="{{name}}" {{^show_controls}}disabled{{/show_controls}} style="min-width: {{nameWidth}}ch">
+                          <span> [Parent = <input class="frameParentHeader" id="heap-func-{{funcIndex}}-parent" name="heap-func-{{funcIndex}}-parent" value="{{parent}}" {{^show_controls}}disabled{{/show_controls}} list="frame-indices">]</span>
+                        </div>
+                      </div>
+                    </div>
+                  {{/func}}
+                  {{#list}}
+                    <div class="topLevelHeapObject removable removablePrimary" id="heap-list-{{listIndex}}">
+                    <div class="heapObject">
+                      <div>
+                        <div class="typeLabel">{{^item}}empty{{/item}} list</div>
+                        <button class="btn removeButton removeButtonPrimary" type="button"></button>
+                      </div>
+                      <div class="sequence">
+                        <div class="sequenceContent">
+                          {{#item}}<div id="heap-list-{{listIndex}}-item-{{itemIndex}}" class="sequenceElt removable removableSecondary">
+                            <div class="sequenceAddButtonContainer sequencePrependButtonContainer">
+                              <button class="btn addButton" type="button" {{^show_controls}}disabled{{/show_controls}}></button>
+                            </div>
+                            <div class="sequenceHeader">
+                              <span class="sequenceEltIndex">{{itemIndex}}</span>
+                              <button class="btn removeButton removeButtonSecondary" type="button" {{^show_controls}}disabled{{/show_controls}}></button>
+                            </div>
+                            <div class="valueContainer">
+                              <input id="heap-list-{{listIndex}}-item-{{itemIndex}}-val" name="heap-list-{{listIndex}}-item-{{itemIndex}}-val" class="sequenceElementValueContainer varLengthInput" value="{{val}}" {{^show_controls}}disabled{{/show_controls}} {{#valWidth}}style="min-width: {{valWidth}}ch"{{/valWidth}}>
+                              <button class="btn pointerButton pointerValueButton" type="button" {{^show_controls}}disabled{{/show_controls}}></button>
+                            </div>
+                            {{#isLastElement}}
+                            <div class="sequenceAddButtonContainer sequenceAppendButtonContainer">
+                              <button class="btn addButton" type="button" {{^show_controls}}disabled{{/show_controls}}></button>
+                            </div>
+                            {{/isLastElement}}
+                          </div>{{/item}}
+                        </div>
+                        {{^item}}
+                          <div class="sequenceAddButtonContainer sequenceAppendButtonContainer">
+                            <button class="btn addButton" type="button" {{^show_controls}}disabled{{/show_controls}}></button>
+                          </div>
+                        {{/item}}
+                      </div>
+                    </div></div>
+                  {{/list}}
+                  {{#tuple}}
+                    <div class="topLevelHeapObject removable removablePrimary" id="heap-tuple-{{tupleIndex}}">
+                    <div class="heapObject">
+                      <div>
+                        <div class="typeLabel">{{^item}}empty{{/item}} tuple</div>
+                        <button class="btn removeButton removeButtonPrimary" type="button"></button>
+                      </div>
+                      <div class="sequence">
+                        <div class="sequenceContent">
+                          {{#item}}<div id="heap-tuple-{{tupleIndex}}-item-{{itemIndex}}" class="sequenceElt removable removableSecondary">
+                            <div class="sequenceAddButtonContainer sequencePrependButtonContainer">
+                              <button class="btn addButton" type="button" {{^show_controls}}disabled{{/show_controls}}></button>
+                            </div>
+                            <div class="sequenceHeader">
+                              <span class="sequenceEltIndex">{{itemIndex}}</span>
+                              <button class="btn removeButton removeButtonSecondary" type="button" {{^show_controls}}disabled{{/show_controls}}></button>
+                            </div>
+                            <div class="valueContainer">
+                              <input id="heap-tuple-{{tupleIndex}}-item-{{itemIndex}}-val" name="heap-tuple-{{tupleIndex}}-item-{{itemIndex}}-val" class="sequenceElementValueContainer varLengthInput" value="{{val}}" {{^show_controls}}disabled{{/show_controls}} {{#valWidth}}style="min-width: {{valWidth}}ch"{{/valWidth}}>
+                              <button class="btn pointerButton pointerValueButton" type="button" {{^show_controls}}disabled{{/show_controls}}></button>
+                            </div>
+                            {{#isLastElement}}
+                            <div class="sequenceAddButtonContainer sequenceAppendButtonContainer">
+                              <button class="btn addButton" type="button" {{^show_controls}}disabled{{/show_controls}}></button>
+                            </div>
+                            {{/isLastElement}}
+                          </div>{{/item}}
+                        </div>
+                        {{^item}}
+                          <div class="sequenceAddButtonContainer sequenceAppendButtonContainer">
+                            <button class="btn addButton" type="button" {{^show_controls}}disabled{{/show_controls}}></button>
+                          </div>
+                        {{/item}}
+                      </div>
+                    </div></div>
+                  {{/tuple}}
+                {{/heap}}
+            </div>
+            <button type="button" class="btn" id="addFuncButton" {{^show_controls}}disabled{{/show_controls}}>Add function</button>
+            <button type="button" class="btn" id="addListButton" {{^show_controls}}disabled{{/show_controls}}>Add list</button>
+            <button type="button" class="btn" id="addTupleButton" {{^show_controls}}disabled{{/show_controls}}>Add tuple</button>
+            </td>
+        </tr>
+        </tbody></table>
+      </div>
+      {{#pointer}}
+        <div class="pointerArrow pointerTo-{{destination}}" id="pointer-{{origin}}">
+          <svg xmlns="http://www.w3.org/2000/svg" 
+          width="{{width}}" height="{{height}}" viewBox="0 0 {{width}} {{height}}" style="top: {{top}}; left: {{left}}"><path marker-end="url(#pointerArrowHead)" d="{{d}}"></path></svg>
+          <input class="pointerInput" id="pointer-{{origin}}-input" name="pointer-{{origin}}-input" value="{{raw}}">
+        </div>
+      {{/pointer}}
+      </div>
+      </div>
+<p>This tool is based on Python Tutor: <a href="https://pythontutor.com/">pythontutor.com</a></p>
+</body>
+</html> 

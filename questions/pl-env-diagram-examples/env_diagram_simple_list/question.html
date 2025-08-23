@@ -1,0 +1,24 @@
+<pl-question-panel>
+    <p> 
+        Fill in the environment diagram that results from executing the code below until the entire program is finished, an error occurs, or all frames are filled. A complete answer will:
+    </p>
+    <ul>
+        <li>Add all missing names and parent annotations to all local frames.</li>
+        <li>Add all missing values created or referenced during execution.</li>
+        <li>Show the return value for each local frame.</li>
+    </ul>
+<pl-code language="python">
+{{params.codestring}}
+</pl-code>
+    <p> 
+      Order of frames, variables within each frame, and objects on the heap does not matter.
+    </p>
+
+<pl-env-diagram granularity="5">
+<base-code>
+{{params.codestring}}
+</base-code>
+</pl-env-diagram>
+</pl-question-panel>
+<pl-submission-panel> {{partial_scores.problem.feedback}} </pl-submission-panel>
+
