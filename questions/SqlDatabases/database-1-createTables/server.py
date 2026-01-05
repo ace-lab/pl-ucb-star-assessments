@@ -13,7 +13,7 @@ def fill_db(conn, table_name):
                           .format(table_name))
     num_cols = random.randint(1, 4)
     df = pd.read_csv('../../../clientFilesCourse/faker.csv')
-    cols = ['id'] + random.sample(set(df.keys()), num_cols)
+    cols = ['id'] + random.sample(list(df.keys()), num_cols)
     types = ['INTEGER PRIMARY KEY'] + \
         [fields[type(df[col][0])] for col in cols[1:]]
 
