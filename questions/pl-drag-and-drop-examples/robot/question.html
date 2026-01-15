@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Robot</title>
+</head>
+<body>
+
+<p>
+
+    <img src="{{options.client_files_question_url}}/robot.png" alt="Robot Image" width = "700px" height = auto />
+    <br></br>
+
+    In the grid below, assume that pick random 0 to 1 always returns 1. Where would the robot be after a call to Meander(1)?
+    Note that blocked cells are in red.
+
+
+
+
+</p>
+
+<pl-drag-and-drop-grid 
+    num_cols="5" 
+    pool_type = "infinite" 
+    num_rows="5" 
+    blocked_cells="[(1, 1),(2, 1)]" 
+    items='^, >, <, v' 
+    partial_credit = "True" 
+    answer='[["", "", "", "", ""], 
+            ["", "", "", "", ""], 
+            ["", "", "", "v", ""], 
+            ["", "", "", "", ""], 
+            ["", "", "", "", ""]]'>
+</pl-drag-and-drop-grid>
+
+</body>
+</html>
