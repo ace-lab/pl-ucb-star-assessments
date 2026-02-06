@@ -1,0 +1,1 @@
+{"gradable":true,"score":0,"tests":[{"name":"Test: factorial RECURSIVE","points":0,"max_points":10,"output":"Test failed."},{"name":"Test: factorial ITERATIVE","points":0,"max_points":10,"output":"Test failed."}]}

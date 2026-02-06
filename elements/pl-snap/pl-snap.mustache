@@ -1,0 +1,12 @@
+<div id="pl-snap" class = "d-flex mb-4" >  
+    <div class = "mb-4" style="height:800px;">
+        <canvas id="world" tabindex="1"  style="height:800px; position: absolute;"></canvas>
+    </div>
+    <input type="hidden" name="submission.xml" data-skip-unload-check="true">
+</div>
+
+<script>
+    $(function() {
+        window.setupSnapElement("{{student_submission}}");
+    });
+</script>

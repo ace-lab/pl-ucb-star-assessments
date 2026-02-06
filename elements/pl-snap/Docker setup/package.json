@@ -1,0 +1,8 @@
+{
+    "name": "pl-snap-ag",
+    "version": "1.0.0",
+    "description": "",
+    "dependencies": {
+        "puppeteer": "^22.3.0"
+    }
+}
