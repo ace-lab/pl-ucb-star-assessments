@@ -1,0 +1,59 @@
+.pl-intent-console {
+  border: 1px solid #d8dee4;
+  border-radius: 0.5rem;
+  background: #fff;
+  padding: 1rem;
+  margin: 1rem 0;
+}
+
+.pl-intent-console-field + .pl-intent-console-field {
+  margin-top: 1rem;
+}
+
+.pl-intent-console-label,
+.pl-intent-console-preview-title {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.35rem;
+}
+
+.pl-intent-console-english {
+  resize: vertical;
+}
+
+.pl-intent-console-code,
+.pl-intent-console-submitted-code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+.pl-intent-console-code {
+  resize: vertical;
+  white-space: pre;
+}
+
+.pl-intent-console-hint {
+  color: #5f6872;
+  font-size: 0.85rem;
+  margin: 0.35rem 0 0;
+}
+
+.pl-intent-console-preview {
+  margin-top: 1rem;
+}
+
+.pl-intent-console-preview td,
+.pl-intent-console-preview th {
+  white-space: nowrap;
+}
+
+.pl-intent-console-submitted-source,
+.pl-intent-console-submitted-code {
+  border: 1px solid #d8dee4;
+  border-radius: 0.25rem;
+  background: #f6f8fa;
+  margin: 0;
+  padding: 0.75rem;
+  white-space: pre-wrap;
+}

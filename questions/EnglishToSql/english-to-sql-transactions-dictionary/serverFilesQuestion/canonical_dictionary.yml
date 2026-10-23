@@ -1,0 +1,203 @@
+version: 1
+implementation: dictionary-plus-llm
+stage: 1-of-2-deterministic-normalization
+description: Normalize explicitly stated phrases before the single LLM call without adding operations.
+
+runtime:
+  type: deterministic_dictionary
+  model_call: false
+  matching:
+    case_sensitive: false
+    require_word_boundaries: true
+    prefer_longest_match: true
+    preserve_unmatched_text: true
+    preserve_matched_arguments: true
+    do_not_match_inside_identifiers_or_quoted_values: true
+
+normalizations:
+  - canonical: use table
+    kind: operation
+    phrases:
+      - start with the table
+      - start with table
+      - use the table
+      - use table
+
+  - canonical: select
+    kind: operation
+    phrases:
+      - return the columns
+      - return columns
+      - select the columns
+      - select columns
+      - select
+
+  - canonical: select distinct
+    kind: operation
+    phrases:
+      - select unique
+      - return unique
+      - select distinct
+
+  - canonical: filter rows where
+    kind: operation
+    phrases:
+      - keep only rows where
+      - keep rows where
+      - filter rows where
+
+  - canonical: group rows by
+    kind: operation
+    phrases:
+      - group the rows by
+      - group rows by
+      - group by
+
+  - canonical: compute count distinct of
+    kind: operation
+    phrases:
+      - count the distinct
+      - count distinct
+      - compute count distinct of
+
+  - canonical: compute count of
+    kind: operation
+    phrases:
+      - count the number of
+      - compute the count of
+      - compute count of
+
+  - canonical: compute sum of
+    kind: operation
+    phrases:
+      - calculate the sum of
+      - compute the sum of
+      - compute sum of
+
+  - canonical: compute average of
+    kind: operation
+    phrases:
+      - calculate the average of
+      - compute the average of
+      - compute average of
+
+  - canonical: compute minimum of
+    kind: operation
+    phrases:
+      - calculate the minimum of
+      - compute the minimum of
+      - compute minimum of
+
+  - canonical: compute maximum of
+    kind: operation
+    phrases:
+      - calculate the maximum of
+      - compute the maximum of
+      - compute maximum of
+
+  - canonical: keep groups where
+    kind: operation
+    phrases:
+      - keep only groups where
+      - keep groups where
+      - filter groups where
+
+  - canonical: aggregate the result with
+    kind: operation
+    phrases:
+      - aggregate the result with
+      - summarize the result with
+
+  - canonical: order by
+    kind: operation
+    phrases:
+      - sort the rows by
+      - sort rows by
+      - order by
+
+  - canonical: ascending
+    kind: modifier
+    phrases:
+      - from smallest to largest
+      - in increasing order
+      - ascending
+
+  - canonical: descending
+    kind: modifier
+    phrases:
+      - from largest to smallest
+      - in decreasing order
+      - descending
+
+  - canonical: greater than or equal to
+    kind: modifier
+    phrases:
+      - no less than
+      - at least
+      - greater than or equal to
+
+  - canonical: less than or equal to
+    kind: modifier
+    phrases:
+      - no more than
+      - at most
+      - less than or equal to
+
+  - canonical: greater than
+    kind: modifier
+    phrases:
+      - more than
+      - greater than
+
+  - canonical: less than
+    kind: modifier
+    phrases:
+      - fewer than
+      - less than
+
+  - canonical: equal to
+    kind: modifier
+    phrases:
+      - exactly equal to
+      - equals
+      - equal to
+
+  - canonical: not equal to
+    kind: modifier
+    phrases:
+      - does not equal
+      - not equal to
+
+  - canonical: keep the first
+    kind: operation
+    phrases:
+      - limit the result to
+      - keep the first
+
+  - canonical: skip the first
+    kind: operation
+    phrases:
+      - offset by
+      - skip the first
+
+non_inference_rules:
+  - Never insert a canonical phrase that did not match student text.
+  - Never map a table or column name to an operation.
+  - Never map the word total by itself to SUM because total may be a column name.
+  - Never map for each by itself to GROUP BY because it can be ambiguous.
+  - Never choose a table, column, function, comparison, grouping, or sort direction.
+  - If phrases overlap, apply only the longest matching phrase.
+  - Record each replacement with the original phrase and its character span for auditing.
+  - Matching is a wording normalization pass, not a validity judgment. Preserve all unmatched prose for the LLM to interpret under the generation specification.
+
+output:
+  format: json
+  schema:
+    original_plan: exact student input
+    canonical_plan: input after deterministic replacements
+    replacements:
+      - original: exact matched phrase
+        canonical: replacement phrase
+        kind: operation | modifier
+        start: zero-based start offset
+        end: zero-based exclusive end offset

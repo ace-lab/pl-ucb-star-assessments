@@ -1,0 +1,67 @@
+{{#question}}
+<section class="pl-intent-console-regen" data-pl-intent-console-regen="{{name}}">
+  <div class="pl-intent-console-regen__field">
+    <label class="pl-intent-console-regen__label" for="{{source_name}}">{{input_label}}</label>
+    <textarea class="form-control pl-intent-console-regen__english" id="{{source_name}}" name="{{source_name}}" rows="4" placeholder="Describe the query in English…"{{^input_editable}} disabled{{/input_editable}}{{#input_locked}} readonly{{/input_locked}}>{{source}}</textarea>
+    {{#input_locked}}<p class="pl-intent-console-regen__hint">No generations left. You can still edit the SQL below.</p>{{/input_locked}}
+  </div>
+
+  <div class="pl-intent-console-regen__field">
+    <label class="pl-intent-console-regen__label" for="{{code_name}}">{{code_label}}</label>
+    <textarea class="form-control pl-intent-console-regen__code" id="{{code_name}}" name="{{code_name}}" rows="8" spellcheck="false" placeholder="Click Save to generate SQL from your description."{{^code_editable}} readonly{{/code_editable}}>{{code}}</textarea>
+    <p class="pl-intent-console-regen__hint">Save keeps your SQL edits and regenerates only when your English plan changes. Save &amp; Grade grades the SQL shown if it matches your current plan.</p>
+    {{#show_reset}}<button type="button" class="btn btn-sm btn-outline-secondary mt-2" data-pl-intent-console-regen-reset>Reset to generated SQL</button>{{/show_reset}}
+  </div>
+
+  <input type="hidden" name="{{runs_name}}" value="{{run_count}}">
+  <input type="hidden" name="{{action_name}}" value="" data-pl-intent-console-regen-action>
+  <input type="hidden" name="{{generated_from_name}}" value="{{generated_from}}">
+  <input type="hidden" name="{{generated_sql_name}}" value="{{generated_sql}}" data-pl-intent-console-regen-generated-sql>
+
+  {{#parse_error}}
+  <div class="alert alert-danger py-2" role="alert">{{parse_error}}</div>
+  {{/parse_error}}
+
+  {{#has_preview}}
+  <div class="pl-intent-console-regen__preview">
+    <div class="pl-intent-console-regen__preview-title">Result preview</div>
+    <div class="table-responsive">
+      <table class="table table-sm table-bordered mb-0">
+        <thead><tr>{{#preview_columns}}<th scope="col">{{value}}</th>{{/preview_columns}}</tr></thead>
+        <tbody>
+          {{#preview_rows}}<tr>{{#cells}}<td>{{value}}</td>{{/cells}}</tr>{{/preview_rows}}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  {{/has_preview}}
+</section>
+{{/question}}
+
+{{#submission}}
+<section class="pl-intent-console-regen pl-intent-console-regen--submission">
+  <div class="pl-intent-console-regen__label">English analysis plan</div>
+  <div class="pl-intent-console-regen__submitted-source">{{source}}</div>
+  <div class="pl-intent-console-regen__label mt-3">Submitted SQL</div>
+  <pre class="pl-intent-console-regen__submitted-code"><code>{{code}}</code></pre>
+  {{#parse_error}}<div class="alert alert-danger py-2" role="alert">{{parse_error}}</div>{{/parse_error}}
+  {{#has_preview}}
+  <div class="pl-intent-console-regen__preview">
+    <div class="pl-intent-console-regen__preview-title">Result preview</div>
+    <div class="table-responsive">
+      <table class="table table-sm table-bordered mb-0">
+        <thead><tr>{{#preview_columns}}<th scope="col">{{value}}</th>{{/preview_columns}}</tr></thead>
+        <tbody>{{#preview_rows}}<tr>{{#cells}}<td>{{value}}</td>{{/cells}}</tr>{{/preview_rows}}</tbody>
+      </table>
+    </div>
+  </div>
+  {{/has_preview}}
+</section>
+{{/submission}}
+
+{{#answer}}
+<section class="pl-intent-console-regen pl-intent-console-regen--answer">
+  <div class="pl-intent-console-regen__label">One reference SQL query</div>
+  <pre class="pl-intent-console-regen__submitted-code"><code>{{reference_code}}</code></pre>
+</section>
+{{/answer}}

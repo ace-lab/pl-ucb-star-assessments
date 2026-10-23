@@ -1,0 +1,59 @@
+.pl-intent-console-two-pass {
+  border: 1px solid #d8dee4;
+  border-radius: 0.5rem;
+  background: #fff;
+  padding: 1rem;
+  margin: 1rem 0;
+}
+
+.pl-intent-console-two-pass-field + .pl-intent-console-two-pass-field {
+  margin-top: 1rem;
+}
+
+.pl-intent-console-two-pass-label,
+.pl-intent-console-two-pass-preview-title {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.35rem;
+}
+
+.pl-intent-console-two-pass-english {
+  resize: vertical;
+}
+
+.pl-intent-console-two-pass-code,
+.pl-intent-console-two-pass-submitted-code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+.pl-intent-console-two-pass-code {
+  resize: vertical;
+  white-space: pre;
+}
+
+.pl-intent-console-two-pass-hint {
+  color: #5f6872;
+  font-size: 0.85rem;
+  margin: 0.35rem 0 0;
+}
+
+.pl-intent-console-two-pass-preview {
+  margin-top: 1rem;
+}
+
+.pl-intent-console-two-pass-preview td,
+.pl-intent-console-two-pass-preview th {
+  white-space: nowrap;
+}
+
+.pl-intent-console-two-pass-submitted-source,
+.pl-intent-console-two-pass-submitted-code {
+  border: 1px solid #d8dee4;
+  border-radius: 0.25rem;
+  background: #f6f8fa;
+  margin: 0;
+  padding: 0.75rem;
+  white-space: pre-wrap;
+}

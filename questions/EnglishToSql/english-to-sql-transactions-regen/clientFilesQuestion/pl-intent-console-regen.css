@@ -1,0 +1,59 @@
+.pl-intent-console-regen {
+  border: 1px solid #d8dee4;
+  border-radius: 0.5rem;
+  background: #fff;
+  padding: 1rem;
+  margin: 1rem 0;
+}
+
+.pl-intent-console-regen__field + .pl-intent-console-regen__field {
+  margin-top: 1rem;
+}
+
+.pl-intent-console-regen__label,
+.pl-intent-console-regen__preview-title {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.35rem;
+}
+
+.pl-intent-console-regen__english {
+  resize: vertical;
+}
+
+.pl-intent-console-regen__code,
+.pl-intent-console-regen__submitted-code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+.pl-intent-console-regen__code {
+  resize: vertical;
+  white-space: pre;
+}
+
+.pl-intent-console-regen__hint {
+  color: #5f6872;
+  font-size: 0.85rem;
+  margin: 0.35rem 0 0;
+}
+
+.pl-intent-console-regen__preview {
+  margin-top: 1rem;
+}
+
+.pl-intent-console-regen__preview td,
+.pl-intent-console-regen__preview th {
+  white-space: nowrap;
+}
+
+.pl-intent-console-regen__submitted-source,
+.pl-intent-console-regen__submitted-code {
+  border: 1px solid #d8dee4;
+  border-radius: 0.25rem;
+  background: #f6f8fa;
+  margin: 0;
+  padding: 0.75rem;
+  white-space: pre-wrap;
+}

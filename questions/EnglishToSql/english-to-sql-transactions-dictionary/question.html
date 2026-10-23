@@ -1,0 +1,47 @@
+<pl-question-panel>
+  <h3>Transactions analysis plan</h3>
+  <p>Consider a <code>transactions</code> dataset with the following columns:</p>
+
+  <div class="table-responsive">
+    <table class="table table-bordered">
+      <thead>
+        <tr><th scope="col">Column</th><th scope="col">Description</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>transaction_id</code></td><td>a unique identifier for each transaction</td></tr>
+        <tr><td><code>customer_id</code></td><td>an identifier for the customer associated with the transaction</td></tr>
+        <tr><td><code>store_id</code></td><td>an identifier for the store where the transaction occurred</td></tr>
+        <tr><td><code>date</code></td><td>the date of the transaction</td></tr>
+        <tr><td><code>year</code></td><td>the year of the transaction</td></tr>
+        <tr><td><code>total</code></td><td>the total dollar amount of the transaction</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>Each row of the dataset represents one transaction.</p>
+  <div class="alert alert-secondary">
+    <strong>Note:</strong> Customers can make more than one transaction at more than one store on a particular day.
+  </div>
+
+  <p>Write an analysis plan for the question below.</p>
+  <ul>
+    <li>Your analysis plan should start with the dataset above and result in a <code>table</code> that answers the question.</li>
+    <li>Your final <code>table</code> must only include rows that are relevant to the question. No extra rows.</li>
+    <li>Your final <code>table</code> may optionally include columns that are not required to answer the question. For example, if you are asked to identify customers, but your answer contains a transaction ID column that is not used, that's fine.</li>
+    <li>Your final <code>table</code> should require no additional computation to fully answer the question. A non-technical person should be able to answer the question by scrolling through your final table.</li>
+  </ul>
+  <p>Make sure to use a subset of the appropriate canonical English terms learned in lecture.</p>
+
+  <blockquote class="blockquote border-left pl-3">
+    <strong>(a)</strong> How many customers spent more than <code>$200</code> in the year 2025?
+  </blockquote>
+</pl-question-panel>
+
+<link rel="stylesheet" href="{{options.client_files_question_url}}/pl-intent-console-dictionary.css">
+<pl-question-panel>
+  <script src="{{options.client_files_question_url}}/pl-intent-console-dictionary.js"></script>
+</pl-question-panel>
+
+<!-- Replaced by server.py render() with the intent console for the current panel.
+     Settings formerly on <pl-intent-console-dictionary> live in server.py _attributes(). -->
+<div data-pl-intent-console-placeholder></div>

@@ -1,0 +1,59 @@
+.pl-intent-console-dictionary {
+  border: 1px solid #d8dee4;
+  border-radius: 0.5rem;
+  background: #fff;
+  padding: 1rem;
+  margin: 1rem 0;
+}
+
+.pl-intent-console-dictionary-field + .pl-intent-console-dictionary-field {
+  margin-top: 1rem;
+}
+
+.pl-intent-console-dictionary-label,
+.pl-intent-console-dictionary-preview-title {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.35rem;
+}
+
+.pl-intent-console-dictionary-english {
+  resize: vertical;
+}
+
+.pl-intent-console-dictionary-code,
+.pl-intent-console-dictionary-submitted-code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+.pl-intent-console-dictionary-code {
+  resize: vertical;
+  white-space: pre;
+}
+
+.pl-intent-console-dictionary-hint {
+  color: #5f6872;
+  font-size: 0.85rem;
+  margin: 0.35rem 0 0;
+}
+
+.pl-intent-console-dictionary-preview {
+  margin-top: 1rem;
+}
+
+.pl-intent-console-dictionary-preview td,
+.pl-intent-console-dictionary-preview th {
+  white-space: nowrap;
+}
+
+.pl-intent-console-dictionary-submitted-source,
+.pl-intent-console-dictionary-submitted-code {
+  border: 1px solid #d8dee4;
+  border-radius: 0.25rem;
+  background: #f6f8fa;
+  margin: 0;
+  padding: 0.75rem;
+  white-space: pre-wrap;
+}

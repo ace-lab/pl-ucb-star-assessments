@@ -1,0 +1,63 @@
+{{#question}}
+<section class="pl-intent-console-two-pass" data-pl-intent-console-two-pass="{{name}}">
+  <div class="pl-intent-console-two-pass-field">
+    <label class="pl-intent-console-two-pass-label" for="{{source_name}}">{{input_label}}</label>
+    <textarea class="form-control pl-intent-console-two-pass-english" id="{{source_name}}" name="{{source_name}}" rows="4" placeholder="Describe the query in English…"{{^input_editable}} disabled{{/input_editable}}>{{source}}</textarea>
+  </div>
+
+  <div class="pl-intent-console-two-pass-field">
+    <label class="pl-intent-console-two-pass-label" for="{{code_name}}">{{code_label}}</label>
+    <textarea class="form-control pl-intent-console-two-pass-code" id="{{code_name}}" name="{{code_name}}" rows="8" spellcheck="false" placeholder="Click Save to generate SQL from your description."{{^code_editable}} readonly{{/code_editable}}>{{code}}</textarea>
+    <p class="pl-intent-console-two-pass-hint">Save regenerates this query and replaces edits. Save &amp; Grade grades the SQL currently shown.</p>
+  </div>
+
+  <input type="hidden" name="{{runs_name}}" value="{{run_count}}">
+  <input type="hidden" name="{{generate_name}}" value="1" data-pl-intent-console-two-pass-generate>
+
+  {{#parse_error}}
+  <div class="alert alert-danger py-2" role="alert">{{parse_error}}</div>
+  {{/parse_error}}
+
+  {{#has_preview}}
+  <div class="pl-intent-console-two-pass-preview">
+    <div class="pl-intent-console-two-pass-preview-title">Result preview</div>
+    <div class="table-responsive">
+      <table class="table table-sm table-bordered mb-0">
+        <thead><tr>{{#preview_columns}}<th scope="col">{{value}}</th>{{/preview_columns}}</tr></thead>
+        <tbody>
+          {{#preview_rows}}<tr>{{#cells}}<td>{{value}}</td>{{/cells}}</tr>{{/preview_rows}}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  {{/has_preview}}
+</section>
+{{/question}}
+
+{{#submission}}
+<section class="pl-intent-console-two-pass pl-intent-console-two-pass--submission">
+  <div class="pl-intent-console-two-pass-label">English analysis plan</div>
+  <div class="pl-intent-console-two-pass-submitted-source">{{source}}</div>
+  <div class="pl-intent-console-two-pass-label mt-3">Submitted SQL</div>
+  <pre class="pl-intent-console-two-pass-submitted-code"><code>{{code}}</code></pre>
+  {{#parse_error}}<div class="alert alert-danger py-2" role="alert">{{parse_error}}</div>{{/parse_error}}
+  {{#has_preview}}
+  <div class="pl-intent-console-two-pass-preview">
+    <div class="pl-intent-console-two-pass-preview-title">Result preview</div>
+    <div class="table-responsive">
+      <table class="table table-sm table-bordered mb-0">
+        <thead><tr>{{#preview_columns}}<th scope="col">{{value}}</th>{{/preview_columns}}</tr></thead>
+        <tbody>{{#preview_rows}}<tr>{{#cells}}<td>{{value}}</td>{{/cells}}</tr>{{/preview_rows}}</tbody>
+      </table>
+    </div>
+  </div>
+  {{/has_preview}}
+</section>
+{{/submission}}
+
+{{#answer}}
+<section class="pl-intent-console-two-pass pl-intent-console-two-pass--answer">
+  <div class="pl-intent-console-two-pass-label">One reference SQL query</div>
+  <pre class="pl-intent-console-two-pass-submitted-code"><code>{{reference_code}}</code></pre>
+</section>
+{{/answer}}
