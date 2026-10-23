@@ -30,7 +30,27 @@
     <li>Your final <code>table</code> may optionally include columns that are not required to answer the question. For example, if you are asked to identify customers, but your answer contains a transaction ID column that is not used, that's fine.</li>
     <li>Your final <code>table</code> should require no additional computation to fully answer the question. A non-technical person should be able to answer the question by scrolling through your final table.</li>
   </ul>
-  <p>Make sure to use a subset of the appropriate canonical English terms learned in lecture.</p>
+  <div class="alert alert-info">
+    <p><strong>Use canonical English for every operation.</strong> Use the applicable
+      operation phrases:</p>
+    <ul class="mb-0">
+      <li><code>select</code> or <code>select distinct</code></li>
+      <li><code>filter rows where</code> or <code>filter for</code></li>
+      <li><code>group rows by</code> or <code>for each unique</code></li>
+      <li><code>join</code> with both table names and matching columns for a multi-table question</li>
+      <li><code>compute count of</code>, <code>compute count distinct of</code>,
+        <code>compute sum of</code>, <code>compute average of</code>,
+        <code>compute minimum of</code>, or <code>compute maximum of</code>;
+        <code>sum their</code> is also accepted for a sum</li>
+      <li><code>keep groups where</code> or <code>aggregate the result with</code></li>
+      <li><code>order by</code> with <code>ascending</code> or <code>descending</code></li>
+      <li><code>keep the first</code> or <code>skip the first</code></li>
+    </ul>
+  </div>
+  <p>Name every table and column exactly as shown above. Include all comparison
+    operators, values, calculation inputs, and sort directions needed by your steps.
+    Code-like shorthand such as <code>df[...]</code>, <code>groupby</code>, or
+    <code>more_than</code> is not accepted as canonical English.</p>
 
   <blockquote class="blockquote border-left pl-3">
     <strong>(a)</strong> How many customers spent more than <code>$200</code> in the year 2025?

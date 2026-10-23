@@ -1,4 +1,4 @@
-version: 1
+version: 3
 implementation: dictionary-plus-llm
 stage: 1-of-2-deterministic-normalization
 description: Normalize explicitly stated phrases before the single LLM call without adding operations.
@@ -13,6 +13,7 @@ runtime:
     preserve_unmatched_text: true
     preserve_matched_arguments: true
     do_not_match_inside_identifiers_or_quoted_values: true
+    require_at_least_one_operation_match: true
 
 normalizations:
   - canonical: use table
@@ -46,12 +47,30 @@ normalizations:
       - keep rows where
       - filter rows where
 
+  - canonical: filter where
+    kind: operation
+    phrases:
+      - filter again for
+      - filter for
+
   - canonical: group rows by
     kind: operation
     phrases:
       - group the rows by
       - group rows by
       - group by
+      - for each unique
+      - for each
+
+  - canonical: join
+    kind: operation
+    phrases:
+      - combine the tables where
+      - combine tables where
+      - join the tables on
+      - join tables on
+      - combine
+      - join
 
   - canonical: compute count distinct of
     kind: operation
@@ -73,6 +92,8 @@ normalizations:
       - calculate the sum of
       - compute the sum of
       - compute sum of
+      - sum their
+      - sum the
 
   - canonical: compute average of
     kind: operation
@@ -168,6 +189,12 @@ normalizations:
       - does not equal
       - not equal to
 
+  - canonical: keep filtered rows
+    kind: modifier
+    phrases:
+      - keep those rows only
+      - keep those rows
+
   - canonical: keep the first
     kind: operation
     phrases:
@@ -184,11 +211,12 @@ non_inference_rules:
   - Never insert a canonical phrase that did not match student text.
   - Never map a table or column name to an operation.
   - Never map the word total by itself to SUM because total may be a column name.
-  - Never map for each by itself to GROUP BY because it can be ambiguous.
   - Never choose a table, column, function, comparison, grouping, or sort direction.
   - If phrases overlap, apply only the longest matching phrase.
   - Record each replacement with the original phrase and its character span for auditing.
-  - Matching is a wording normalization pass, not a validity judgment. Preserve all unmatched prose for the LLM to interpret under the generation specification.
+  - At least one operation phrase must match or the plan is rejected before an LLM call.
+  - Preserve unmatched prose only as possible arguments or connectors. Unmatched prose cannot create an operation.
+  - Code-like spellings such as groupby, more_than, and df[...] are not canonical English and must not be interpreted as operations.
 
 output:
   format: json
