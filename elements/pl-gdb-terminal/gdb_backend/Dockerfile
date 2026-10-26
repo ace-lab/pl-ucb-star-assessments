@@ -9,7 +9,10 @@ RUN pip install --no-cache-dir flask flask-sock flask-cors
 RUN useradd -m -s /bin/bash student
 WORKDIR /app
 COPY server.py .
+COPY entrypoint.sh /app/entrypoint.sh
+RUN chmod +x /app/entrypoint.sh
 
 USER student
 EXPOSE 5000
-CMD ["python", "/app/server.py"]
+
+ENTRYPOINT ["/app/entrypoint.sh"]

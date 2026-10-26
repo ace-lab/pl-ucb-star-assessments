@@ -18,7 +18,7 @@ EGG_PATH = os.path.join(WORKDIR, "egg.py")
 app = Flask(__name__)
 CORS(app)
 sock = Sock(app)
-sessions = set()
+sessions = {}  # Map websocket to its PTY file descriptor and object
 
 
 @app.get("/health")
@@ -32,16 +32,23 @@ def sync():
     if not isinstance(code, str) or len(code) > 100_000:
         return jsonify(ok=False, error="missing or oversized 'code'"), 400
 
+    # Ensure a trailing newline so cat output doesn't merge with the prompt
+    if not code.endswith("\n"):
+        code += "\n"
+
     with open(EGG_PATH, "w", encoding="utf-8") as f:
         f.write(code)
     os.chmod(EGG_PATH, 0o755)
 
-    # Tell any open terminals the file changed.
-    for ws in list(sessions):
+    # Send the sync message via WebSocket to display cleanly in xterm,
+    # and send a newline to the PTY so bash redraws the prompt correctly.
+    for ws, (fd, _) in list(sessions.items()):
         try:
             ws.send("\r\n[sync] egg.py updated in container\r\n")
+            os.write(fd, b"\n")
         except Exception:
-            sessions.discard(ws)
+            sessions.pop(ws, None)
+
     return jsonify(ok=True, path=EGG_PATH, bytes=len(code.encode("utf-8")))
 
 
@@ -53,7 +60,7 @@ def term(ws):
         os.environ["TERM"] = "xterm"
         os.execvp("bash", ["bash", "--login"])
 
-    sessions.add(ws)
+    sessions[ws] = (fd, pid)
     try:
         while True:
             readable, _, _ = select.select([fd], [], [], 0.02)
@@ -68,7 +75,7 @@ def term(ws):
     except Exception:
         pass  # client disconnected or shell exited
     finally:
-        sessions.discard(ws)
+        sessions.pop(ws, None)
         try:
             os.kill(pid, signal.SIGKILL)
             os.waitpid(pid, 0)
