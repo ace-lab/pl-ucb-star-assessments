@@ -1,0 +1,9 @@
+{
+  "uuid": "4a281056-d50c-455e-bad0-a884f198d2c2",
+  "type": "Homework",
+  "title": "Test Homework",
+  "set": "Homework",
+  "number": "1",
+  "accessControl": [],
+  "zones": [{ "questions": [{ "id": "gdb_pt2", "autoPoints": 1 }] }]
+}

@@ -1,0 +1,83 @@
+<!-- <p>Write your code in <code>egg.py</code> below, and use the interactive terminal underneath.</p>
+
+<div style="margin-bottom: 20px;">
+    <h4>Code Editor (egg.py)</h4>
+    <pl-file-editor file-name="egg.py" ace-mode="ace/mode/python"></pl-file-editor>
+</div>
+
+<div>
+    <h4>Interactive Terminal</h4>
+    <div class="card mb-3">
+        <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+            <span>Interactive Shell</span>
+            <span class="badge bg-secondary">Container</span>
+        </div>
+        <div class="card-body bg-black p-2">
+            <div id="inline-terminal-box" style="width: 100%; height: 350px; position: relative;"></div>
+        </div>
+    </div>
+</div>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/xterm@5.3.0/css/xterm.css" />
+<script src="https://cdn.jsdelivr.net/npm/xterm@5.3.0/lib/xterm.js"></script>
+
+<script>
+    window.addEventListener('load', function() {
+        const container = document.getElementById('inline-terminal-box');
+        if (!container || container.classList.contains('initialized')) return;
+        container.classList.add('initialized');
+
+        const term = new Terminal({
+            cursorBlink: true,
+            fontSize: 14,
+            fontFamily: 'Menlo, Monaco, "Courier New", monospace',
+            theme: {
+                background: '#000000',
+                foreground: '#00ff00'
+            }
+        });
+
+        term.open(container);
+        term.writeln('Welcome to the container shell.');
+        term.write('student@container:~$ ');
+
+        let currentInput = '';
+
+        term.onKey(e => {
+            const ev = e.domEvent;
+            const printable = !ev.altKey && !ev.ctrlKey && !ev.metaKey;
+
+            if (ev.keyCode === 13) {
+                term.write('\r\n');
+                if (currentInput.trim() === 'clear') {
+                    term.clear();
+                } else if (currentInput.trim() !== '') {
+                    term.writeln('Running: ' + currentInput);
+                }
+                currentInput = '';
+                term.write('student@container:~$ ');
+            } else if (ev.keyCode === 8) {
+                if (currentInput.length > 0) {
+                    currentInput = currentInput.slice(0, -1);
+                    term.write('\b \b');
+                }
+            } else if (printable) {
+                currentInput += e.key;
+                term.write(e.key);
+            }
+        });
+    });
+</script> -->
+
+
+<p>Write your code in <code>egg.py</code> below, and use the interactive terminal underneath.</p>
+
+<div style="margin-bottom: 20px;">
+    <h4>Code Editor (egg.py)</h4>
+    <pl-file-editor file-name="egg.py" ace-mode="ace/mode/python"></pl-file-editor>
+</div>
+
+<div>
+    <h4>Interactive Terminal</h4>
+    <pl-gdb-terminal></pl-gdb-terminal>
+</div>
