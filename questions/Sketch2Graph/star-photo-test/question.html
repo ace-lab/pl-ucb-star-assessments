@@ -1,0 +1,39 @@
+<pl-question-panel>
+  <h4>Step 2 check: the instructor switch and the panel</h4>
+  <p>
+    This canvas sets <code>allow-hand-drawn="true"</code>. A camera button should appear
+    in the bottom-left corner of the canvas, and clicking it should open a panel over the
+    drawing area.
+  </p>
+  <p>Sketch the graph of $f(x) = x^2$.</p>
+</pl-question-panel>
+
+<pl-card>
+  <pl-question-panel><p><strong>Switch on.</strong> Camera button expected.</p></pl-question-panel>
+
+  <pl-sketch-extension answers-name="hand-drawn-on"
+      x-range="-5,5" y-range="-5,5"
+      allow-hand-drawn="true">
+    <pl-sketch-tool id="sp" type="spline"
+        label="Your graph"></pl-sketch-tool>
+    <pl-sketch-grade type="match-function" tool-id="sp"
+        function="x**2" x-range="-2.2,2.2"></pl-sketch-grade>
+  </pl-sketch-extension>
+</pl-card>
+
+<pl-card>
+  <pl-question-panel>
+    <p>
+      <strong>Switch off.</strong> Same question with the attribute omitted. No camera button,
+      and the canvas behaves exactly as the stock element does. This is the control.
+    </p>
+  </pl-question-panel>
+
+  <pl-sketch-extension answers-name="hand-drawn-off"
+      x-range="-5,5" y-range="-5,5">
+    <pl-sketch-tool id="sp2" type="spline"
+        label="Your graph"></pl-sketch-tool>
+    <pl-sketch-grade type="match-function" tool-id="sp2"
+        function="x**2" x-range="-2.2,2.2"></pl-sketch-grade>
+  </pl-sketch-extension>
+</pl-card>
