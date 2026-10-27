@@ -17,7 +17,7 @@
 
 <script>
     (function() {
-        const BACKEND = 'localhost:5001';  // change if the backend runs elsewhere
+        const BACKEND = 'localhost:5001';  // matches your local port mapping
 
         const containers = document.querySelectorAll('.gdb-terminal-box:not(.initialized)');
         if (containers.length === 0) return;
@@ -38,19 +38,6 @@
         });
         term.open(container);
 
-        // ---- terminal <-> backend shell ----
-        const ws = new WebSocket('ws://' + BACKEND + '/term');
-        ws.onopen = () => { statusEl.textContent = 'Container'; };
-        ws.onmessage = (e) => term.write(e.data);
-        ws.onclose = () => {
-            statusEl.textContent = 'Disconnected';
-            term.writeln('\r\n[disconnected from backend]');
-        };
-        ws.onerror = () => {
-            term.writeln('Could not reach backend at ' + BACKEND + '. Is the Docker container running?');
-        };
-        term.onData((d) => { if (ws.readyState === WebSocket.OPEN) ws.send(d); });
-
         // ---- read the current egg.py text from the PL file editor ----
         function getEditorCode() {
             const aceEl = document.querySelector('.ace_editor');
@@ -65,15 +52,17 @@
             return null;
         }
 
-        // ---- Sync button ----
-        syncBtn.addEventListener('click', async () => {
+        // ---- Shared Sync Function ----
+        async function performSync(silent = false) {
             const code = getEditorCode();
             if (code === null) {
-                syncMsg.textContent = 'Could not read the editor contents.';
+                if (!silent) syncMsg.textContent = 'Could not read the editor contents.';
                 return;
             }
-            syncBtn.disabled = true;
-            syncMsg.textContent = 'Syncing...';
+            if (!silent) {
+                syncBtn.disabled = true;
+                syncMsg.textContent = 'Syncing...';
+            }
             try {
                 const res = await fetch('http://' + BACKEND + '/sync', {
                     method: 'POST',
@@ -81,14 +70,36 @@
                     body: JSON.stringify({ code: code })
                 });
                 const body = await res.json();
-                syncMsg.textContent = body.ok
-                    ? 'Synced egg.py (' + body.bytes + ' bytes) to the container.'
-                    : 'Sync failed: ' + (body.error || res.status);
+                if (!silent) {
+                    syncMsg.textContent = body.ok
+                        ? 'Synced egg.py (' + body.bytes + ' bytes) to the container.'
+                        : 'Sync failed: ' + (body.error || res.status);
+                }
             } catch (err) {
-                syncMsg.textContent = 'Sync failed: backend unreachable.';
+                if (!silent) syncMsg.textContent = 'Sync failed: backend unreachable.';
             } finally {
-                syncBtn.disabled = false;
+                if (!silent) syncBtn.disabled = false;
             }
-        });
+        }
+
+        // ---- terminal <-> backend shell ----
+        const ws = new WebSocket('ws://' + BACKEND + '/term');
+        ws.onopen = () => {
+            statusEl.textContent = 'Container';
+            // Automatically push starter code into the container once connected
+            setTimeout(() => performSync(true), 500);
+        };
+        ws.onmessage = (e) => term.write(e.data);
+        ws.onclose = () => {
+            statusEl.textContent = 'Disconnected';
+            term.writeln('\r\n[disconnected from backend]');
+        };
+        ws.onerror = () => {
+            term.writeln('Could not reach backend at ' + BACKEND + '. Is the Docker container running?');
+        };
+        term.onData((d) => { if (ws.readyState === WebSocket.OPEN) ws.send(d); });
+
+        // ---- Sync button click ----
+        syncBtn.addEventListener('click', () => performSync(false));
     })();
 </script>
