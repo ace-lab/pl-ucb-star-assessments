@@ -11,5 +11,18 @@ docker build -t ucb-star-gdb:latest "$BACKEND_DIR"
 docker rm -f gdb-backend-container 2>/dev/null || true
 
 echo "Starting GDB backend container on port 5001..."
-docker run -d -p 5001:5000 --name gdb-backend-container ucb-star-gdb:latest
-echo "GDB backend is ready on port 5001!"
+# Published on loopback only: the backend gives a shell-like session to anyone
+# who can reach it. If the page says "Could not reach backend", try removing
+# the "127.0.0.1:" prefix (some setups resolve localhost to ::1).
+docker run -d -p 127.0.0.1:5001:5000 --name gdb-backend-container ucb-star-gdb:latest
+
+echo "Waiting for the backend..."
+for i in $(seq 1 20); do
+  if curl -fs http://localhost:5001/health >/dev/null; then
+    echo "GDB backend is ready on port 5001!"
+    exit 0
+  fi
+  sleep 0.5
+done
+echo "Backend did not answer. Check: docker logs gdb-backend-container" >&2
+exit 1

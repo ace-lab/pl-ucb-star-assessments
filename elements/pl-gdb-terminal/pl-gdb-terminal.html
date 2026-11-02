@@ -92,7 +92,7 @@
         ws.onmessage = (e) => term.write(e.data);
         ws.onclose = () => {
             statusEl.textContent = 'Disconnected';
-            term.writeln('\r\n[disconnected from backend]');
+            term.writeln('\r\n[disconnected from backend, reload page for new session]');
         };
         ws.onerror = () => {
             term.writeln('Could not reach backend at ' + BACKEND + '. Is the Docker container running?');
