@@ -52,7 +52,7 @@
             return null;
         }
 
-        // ---- Shared Sync Function ----
+        // ---- Shared Sync Function (egg.py -> /sync) ----
         async function performSync(silent = false) {
             const code = getEditorCode();
             if (code === null) {
@@ -82,25 +82,56 @@
             }
         }
 
-        // ---- terminal <-> backend shell ----
         const config = JSON.parse(container.dataset.config);
-        const ws = new WebSocket('ws://' + BACKEND + '/term?' + new URLSearchParams(config));
-        ws.onopen = () => {
-            statusEl.textContent = 'Container';
-            // Automatically push starter code into the container once connected
-            setTimeout(() => performSync(true), 500);
-        };
-        ws.onmessage = (e) => term.write(e.data);
-        ws.onclose = () => {
-            statusEl.textContent = 'Disconnected';
-            term.writeln('\r\n[disconnected from backend, reload page for new session]');
-        };
-        ws.onerror = () => {
-            term.writeln('Could not reach backend at ' + BACKEND + '. Is the Docker container running?');
-        };
-        term.onData((d) => { if (ws.readyState === WebSocket.OPEN) ws.send(d); });
 
-        // ---- Sync button click ----
+        // ---- Compile the question's vuln.c before the terminal connects ----
+        async function compileChallenge() {
+            statusEl.textContent = 'Compiling...';
+            try {
+                const res = await fetch('http://' + BACKEND + '/sync-challenge', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ code: config.source })
+                });
+                const body = await res.json();
+                if (!body.ok) {
+                    statusEl.textContent = 'Compile error';
+                    term.writeln('Challenge failed to compile:\r\n' + (body.error || res.status));
+                    return false;
+                }
+                return true;
+            } catch (err) {
+                statusEl.textContent = 'Disconnected';
+                term.writeln('Could not reach backend at ' + BACKEND + ' to compile the challenge.');
+                return false;
+            }
+        }
+
+        // ---- terminal <-> backend shell (only after a successful compile) ----
+        compileChallenge().then((ok) => {
+            if (!ok) return;
+
+            // Don't put the full source into the websocket URL query string -
+            // only aslr/canary/nx are meaningful to /term.
+            const { source, ...wsConfig } = config;
+            const ws = new WebSocket('ws://' + BACKEND + '/term?' + new URLSearchParams(wsConfig));
+            ws.onopen = () => {
+                statusEl.textContent = 'Container';
+                // Automatically push starter code into the container once connected
+                setTimeout(() => performSync(true), 500);
+            };
+            ws.onmessage = (e) => term.write(e.data);
+            ws.onclose = () => {
+                statusEl.textContent = 'Disconnected';
+                term.writeln('\r\n[disconnected from backend, reload page for new session]');
+            };
+            ws.onerror = () => {
+                term.writeln('Could not reach backend at ' + BACKEND + '. Is the Docker container running?');
+            };
+            term.onData((d) => { if (ws.readyState === WebSocket.OPEN) ws.send(d); });
+        });
+
+        // ---- Sync button click (still just egg.py) ----
         syncBtn.addEventListener('click', () => performSync(false));
     })();
 </script>

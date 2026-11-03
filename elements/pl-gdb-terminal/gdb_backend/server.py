@@ -1,9 +1,11 @@
-"""Local backend: gdb over a websocket, plus /sync for the editor's egg.py.
+"""Local backend: gdb over a websocket, plus /sync for the editor's egg.py
+and /sync-challenge for the question's vuln.c.
 
 Speaks the protocol pl-gdb-terminal.html expects:
-  GET  /health            -> {"ok": true}
-  POST /sync {"code": s}  -> writes /home/student/egg.py
-  WS   /term              -> raw text in/out of a pty running gdb
+  GET  /health                -> {"ok": true}
+  POST /sync {"code": s}      -> writes /home/student/egg.py
+  POST /sync-challenge {...}  -> writes + compiles /opt/challenge/vuln.c
+  WS   /term                  -> raw text in/out of a pty running gdb
 
 LOCAL DEVELOPMENT ONLY: all browsers share this one container, and students
 run their own egg.py, which is arbitrary Python. Never expose it publicly.
@@ -15,6 +17,7 @@ import pty
 import select
 import signal
 import struct
+import subprocess
 import termios
 
 from flask import Flask, jsonify, request
@@ -28,6 +31,10 @@ UID = int(os.environ.get("GDB_UID", "1001"))
 GID = int(os.environ.get("GDB_GID", "1001"))
 ROWS, COLS = 20, 80  # matches the xterm.js size in pl-gdb-terminal.html
 
+# Per-question vulnerable source, written and compiled by /sync-challenge.
+CHALLENGE_SRC = "/opt/challenge/vuln.c"
+CHALLENGE_BIN = "/opt/challenge/vuln"
+
 app = Flask(__name__)
 CORS(app)
 sock = Sock(app)
@@ -38,7 +45,7 @@ def gdb_command() -> list[str]:
         uid=UID,
         gid=GID,
         home=HOME,
-        program_args=json.loads(os.environ.get("PROGRAM_ARGS", "[]")),
+        program_args=[CHALLENGE_BIN],
         script_dir=os.environ.get("GDB_SCRIPT_DIR", "/opt/gdb"),
         # egg.py is normally run as `run $(python3 egg.py)`, which needs a shell.
         run_uses_shell=os.environ.get("GDB_RUN_USES_SHELL", "1") == "1",
@@ -82,6 +89,39 @@ def sync():
     # sent "\n" to redraw the prompt, but in gdb an empty line REPEATS THE
     # LAST COMMAND (e.g. `run` or `step`). The page shows its own message.
     return jsonify(ok=True, path=EGG_PATH, bytes=len(code.encode("utf-8")))
+
+
+@app.post("/sync-challenge")
+def sync_challenge():
+    """Write and compile the question's vulnerable source (vuln.c).
+
+    Runs once per page load, before the terminal connects. The binary this
+    produces (CHALLENGE_BIN) is what gdb_command() points gdb --args at.
+    """
+    code = (request.get_json(silent=True) or {}).get("code")
+    if not isinstance(code, str) or len(code) > 200_000:
+        return jsonify(ok=False, error="missing or oversized 'code'"), 400
+
+    os.makedirs(os.path.dirname(CHALLENGE_SRC), exist_ok=True)
+    with open(CHALLENGE_SRC, "w", encoding="utf-8") as f:
+        f.write(code)
+
+    # -fno-stack-protector/-no-pie keep classic stack-smashing exploits
+    # working by default; adjust per challenge if you need canaries/PIE on.
+    result = subprocess.run(
+        ["gcc", "-g", "-O0", "-fno-stack-protector", "-no-pie",
+         "-o", CHALLENGE_BIN, CHALLENGE_SRC],
+        capture_output=True,
+        text=True,
+    )
+    if result.returncode != 0:
+        return jsonify(ok=False, error=result.stderr), 400
+
+    os.chmod(CHALLENGE_BIN, 0o755)
+    if os.getuid() == 0:
+        os.chown(CHALLENGE_BIN, UID, GID)
+
+    return jsonify(ok=True, path=CHALLENGE_BIN)
 
 
 @sock.route("/term")
