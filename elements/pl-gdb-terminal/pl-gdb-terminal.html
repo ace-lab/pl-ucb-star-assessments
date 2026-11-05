@@ -38,6 +38,46 @@
         });
         term.open(container);
 
+        const config = JSON.parse(container.dataset.config);
+
+        // ---- per-student session ------------------------------------------
+        // The backend mints a random token; it identifies this student's private
+        // environment (own directory, own unix user). sessionStorage keeps it
+        // across page reloads in this tab, so a reload reattaches to the same
+        // environment, while a second tab or another student gets a different one.
+        const SESSION_KEY = 'gdb-session:' + location.pathname;
+        let token = null;
+
+        function authHeaders() {
+            return { 'Content-Type': 'application/json', 'X-Session-Token': token };
+        }
+
+        async function openSession() {
+            statusEl.textContent = 'Starting...';
+            let saved = null;
+            try { saved = sessionStorage.getItem(SESSION_KEY); } catch (e) { /* storage blocked */ }
+            try {
+                const res = await fetch('http://' + BACKEND + '/session', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ token: saved })
+                });
+                const body = await res.json();
+                if (!body.ok) {
+                    statusEl.textContent = 'Busy';
+                    term.writeln(body.error || ('Could not start a session (' + res.status + ').'));
+                    return false;
+                }
+                token = body.token;
+                try { sessionStorage.setItem(SESSION_KEY, token); } catch (e) { /* storage blocked */ }
+                return true;
+            } catch (err) {
+                statusEl.textContent = 'Disconnected';
+                term.writeln('Could not reach backend at ' + BACKEND + '. Is the Docker container running?');
+                return false;
+            }
+        }
+
         // ---- read the current egg.py text from the PL file editor ----
         function getEditorCode() {
             const aceEl = document.querySelector('.ace_editor');
@@ -66,14 +106,18 @@
             try {
                 const res = await fetch('http://' + BACKEND + '/sync', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: authHeaders(),
                     body: JSON.stringify({ code: code })
                 });
                 const body = await res.json();
                 if (!silent) {
-                    syncMsg.textContent = body.ok
-                        ? 'Synced egg.py (' + body.bytes + ' bytes) to the container.'
-                        : 'Sync failed: ' + (body.error || res.status);
+                    if (res.status === 401) {
+                        syncMsg.textContent = 'Your session expired. Reload the page.';
+                    } else {
+                        syncMsg.textContent = body.ok
+                            ? 'Synced egg.py (' + body.bytes + ' bytes) to your environment.'
+                            : 'Sync failed: ' + (body.error || res.status);
+                    }
                 }
             } catch (err) {
                 if (!silent) syncMsg.textContent = 'Sync failed: backend unreachable.';
@@ -82,21 +126,23 @@
             }
         }
 
-        const config = JSON.parse(container.dataset.config);
-
         // ---- Compile the question's vuln.c before the terminal connects ----
+        // The backend caches by content, so only the first student to load a
+        // question pays for the compile.
         async function compileChallenge() {
             statusEl.textContent = 'Compiling...';
             try {
                 const res = await fetch('http://' + BACKEND + '/sync-challenge', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: authHeaders(),
                     body: JSON.stringify({ code: config.source })
                 });
                 const body = await res.json();
                 if (!body.ok) {
-                    statusEl.textContent = 'Compile error';
-                    term.writeln('Challenge failed to compile:\r\n' + (body.error || res.status));
+                    statusEl.textContent = res.status === 401 ? 'Session expired' : 'Compile error';
+                    term.writeln(res.status === 401
+                        ? 'Your session expired. Reload the page.'
+                        : 'Challenge failed to compile:\r\n' + (body.error || res.status));
                     return false;
                 }
                 return true;
@@ -107,15 +153,15 @@
             }
         }
 
-        // ---- terminal <-> backend shell (only after a successful compile) ----
-        compileChallenge().then((ok) => {
-            if (!ok) return;
-
-            // Don't put the full source into the websocket URL query string -
-            // only aslr/canary/nx are meaningful to /term.
-            const { source, ...wsConfig } = config;
-            const ws = new WebSocket('ws://' + BACKEND + '/term?' + new URLSearchParams(wsConfig));
+        // ---- terminal <-> backend shell ----
+        function connectTerminal() {
+            const ws = new WebSocket('ws://' + BACKEND + '/term');
             ws.onopen = () => {
+                // First message authenticates the socket. The token stays out of
+                // the URL (and therefore out of server logs). aslr/canary/nx ride
+                // along for when the backend starts honouring them; source does not.
+                const { source, ...wsConfig } = config;
+                ws.send(JSON.stringify({ token: token, ...wsConfig }));
                 statusEl.textContent = 'Container';
                 // Automatically push starter code into the container once connected
                 setTimeout(() => performSync(true), 500);
@@ -129,7 +175,13 @@
                 term.writeln('Could not reach backend at ' + BACKEND + '. Is the Docker container running?');
             };
             term.onData((d) => { if (ws.readyState === WebSocket.OPEN) ws.send(d); });
-        });
+        }
+
+        (async () => {
+            if (!(await openSession())) return;
+            if (!(await compileChallenge())) return;
+            connectTerminal();
+        })();
 
         // ---- Sync button click (still just egg.py) ----
         syncBtn.addEventListener('click', () => performSync(false));

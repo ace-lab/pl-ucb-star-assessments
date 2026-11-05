@@ -17,12 +17,18 @@ WORKDIR /app
 RUN python3 -m venv /opt/venv
 COPY requirements.txt .
 RUN /opt/venv/bin/pip install --no-cache-dir -r requirements.txt
-COPY server.py launcher.py ./
+COPY server.py launcher.py sessions.py ./
+COPY tests/ /app/tests/
 COPY gdb/ /opt/gdb/
 
-# /opt/challenge is where the per-question vuln.c gets written and compiled
-# at runtime by /sync-challenge. Nothing is baked in here at build time.
-RUN mkdir -p /opt/challenge && chown root:root /opt/challenge && chmod 755 /opt/challenge
+# Compiled challenges are cached by content hash in /opt/challenge-cache
+# (root-owned, read-only to students). Per-student state lives in /sessions/s<N>,
+# one directory and one unix uid per slot; both are created at runtime.
+# For local runs the container user is root, so the server can drop each
+# session to its own uid. Nothing is baked in here at build time.
+RUN mkdir -p /opt/challenge-cache /sessions && \
+    chown root:root /opt/challenge-cache /sessions && \
+    chmod 755 /opt/challenge-cache && chmod 711 /sessions
 
 RUN chown -R root:root /app /opt/gdb /opt/venv && \
     chmod -R a+rX,go-w /app /opt/gdb /opt/venv && \
