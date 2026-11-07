@@ -15,7 +15,6 @@ def build_command(
     script_dir: str,
     run_uses_shell: bool,
     running_as_root: bool,
-    limits: dict[str, int] | None = None,
 ) -> list[str]:
     # `env -i` gives gdb a clean environment. SHELL decides what gdb's
     # `shell`, `!`, `pipe` and `make` commands execute.
@@ -23,7 +22,6 @@ def build_command(
     env_cmd = [
         "env", "-i",
         f"HOME={home}",
-        f"TMPDIR={home}",  # keep scratch files inside the student's own directory
         f"SHELL={shell}",
         "TERM=xterm-256color",
         "LANG=C.UTF-8",
@@ -47,10 +45,4 @@ def build_command(
         # Local Docker runs containers as root; production runs them as
         # 1001:1001. Drop privileges without using su or a shell.
         cmd = ["setpriv", f"--reuid={uid}", f"--regid={gid}", "--clear-groups"] + cmd
-    if limits:
-        # Per-process rlimits, e.g. {"nproc": 128, "nofile": 256}. RLIMIT_NPROC is
-        # counted per uid, and every session has its own uid, so a fork bomb in
-        # one student's egg.py hits that student's limit and nobody else's.
-        # prlimit sets the limits and execs the rest; they survive the uid drop.
-        cmd = ["prlimit", *[f"--{k}={v}" for k, v in sorted(limits.items())], "--"] + cmd
     return cmd

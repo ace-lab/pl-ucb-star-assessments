@@ -2,6 +2,7 @@
     <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
         <span>Interactive Shell</span>
         <span class="d-flex align-items-center">
+            <a class="small mr-2 me-2 text-white gdb-fallback" style="display:none" target="_blank" rel="noopener">Open workspace in a new tab</a>
             <span class="small mr-2 me-2 gdb-sync-msg"></span>
             <button type="button" class="btn btn-primary btn-sm mr-2 me-2 gdb-sync-btn">Sync</button>
             <span class="badge bg-secondary gdb-status">Connecting...</span>
@@ -12,13 +13,11 @@
     </div>
 </div>
 
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/xterm@5.3.0/css/xterm.css" />
-<script src="https://cdn.jsdelivr.net/npm/xterm@5.3.0/lib/xterm.js"></script>
+<link rel="stylesheet" href="__XTERM_CSS__" />
+<script src="__XTERM_JS__"></script>
 
 <script>
     (function() {
-        const BACKEND = 'localhost:5001';  // matches your local port mapping
-
         const containers = document.querySelectorAll('.gdb-terminal-box:not(.initialized)');
         if (containers.length === 0) return;
         const container = containers[containers.length - 1];
@@ -28,6 +27,7 @@
         const statusEl = card.querySelector('.gdb-status');
         const syncBtn = card.querySelector('.gdb-sync-btn');
         const syncMsg = card.querySelector('.gdb-sync-msg');
+        const fallbackEl = card.querySelector('.gdb-fallback');
 
         const term = new Terminal({
             cursorBlink: true,
@@ -40,42 +40,83 @@
 
         const config = JSON.parse(container.dataset.config);
 
-        // ---- per-student session ------------------------------------------
-        // The backend mints a random token; it identifies this student's private
-        // environment (own directory, own unix user). sessionStorage keeps it
-        // across page reloads in this tab, so a reload reattaches to the same
-        // environment, while a second tab or another student gets a different one.
-        const SESSION_KEY = 'gdb-session:' + location.pathname;
-        let token = null;
+        // The student's own workspace container, proxied by PrairieLearn on this
+        // origin (e.g. /pl/workspace/1/container/). Same origin means the login
+        // cookie is sent automatically: no CORS, no tokens.
+        const BASE = config.base;
+        const WS_BASE = (location.protocol === 'https:' ? 'wss://' : 'ws://') + location.host + BASE;
+        const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
-        function authHeaders() {
-            return { 'Content-Type': 'application/json', 'X-Session-Token': token };
+        // ---- optional: start the workspace inside this page (experimental) ----
+        // PrairieLearn starts a workspace when its page is opened. Loading that page
+        // in a hidden iframe starts the container without a second tab, and keeps a
+        // workspace page open for PrairieLearn while this page is.
+        if (config.autostart) {
+            const frame = document.createElement('iframe');
+            frame.src = config.workspaceUrl;
+            frame.title = 'workspace launcher';
+            frame.setAttribute('aria-hidden', 'true');
+            frame.style.display = 'none';
+            card.appendChild(frame);
+
+            // <pl-workspace>'s "Open workspace" link would open the same page in a
+            // new tab. Swallow clicks on any link that points at the workspace.
+            let wsPath = null;
+            try { wsPath = new URL(config.workspaceUrl, location.href).pathname.replace(/\/$/, ''); } catch (e) { /* ignore */ }
+            document.addEventListener('click', (e) => {
+                const a = e.target.closest && e.target.closest('a[href]');
+                if (!a || a === fallbackEl || !wsPath) return;
+                let p;
+                try { p = new URL(a.href, location.href).pathname.replace(/\/$/, ''); } catch (err) { return; }
+                if (p === wsPath) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    syncMsg.textContent = 'Starting your environment in this page...';
+                }
+            }, true);
         }
 
-        async function openSession() {
-            statusEl.textContent = 'Starting...';
-            let saved = null;
-            try { saved = sessionStorage.getItem(SESSION_KEY); } catch (e) { /* storage blocked */ }
+        // ---- is the container answering? ----
+        // Before the workspace is running, the proxy answers with an error or an
+        // HTML page, so insist on our own JSON.
+        async function backendUp() {
             try {
-                const res = await fetch('http://' + BACKEND + '/session', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ token: saved })
-                });
+                const res = await fetch(BASE + 'health', { cache: 'no-store' });
+                if (!res.ok) return false;
                 const body = await res.json();
-                if (!body.ok) {
-                    statusEl.textContent = 'Busy';
-                    term.writeln(body.error || ('Could not start a session (' + res.status + ').'));
-                    return false;
-                }
-                token = body.token;
-                try { sessionStorage.setItem(SESSION_KEY, token); } catch (e) { /* storage blocked */ }
-                return true;
+                return !!(body && body.ok === true);
             } catch (err) {
-                statusEl.textContent = 'Disconnected';
-                term.writeln('Could not reach backend at ' + BACKEND + '. Is the Docker container running?');
                 return false;
             }
+        }
+
+        // A first start can take minutes (new host, image pull), so wait a long time.
+        async function waitForWorkspace() {
+            statusEl.textContent = 'Waiting for workspace...';
+            if (await backendUp()) return true;
+            term.writeln('Your environment is not running yet.');
+            term.writeln(config.autostart
+                ? 'Starting it automatically. The first start can take a few minutes.'
+                : 'Click "Open workspace" above to start it. The first start can take a few minutes.');
+            term.writeln('This terminal connects by itself once it is ready.');
+            for (let i = 0; i < 200; i++) {  // ~10 minutes
+                await sleep(3000);
+                if (await backendUp()) {
+                    term.writeln('\r\nWorkspace is up.');
+                    fallbackEl.style.display = 'none';
+                    return true;
+                }
+                if (config.autostart && i === 20) {
+                    // A minute in and still nothing: the hidden iframe may have been
+                    // blocked. Offer the normal way.
+                    fallbackEl.href = config.workspaceUrl;
+                    fallbackEl.style.display = 'inline';
+                    term.writeln('\r\nStill waiting. If nothing starts, use "Open workspace in a new tab" above.');
+                }
+            }
+            statusEl.textContent = 'Not running';
+            term.writeln('\r\nGave up waiting. Start the workspace, then reload this page.');
+            return false;
         }
 
         // ---- read the current egg.py text from the PL file editor ----
@@ -104,64 +145,51 @@
                 syncMsg.textContent = 'Syncing...';
             }
             try {
-                const res = await fetch('http://' + BACKEND + '/sync', {
+                const res = await fetch(BASE + 'sync', {
                     method: 'POST',
-                    headers: authHeaders(),
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ code: code })
                 });
                 const body = await res.json();
                 if (!silent) {
-                    if (res.status === 401) {
-                        syncMsg.textContent = 'Your session expired. Reload the page.';
-                    } else {
-                        syncMsg.textContent = body.ok
-                            ? 'Synced egg.py (' + body.bytes + ' bytes) to your environment.'
-                            : 'Sync failed: ' + (body.error || res.status);
-                    }
+                    syncMsg.textContent = body.ok
+                        ? 'Synced egg.py (' + body.bytes + ' bytes) to your environment.'
+                        : 'Sync failed: ' + (body.error || res.status);
                 }
             } catch (err) {
-                if (!silent) syncMsg.textContent = 'Sync failed: backend unreachable.';
+                if (!silent) syncMsg.textContent = 'Sync failed: workspace unreachable.';
             } finally {
                 if (!silent) syncBtn.disabled = false;
             }
         }
 
         // ---- Compile the question's vuln.c before the terminal connects ----
-        // The backend caches by content, so only the first student to load a
-        // question pays for the compile.
         async function compileChallenge() {
             statusEl.textContent = 'Compiling...';
             try {
-                const res = await fetch('http://' + BACKEND + '/sync-challenge', {
+                const res = await fetch(BASE + 'sync-challenge', {
                     method: 'POST',
-                    headers: authHeaders(),
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ code: config.source })
                 });
                 const body = await res.json();
                 if (!body.ok) {
-                    statusEl.textContent = res.status === 401 ? 'Session expired' : 'Compile error';
-                    term.writeln(res.status === 401
-                        ? 'Your session expired. Reload the page.'
-                        : 'Challenge failed to compile:\r\n' + (body.error || res.status));
+                    statusEl.textContent = 'Compile error';
+                    term.writeln('Challenge failed to compile:\r\n' + (body.error || res.status));
                     return false;
                 }
                 return true;
             } catch (err) {
                 statusEl.textContent = 'Disconnected';
-                term.writeln('Could not reach backend at ' + BACKEND + ' to compile the challenge.');
+                term.writeln('Could not reach your workspace to compile the challenge.');
                 return false;
             }
         }
 
-        // ---- terminal <-> backend shell ----
+        // ---- terminal <-> gdb in the workspace container ----
         function connectTerminal() {
-            const ws = new WebSocket('ws://' + BACKEND + '/term');
+            const ws = new WebSocket(WS_BASE + 'term');
             ws.onopen = () => {
-                // First message authenticates the socket. The token stays out of
-                // the URL (and therefore out of server logs). aslr/canary/nx ride
-                // along for when the backend starts honouring them; source does not.
-                const { source, ...wsConfig } = config;
-                ws.send(JSON.stringify({ token: token, ...wsConfig }));
                 statusEl.textContent = 'Container';
                 // Automatically push starter code into the container once connected
                 setTimeout(() => performSync(true), 500);
@@ -169,16 +197,16 @@
             ws.onmessage = (e) => term.write(e.data);
             ws.onclose = () => {
                 statusEl.textContent = 'Disconnected';
-                term.writeln('\r\n[disconnected from backend, reload page for new session]');
+                term.writeln('\r\n[disconnected from your workspace, reload the page to reconnect]');
             };
             ws.onerror = () => {
-                term.writeln('Could not reach backend at ' + BACKEND + '. Is the Docker container running?');
+                term.writeln('Could not reach your workspace. Is it still running?');
             };
             term.onData((d) => { if (ws.readyState === WebSocket.OPEN) ws.send(d); });
         }
 
         (async () => {
-            if (!(await openSession())) return;
+            if (!(await waitForWorkspace())) return;
             if (!(await compileChallenge())) return;
             connectTerminal();
         })();
