@@ -1,13 +1,14 @@
 #!/bin/bash
 # Builds the workspace image and checks it the way PrairieLearn will run it:
 # as user 1001:1001, serving on port 5000. Does not need PrairieLearn.
-#   usage: ./build_and_smoke_test.sh [image:tag]
+#   usage: [PLATFORM=linux/amd64] ./build_and_smoke_test.sh [image:tag]
+#   PLATFORM: set on Apple Silicon so the image matches PrairieLearn's servers.
 set -e
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 IMAGE="${1:-pl-gdb-workspace:latest}"
 
 echo "Building $IMAGE ..."
-docker build -t "$IMAGE" "$HERE"
+docker build ${PLATFORM:+--platform "$PLATFORM"} -t "$IMAGE" "$HERE"
 
 docker rm -f gdb-workspace-test 2>/dev/null || true
 docker run -d --name gdb-workspace-test --user 1001:1001 -p 127.0.0.1:5001:5000 "$IMAGE" >/dev/null

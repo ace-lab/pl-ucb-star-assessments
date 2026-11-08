@@ -15,6 +15,7 @@ def build_command(
     script_dir: str,
     run_uses_shell: bool,
     running_as_root: bool,
+    extra_gdb_commands: list[str] | None = None,
 ) -> list[str]:
     # `env -i` gives gdb a clean environment. SHELL decides what gdb's
     # `shell`, `!`, `pipe` and `make` commands execute.
@@ -37,6 +38,8 @@ def build_command(
         gdb_cmd += ["-ex", "set startup-with-shell off"]
     for script in sorted(glob.glob(os.path.join(script_dir, "*.gdb"))):
         gdb_cmd += ["-x", script]
+    for command in extra_gdb_commands or []:
+        gdb_cmd += ["-ex", command]  # after the scripts, before the program
     if program_args:
         gdb_cmd += ["--args", *program_args]  # must stay last
 

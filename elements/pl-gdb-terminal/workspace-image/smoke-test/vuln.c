@@ -1,6 +1,5 @@
-/* Placeholder program for students to debug. Replace with your own sources.
- * Everything in challenge/ is compiled in the build stage of the Dockerfile
- * and copied to /opt/challenge (read-only for the student). */
+/* Smoke-test program used by build_and_smoke_test.sh only. Real questions ship
+ * their own vuln.c; the page sends it to the workspace, which compiles it. */
 #include <stdio.h>
 #include <string.h>
 

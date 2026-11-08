@@ -7,7 +7,9 @@ so this server simply sees / and no path prefix).
 
   GET  /health                -> {"ok": true}
   POST /sync {"code": s}      -> writes $HOME/egg.py
-  POST /sync-challenge {...}  -> writes + compiles $HOME/.challenge/vuln.c
+  POST /sync-challenge {code, aslr, canary, nx}
+                              -> writes + compiles $HOME/.challenge/vuln.c with the
+                                 requested protections; gdb is configured for ASLR
   WS   /term                  -> raw text in/out of a pty running gdb
 
 There is no session or token logic on purpose: the container already belongs
@@ -16,6 +18,8 @@ Do NOT publish this port yourself. Never put secrets (reference solutions,
 flags) in the image or the home directory; the student can read all of it.
 """
 import fcntl
+import hashlib
+import json
 import os
 import pty
 import select
@@ -43,9 +47,29 @@ CHALLENGE_DIR = os.environ.get("GDB_CHALLENGE_DIR", os.path.join(HOME, ".challen
 CHALLENGE_SRC = os.path.join(CHALLENGE_DIR, "vuln.c")
 CHALLENGE_BIN = os.path.join(CHALLENGE_DIR, "vuln")
 
-# -fno-stack-protector/-no-pie keep classic stack-smashing exploits working
-# by default; adjust per challenge if you need canaries/PIE on.
-CFLAGS = ["-g", "-O0", "-fno-stack-protector", "-no-pie"]
+BUILD_INFO = os.path.join(CHALLENGE_DIR, "build.json")
+
+# The three protections the instructor chooses per question (element attributes
+# enable-aslr, enable-canary, enable-non-exec-pages). All default to off.
+SETTING_NAMES = ("aslr", "canary", "nx")
+
+
+def cflags(canary: bool, nx: bool) -> list[str]:
+    """Compiler flags for the requested protections.
+
+    canary: -fstack-protector-all puts a canary in every function; otherwise it is
+            switched off explicitly (Ubuntu's gcc would enable one by default).
+    nx:     -z noexecstack marks the stack non-executable; otherwise -z execstack
+            makes it executable, which is what stack-shellcode exercises need.
+    -no-pie keeps the program's own addresses fixed whatever ASLR does.
+    ASLR is a runtime setting: see gdb_command().
+    """
+    return [
+        "-g", "-O0", "-no-pie",
+        "-fstack-protector-all" if canary else "-fno-stack-protector",
+        "-Wl,-z,noexecstack" if nx else "-Wl,-z,execstack",
+    ]
+
 
 IS_ROOT = os.getuid() == 0
 
@@ -66,22 +90,57 @@ def _read(path):
         return None
 
 
-def compile_challenge(code: str) -> None:
-    """Write and compile vuln.c; do nothing if this exact source is already built."""
+def _read_build_info() -> dict:
+    try:
+        with open(BUILD_INFO, "r", encoding="utf-8") as f:
+            info = json.load(f)
+        return info if isinstance(info, dict) else {}
+    except (OSError, ValueError):
+        return {}
+
+
+def _write_build_info(info: dict) -> None:
+    tmp = BUILD_INFO + ".tmp"
+    with open(tmp, "w", encoding="utf-8") as f:
+        json.dump(info, f)
+    os.replace(tmp, BUILD_INFO)
+    if IS_ROOT:  # only when run by hand as root; PrairieLearn runs us as 1001
+        os.chown(BUILD_INFO, UID, GID)
+
+
+def _fingerprint(code: str, canary: bool, nx: bool) -> str:
+    # ASLR is not part of the build, so changing only it never forces a recompile.
+    payload = json.dumps({"code": code, "flags": cflags(canary, nx)}, sort_keys=True)
+    return hashlib.sha256(payload.encode("utf-8")).hexdigest()
+
+
+def compile_challenge(code: str, settings: dict) -> None:
+    """Write and compile vuln.c with the requested protections.
+
+    Does nothing if this exact source and flags are already built. Always records
+    the settings (including aslr) so the next terminal connection uses them.
+    """
+    canary, nx = settings["canary"], settings["nx"]
     with _compile_lock:
         os.makedirs(CHALLENGE_DIR, exist_ok=True)
-        if os.path.exists(CHALLENGE_BIN) and _read(CHALLENGE_SRC) == code:
+        fingerprint = _fingerprint(code, canary, nx)
+        info = {"fingerprint": fingerprint, **{k: settings[k] for k in SETTING_NAMES}}
+
+        if os.path.exists(CHALLENGE_BIN) and _read_build_info().get("fingerprint") == fingerprint:
+            _write_build_info(info)  # only aslr may have changed
             return
-        try:
-            os.remove(CHALLENGE_BIN)  # never leave a stale binary next to new source
-        except FileNotFoundError:
-            pass
+
+        for stale in (CHALLENGE_BIN, BUILD_INFO):  # never keep a binary that doesn't match
+            try:
+                os.remove(stale)
+            except FileNotFoundError:
+                pass
         with open(CHALLENGE_SRC, "w", encoding="utf-8") as f:
             f.write(code)
         try:
             # Absolute paths, so gdb's `list` finds vuln.c from the debug info.
             result = subprocess.run(
-                ["gcc", *CFLAGS, "-o", CHALLENGE_BIN, CHALLENGE_SRC],
+                ["gcc", *cflags(canary, nx), "-o", CHALLENGE_BIN, CHALLENGE_SRC],
                 capture_output=True, text=True, timeout=30,
             )
         except subprocess.TimeoutExpired:
@@ -89,12 +148,16 @@ def compile_challenge(code: str) -> None:
         if result.returncode != 0:
             raise CompileError(result.stderr)
         os.chmod(CHALLENGE_BIN, 0o755)
-        if IS_ROOT:  # only when run by hand as root; PrairieLearn runs us as 1001
+        _write_build_info(info)
+        if IS_ROOT:
             for p in (CHALLENGE_DIR, CHALLENGE_SRC, CHALLENGE_BIN):
                 os.chown(p, UID, GID)
 
 
 def gdb_command() -> list[str]:
+    # ASLR is applied here, not at compile time. gdb turns it off by default, so
+    # both cases are set explicitly.
+    aslr = bool(_read_build_info().get("aslr", False))
     return build_command(
         uid=UID,
         gid=GID,
@@ -104,6 +167,7 @@ def gdb_command() -> list[str]:
         # egg.py is normally run as `run $(python3 egg.py)`, which needs a shell.
         run_uses_shell=os.environ.get("GDB_RUN_USES_SHELL", "1") == "1",
         running_as_root=IS_ROOT,
+        extra_gdb_commands=[f"set disable-randomization {'off' if aslr else 'on'}"],
     )
 
 
@@ -159,14 +223,21 @@ def sync_challenge():
     Runs once per page load, before the terminal connects. The binary this
     produces (CHALLENGE_BIN) is what gdb_command() points gdb --args at.
     """
-    code = (request.get_json(silent=True) or {}).get("code")
+    payload = request.get_json(silent=True) or {}
+    code = payload.get("code")
     if not isinstance(code, str) or len(code) > 200_000:
         return jsonify(ok=False, error="missing or oversized 'code'"), 400
+    settings = {}
+    for name in SETTING_NAMES:
+        value = payload.get(name, False)
+        if not isinstance(value, bool):
+            return jsonify(ok=False, error=f"'{name}' must be true or false"), 400
+        settings[name] = value
     try:
-        compile_challenge(code)
+        compile_challenge(code, settings)
     except CompileError as e:
         return jsonify(ok=False, error=str(e)), 400
-    return jsonify(ok=True, path=CHALLENGE_BIN)
+    return jsonify(ok=True, path=CHALLENGE_BIN, **settings)
 
 
 @sock.route("/term")

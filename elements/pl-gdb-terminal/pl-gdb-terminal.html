@@ -170,7 +170,12 @@
                 const res = await fetch(BASE + 'sync-challenge', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ code: config.source })
+                    body: JSON.stringify({
+                        code: config.source,
+                        aslr: !!config.aslr,
+                        canary: !!config.canary,
+                        nx: !!config.nx
+                    })
                 });
                 const body = await res.json();
                 if (!body.ok) {
