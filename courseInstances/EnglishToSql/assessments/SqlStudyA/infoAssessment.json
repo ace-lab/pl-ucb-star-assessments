@@ -12,11 +12,26 @@
             "endDate": "2027-12-31T23:59:59"
         }
     ],
-    "zones": [{
-        "title": "SQL tasks",
-        "questions": [
-            {"id": "EnglishToSql/cook-county-neighborhood-rank-sql", "points": 10, "triesPerVariant": 99999, "maxPoints": 10, "preferences": {"problem_variant": "garage"}},
-            {"id": "EnglishToSql/cook-county-neighborhood-rank-english", "points": 10, "triesPerVariant": 99999, "maxPoints": 10, "preferences": {"problem_variant": "central_air"}}
-        ]
-    }]
+    "zones": [
+        {
+            "title": "SQL tasks",
+            "questions": [
+                {
+                    "id": "EnglishToSql/cook-county-neighborhood-rank-sql",
+                    "points": 10,
+                    "triesPerVariant": 99999,
+                    "maxPoints": 10,
+                    "preferences": {
+                        "problem_variant": "garage"
+                    }
+                },
+                {
+                    "id": "EnglishToSql/english-to-sql-top-customers-dictionary",
+                    "points": 10,
+                    "triesPerVariant": 99999,
+                    "maxPoints": 10
+                }
+            ]
+        }
+    ]
 }

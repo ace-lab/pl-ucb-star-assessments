@@ -1,0 +1,46 @@
+{{#question}}
+<section class="pl-sql-console">
+  <label class="pl-sql-console-label" for="{{name}}">SQLite query</label>
+  <textarea class="form-control pl-sql-console-editor" id="{{name}}" name="{{name}}" rows="14" spellcheck="false" placeholder="Write one SELECT or WITH query…"{{^editable}} readonly{{/editable}}>{{query}}</textarea>
+  <p class="pl-sql-console-hint">Save checks the query and refreshes the preview. Save &amp; Grade compares its result with the expected result.</p>
+
+  {{#parse_error}}<div class="alert alert-danger py-2 mt-3" role="alert">{{parse_error}}</div>{{/parse_error}}
+  {{#has_preview}}
+  <div class="pl-sql-console-preview">
+    <div class="pl-sql-console-preview-title">Result preview</div>
+    <div class="table-responsive">
+      <table class="table table-sm table-bordered mb-0">
+        <thead><tr>{{#preview_columns}}<th scope="col">{{value}}</th>{{/preview_columns}}</tr></thead>
+        <tbody>{{#preview_rows}}<tr>{{#cells}}<td>{{value}}</td>{{/cells}}</tr>{{/preview_rows}}</tbody>
+      </table>
+    </div>
+  </div>
+  {{/has_preview}}
+</section>
+{{/question}}
+
+{{#submission}}
+<section class="pl-sql-console pl-sql-console--submission">
+  <div class="pl-sql-console-label">Submitted SQLite query</div>
+  <pre class="pl-sql-console-submitted-query"><code>{{query}}</code></pre>
+  {{#parse_error}}<div class="alert alert-danger py-2 mt-3" role="alert">{{parse_error}}</div>{{/parse_error}}
+  {{#has_preview}}
+  <div class="pl-sql-console-preview">
+    <div class="pl-sql-console-preview-title">Result preview</div>
+    <div class="table-responsive">
+      <table class="table table-sm table-bordered mb-0">
+        <thead><tr>{{#preview_columns}}<th scope="col">{{value}}</th>{{/preview_columns}}</tr></thead>
+        <tbody>{{#preview_rows}}<tr>{{#cells}}<td>{{value}}</td>{{/cells}}</tr>{{/preview_rows}}</tbody>
+      </table>
+    </div>
+  </div>
+  {{/has_preview}}
+</section>
+{{/submission}}
+
+{{#answer}}
+<section class="pl-sql-console pl-sql-console--answer">
+  <div class="pl-sql-console-label">One reference SQLite query</div>
+  <pre class="pl-sql-console-submitted-query"><code>{{reference_query}}</code></pre>
+</section>
+{{/answer}}
