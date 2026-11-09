@@ -1,18 +1,21 @@
 {{#question}}
-<section class="pl-intent-console-two-pass" data-pl-intent-console-two-pass="{{name}}">
+<section class="pl-intent-console-two-pass" data-pl-intent-console-two-pass="{{name}}" data-intent-console-root="{{name}}" data-action-name="{{action_name}}" data-pending="{{#pending}}1{{/pending}}{{^pending}}0{{/pending}}">
   <div class="pl-intent-console-two-pass-field">
     <label class="pl-intent-console-two-pass-label" for="{{source_name}}">{{input_label}}</label>
     <textarea class="form-control pl-intent-console-two-pass-english" id="{{source_name}}" name="{{source_name}}" rows="4" placeholder="Describe the query in English…"{{^input_editable}} disabled{{/input_editable}}>{{source}}</textarea>
+    {{#input_editable}}
+    <div class="pl-intent-console-two-pass-actions">
+      <button type="button" class="btn btn-primary btn-sm" data-intent-console-generate{{^can_generate}} disabled{{/can_generate}}>Generate SQL</button>
+      <span class="pl-intent-console-two-pass-hint" data-intent-console-status>{{#pending}}Generating SQL…{{/pending}}{{^pending}}Generations left: {{generations_left}}{{/pending}}</span>
+    </div>
+    {{/input_editable}}
   </div>
 
   <div class="pl-intent-console-two-pass-field">
     <label class="pl-intent-console-two-pass-label" for="{{code_name}}">{{code_label}}</label>
-    <textarea class="form-control pl-intent-console-two-pass-code" id="{{code_name}}" name="{{code_name}}" rows="8" spellcheck="false" placeholder="Click Save to generate SQL from your description."{{^code_editable}} readonly{{/code_editable}}>{{code}}</textarea>
-    <p class="pl-intent-console-two-pass-hint">Save regenerates this query and replaces edits. Save &amp; Grade grades the SQL currently shown.</p>
+    <textarea class="form-control pl-intent-console-two-pass-code" id="{{code_name}}" name="{{code_name}}" rows="8" spellcheck="false" placeholder="Click Generate SQL to turn your plan into SQL."{{^code_editable}} readonly{{/code_editable}}>{{code}}</textarea>
+    <p class="pl-intent-console-two-pass-hint">Generate SQL replaces this query. Save &amp; Grade grades the SQL shown.</p>
   </div>
-
-  <input type="hidden" name="{{runs_name}}" value="{{run_count}}">
-  <input type="hidden" name="{{generate_name}}" value="1" data-pl-intent-console-two-pass-generate>
 
   {{#parse_error}}
   <div class="alert alert-danger py-2" role="alert">{{parse_error}}</div>

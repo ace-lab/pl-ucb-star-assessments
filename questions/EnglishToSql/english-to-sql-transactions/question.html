@@ -30,7 +30,9 @@
     <li>Your final <code>table</code> may optionally include columns that are not required to answer the question. For example, if you are asked to identify customers, but your answer contains a transaction ID column that is not used, that's fine.</li>
     <li>Your final <code>table</code> should require no additional computation to fully answer the question. A non-technical person should be able to answer the question by scrolling through your final table.</li>
   </ul>
-  <p>Make sure to use a subset of the appropriate canonical English terms learned in lecture.</p>
+  <p>Make sure to use a subset of the appropriate canonical English terms learned in lecture,
+    and name every column, comparison, value, calculation input, and sort direction needed
+    by your steps.</p>
 
   <blockquote class="blockquote border-left pl-3">
     <strong>(a)</strong> How many customers spent more than <code>$200</code> in the year 2025?
@@ -43,5 +45,5 @@
 </pl-question-panel>
 
 <!-- Replaced by server.py render() with the intent console for the current panel.
-     Settings formerly on <pl-intent-console> live in server.py _attributes(). -->
+     The element's settings live in ELEMENT_HTML in server.py. -->
 <div data-pl-intent-console-placeholder></div>

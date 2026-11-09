@@ -1,0 +1,50 @@
+.pl-sql-console {
+  border: 1px solid #d8dee4;
+  border-radius: 0.5rem;
+  background: #fff;
+  margin: 1rem 0;
+  padding: 1rem;
+}
+
+.pl-sql-console-label,
+.pl-sql-console-preview-title {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.35rem;
+}
+
+.pl-sql-console-editor,
+.pl-sql-console-submitted-query {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+.pl-sql-console-editor {
+  resize: vertical;
+  white-space: pre;
+}
+
+.pl-sql-console-hint {
+  color: #5f6872;
+  font-size: 0.85rem;
+  margin: 0.35rem 0 0;
+}
+
+.pl-sql-console-preview {
+  margin-top: 1rem;
+}
+
+.pl-sql-console-preview td,
+.pl-sql-console-preview th {
+  white-space: nowrap;
+}
+
+.pl-sql-console-submitted-query {
+  border: 1px solid #d8dee4;
+  border-radius: 0.25rem;
+  background: #f6f8fa;
+  margin: 0;
+  padding: 0.75rem;
+  white-space: pre-wrap;
+}

@@ -1,0 +1,17 @@
+{
+  "tables": [
+    {
+      "name": "transactions",
+      "source": "transactions.csv",
+      "description": "Each row represents one transaction.",
+      "columns": [
+        {"name": "transaction_id", "type": "INTEGER", "description": "Unique transaction identifier."},
+        {"name": "customer_id", "type": "TEXT", "description": "Customer associated with the transaction."},
+        {"name": "store_id", "type": "TEXT", "description": "Store where the transaction occurred."},
+        {"name": "date", "type": "TEXT", "description": "Transaction date."},
+        {"name": "year", "type": "INTEGER", "description": "Transaction year."},
+        {"name": "total", "type": "REAL", "description": "Total dollar amount of the transaction."}
+      ]
+    }
+  ]
+}

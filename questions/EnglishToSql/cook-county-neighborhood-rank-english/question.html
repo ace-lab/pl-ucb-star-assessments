@@ -1,0 +1,77 @@
+<pl-question-panel>
+  <h3>Cook County property sales: top neighborhoods</h3>
+
+  <p>The table <code>cook_county</code> contains a deterministic sample of property
+    sales from the Cook County training data used in DATA 100. Each row describes
+    one sale record.</p>
+
+  <div class="table-responsive">
+    <table class="table table-sm table-bordered">
+      <thead><tr><th scope="col">Column</th><th scope="col">Meaning</th></tr></thead>
+      <tbody>
+        <tr><td><code>property_id</code></td><td>Cook County parcel identifier</td></tr>
+        <tr><td><code>property_class</code></td><td>assessor property-class code</td></tr>
+        <tr><td><code>neighborhood_code</code></td><td>assessor neighborhood code</td></tr>
+        <tr><td><code>building_sqft</code></td><td>building area in square feet</td></tr>
+        <tr><td><code>sale_price</code></td><td>recorded sale price in dollars</td></tr>
+        <tr><td><code>modeling_group</code></td><td><code>SF</code>, <code>MF</code>, or <code>NCHARS</code></td></tr>
+        <tr><td><code>sale_year</code></td><td>year of sale</td></tr>
+        <tr><td><code>garage_indicator</code></td><td><code>1</code> when a garage is present</td></tr>
+        <tr><td><code>central_air</code></td><td><code>1</code> when central air is present</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>For every sale year from 2016 through 2019, identify the three qualifying
+    neighborhoods with the greatest mean sale price per building square foot.</p>
+
+  <p>A sale qualifies only when:</p>
+  <ul>
+    <li><code>modeling_group = 'SF'</code>;</li>
+    <li><code>sale_price &gt;= 10000</code> and <code>building_sqft &gt; 0</code>; and</li>
+    {{#params.garage_variant}}<li><code>garage_indicator = 1</code>.</li>{{/params.garage_variant}}
+    {{#params.central_air_variant}}<li><code>central_air = 1</code>.</li>{{/params.central_air_variant}}
+  </ul>
+
+  <p>For each qualifying sale, first calculate
+    <code>sale_price * 1.0 / building_sqft</code>. Then group by
+    <code>sale_year</code> and <code>neighborhood_code</code>. Exclude a group if it
+    has fewer than 10 qualifying sales. For every remaining group, report the
+    qualifying sale count and the mean of the row-level price-per-square-foot
+    values, rounded to two decimal places.</p>
+
+  <p>Rank neighborhoods separately within each year by the rounded mean in
+    descending order. Break ties by <code>neighborhood_code</code> in ascending
+    order. Return ranks 1 through 3. The result must contain
+    <code>sale_year</code>, <code>neighborhood_code</code>, <code>sale_count</code>,
+    <code>avg_price_per_sqft</code>, and <code>rank_in_year</code>. Result row order
+    is not graded.</p>
+
+  <p><strong>Write a complete English analysis plan that produces this result.</strong>
+    Name each intermediate result so that later steps can refer to it.</p>
+
+  <div class="alert alert-info">
+    <p><strong>Describe every operation explicitly in English.</strong> Supported
+      operation phrases include:</p>
+    <ul class="mb-0">
+      <li><code>use table</code>, <code>select</code>, and <code>filter rows where</code></li>
+      <li><code>group rows by</code>, <code>compute count of</code>, and <code>compute average of</code></li>
+      <li><code>keep groups where</code> and <code>round to decimal places</code></li>
+      <li><code>order by</code> with <code>ascending</code> or <code>descending</code></li>
+      <li><code>keep the first</code>, including when done separately for each year</li>
+    </ul>
+  </div>
+
+  <p>Include every table, column, expression, comparison, value, grouping column,
+    sort direction, tie-breaker, and row count. Code or dataframe shorthand is not
+    accepted as English analysis-plan wording.</p>
+</pl-question-panel>
+
+<link rel="stylesheet" href="{{options.client_files_question_url}}/pl-intent-console-dictionary.css">
+<pl-question-panel>
+  <script src="{{options.client_files_question_url}}/pl-intent-console-dictionary.js"></script>
+</pl-question-panel>
+
+<!-- Replaced by server.py render() with the intent console for the current panel.
+     The element's settings live in ELEMENT_HTML in server.py. -->
+<div data-pl-intent-console-placeholder></div>

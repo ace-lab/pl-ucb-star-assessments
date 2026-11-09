@@ -1,22 +1,30 @@
 {{#question}}
-<section class="pl-intent-console-regen" data-pl-intent-console-regen="{{name}}">
+<section class="pl-intent-console-regen" data-pl-intent-console-regen="{{name}}" data-intent-console-root="{{name}}" data-action-name="{{action_name}}" data-pending="{{#pending}}1{{/pending}}{{^pending}}0{{/pending}}">
   <div class="pl-intent-console-regen__field">
     <label class="pl-intent-console-regen__label" for="{{source_name}}">{{input_label}}</label>
     <textarea class="form-control pl-intent-console-regen__english" id="{{source_name}}" name="{{source_name}}" rows="4" placeholder="Describe the query in English…"{{^input_editable}} disabled{{/input_editable}}{{#input_locked}} readonly{{/input_locked}}>{{source}}</textarea>
     {{#input_locked}}<p class="pl-intent-console-regen__hint">No generations left. You can still edit the SQL below.</p>{{/input_locked}}
+    {{#input_editable}}{{^input_locked}}
+    <div class="pl-intent-console-regen__actions">
+      <button type="button" class="btn btn-primary btn-sm" data-intent-console-generate{{^can_generate}} disabled{{/can_generate}}>Generate SQL</button>
+      <span class="pl-intent-console-regen__hint" data-intent-console-status>{{#pending}}Generating SQL…{{/pending}}{{^pending}}Generations left: {{generations_left}}{{/pending}}</span>
+    </div>
+    {{/input_locked}}{{/input_editable}}
   </div>
 
   <div class="pl-intent-console-regen__field">
     <label class="pl-intent-console-regen__label" for="{{code_name}}">{{code_label}}</label>
-    <textarea class="form-control pl-intent-console-regen__code" id="{{code_name}}" name="{{code_name}}" rows="8" spellcheck="false" placeholder="Click Save to generate SQL from your description."{{^code_editable}} readonly{{/code_editable}}>{{code}}</textarea>
-    <p class="pl-intent-console-regen__hint">Save keeps your SQL edits and regenerates only when your English plan changes. Save &amp; Grade grades the SQL shown if it matches your current plan.</p>
+    <textarea class="form-control pl-intent-console-regen__code" id="{{code_name}}" name="{{code_name}}" rows="8" spellcheck="false" placeholder="Click Generate SQL to turn your plan into SQL."{{^code_editable}} readonly{{/code_editable}}>{{code}}</textarea>
+    <p class="pl-intent-console-regen__hint">Generate SQL only regenerates when your English plan has changed, so your SQL edits are kept otherwise. Save &amp; Grade grades the SQL shown if it matches your current plan.</p>
     {{#show_reset}}<button type="button" class="btn btn-sm btn-outline-secondary mt-2" data-pl-intent-console-regen-reset>Reset to generated SQL</button>{{/show_reset}}
   </div>
 
-  <input type="hidden" name="{{runs_name}}" value="{{run_count}}">
-  <input type="hidden" name="{{action_name}}" value="" data-pl-intent-console-regen-action>
-  <input type="hidden" name="{{generated_from_name}}" value="{{generated_from}}">
-  <input type="hidden" name="{{generated_sql_name}}" value="{{generated_sql}}" data-pl-intent-console-regen-generated-sql>
+  <input type="hidden" name="{{submit_name}}" value="" data-pl-intent-console-regen-button>
+  <textarea hidden data-pl-intent-console-regen-generated-sql>{{generated_sql}}</textarea>
+
+  {{#notice}}
+  <div class="alert alert-info py-2" role="status">{{notice}}</div>
+  {{/notice}}
 
   {{#parse_error}}
   <div class="alert alert-danger py-2" role="alert">{{parse_error}}</div>
