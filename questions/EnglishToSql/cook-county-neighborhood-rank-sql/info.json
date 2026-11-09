@@ -8,8 +8,8 @@
   "preferences": {
     "problem_variant": {
       "type": "string",
-      "enum": ["garage", "central_air"],
-      "default": "garage"
+      "enum": ["task_a", "task_b"],
+      "default": "task_a"
     }
   }
 }

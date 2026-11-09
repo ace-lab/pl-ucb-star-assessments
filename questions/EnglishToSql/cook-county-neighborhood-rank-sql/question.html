@@ -28,26 +28,55 @@
     <code>building_sqft &gt; 0</code>.
   </div>
 
-  <p>Write one SQLite query for the question below.</p>
-  <ul>
-    <li>Your query should start with the dataset above and result in a table that fully answers the question.</li>
-    <li>Your final table must only include rows relevant to the question. No extra rows.</li>
-    <li>Your final table must contain <code>sale_year</code>, <code>neighborhood_code</code>, <code>sale_count</code>, <code>avg_price_per_sqft</code>, and <code>rank_in_year</code>.</li>
-    <li>Result row order is not graded.</li>
-  </ul>
+  {{#params.task_a}}
+    <h4>(a) Neighborhood price leaderboard</h4>
+    <p>
+      For each year from 2016 through 2019, find the three neighborhoods with the
+      highest average sale price per building square foot. Only use valid sales
+      that have a garage.
+    </p>
+    <p>Use the following definitions:</p>
+    <ul>
+      <li>For one sale, <code>price_per_sqft = sale_price * 1.0 / building_sqft</code>.</li>
+      <li>A neighborhood qualifies in a given year only if it has at least 10 qualifying sales in that year.</li>
+      <li><code>sale_count</code> is the number of qualifying sales for a neighborhood in a given year.</li>
+      <li><code>avg_price_per_sqft</code> is the average <code>price_per_sqft</code> for a neighborhood in a given year, rounded to two decimal places.</li>
+    </ul>
+    <p>
+      Rank qualifying neighborhoods separately within each year by
+      <code>avg_price_per_sqft</code> from highest to lowest. Break ties by
+      <code>neighborhood_code</code> from lowest to highest, and keep ranks 1 through 3.
+    </p>
+    <p>
+      Return a table with exactly these columns:
+      <code>sale_year</code>, <code>neighborhood_code</code>, <code>sale_count</code>,
+      <code>avg_price_per_sqft</code>, and <code>rank_in_year</code>.
+    </p>
+  {{/params.task_a}}
 
-  <blockquote class="blockquote border-left pl-3">
-    <strong>(a)</strong> For each <code>sale_year</code> from 2016 through 2019,
-    which three <code>neighborhood_code</code> values had the greatest average sale
-    price per building square foot among valid sales
-    {{#params.garage_variant}}with a garage{{/params.garage_variant}}{{#params.central_air_variant}}with central air{{/params.central_air_variant}}?
-    For each sale, define price per square foot as
-    <code>sale_price * 1.0 / building_sqft</code>. Only consider neighborhoods with
-    at least 10 qualifying sales. Round each neighborhood's average price per
-    square foot to two decimal places before ranking. Rank neighborhoods separately
-    within each year from greatest to least average, breaking ties by
-    <code>neighborhood_code</code> in ascending order, and return ranks 1 through 3.
-  </blockquote>
+  {{#params.task_b}}
+    <h4>(b) Busiest years by property class</h4>
+    <p>
+      For each <code>property_class</code>, find the two years from 2013 through
+      2019 with the most valid sales that have central air.
+    </p>
+    <p>Use the following definitions:</p>
+    <ul>
+      <li>A property class qualifies in a given year only if it has at least 25 qualifying sales in that year.</li>
+      <li><code>sale_count</code> is the number of qualifying sales for a property class in a given year.</li>
+      <li><code>avg_sale_price</code> is the average <code>sale_price</code> for a property class in a given year, rounded to two decimal places.</li>
+    </ul>
+    <p>
+      Rank qualifying years separately within each <code>property_class</code> by
+      <code>sale_count</code> from highest to lowest. Break ties by
+      <code>sale_year</code> from lowest to highest, and keep ranks 1 and 2.
+    </p>
+    <p>
+      Return a table with exactly these columns:
+      <code>property_class</code>, <code>sale_year</code>, <code>sale_count</code>,
+      <code>avg_sale_price</code>, and <code>rank_in_class</code>.
+    </p>
+  {{/params.task_b}}
 </pl-question-panel>
 
 <pl-sql-console
