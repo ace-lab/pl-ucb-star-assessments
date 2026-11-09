@@ -1,0 +1,35 @@
+{
+  "uuid": "E913B859-5C96-4636-823B-7B466BC138CC",
+  "type": "Homework",
+  "title": "Cook County SQL User Study",
+  "set": "Homework",
+  "number": "2",
+  "shuffleQuestions": false,
+  "allowAccess": [
+    {
+      "startDate": "1800-01-19T00:00:01",
+      "endDate": "2400-05-13T23:59:59"
+    }
+  ],
+  "zones": [
+    {
+      "title": "SQL tasks",
+      "questions": [
+        {
+          "id": "EnglishToSql/cook-county-neighborhood-rank-sql",
+          "points": 10,
+          "triesPerVariant": 99999,
+          "maxPoints": 10,
+          "preferences": {"problem_variant": "garage"}
+        },
+        {
+          "id": "EnglishToSql/cook-county-neighborhood-rank-english",
+          "points": 10,
+          "triesPerVariant": 99999,
+          "maxPoints": 10,
+          "preferences": {"problem_variant": "central_air"}
+        }
+      ]
+    }
+  ]
+}

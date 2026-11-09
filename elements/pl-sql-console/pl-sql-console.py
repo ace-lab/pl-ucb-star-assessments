@@ -1,0 +1,350 @@
+import csv
+import json
+import os
+import re
+import sqlite3
+
+import chevron
+import lxml.html
+import prairielearn as pl
+
+
+TEMPLATE_FILE = "pl-sql-console.mustache"
+DEFAULT_ROW_LIMIT = 20
+MAX_GRADE_ROWS = 10000
+MAX_INPUT_ROWS = 100000
+
+
+def _attributes(element_html):
+    element = lxml.html.fragment_fromstring(element_html)
+    name = pl.get_string_attrib(element, "answers-name")
+    return {
+        "name": name,
+        "schema_name": f"{name}-result-schema",
+        "preview_name": f"{name}-result-preview",
+        "database_schema": pl.get_string_attrib(element, "database-schema"),
+        "reference_name": pl.get_string_attrib(element, "reference-name"),
+        "row_limit": pl.get_integer_attrib(
+            element, "row-limit", DEFAULT_ROW_LIMIT
+        ),
+        "weight": pl.get_integer_attrib(element, "weight", 1),
+    }
+
+
+def _question_file(data, relative_path):
+    root = os.path.realpath(
+        os.path.join(data["options"]["question_path"], "serverFilesQuestion")
+    )
+    path = os.path.realpath(os.path.join(root, relative_path))
+    if os.path.commonpath([root, path]) != root:
+        raise ValueError("Question file paths may not leave serverFilesQuestion.")
+    return path
+
+
+def _answer(data, name, default=""):
+    value = data["submitted_answers"].get(name)
+    if value is None:
+        value = data["raw_submitted_answers"].get(name, default)
+    if value is None:
+        return default
+    return str(value)
+
+
+def _write_answer(data, name, value):
+    data["submitted_answers"][name] = pl.to_json(value)
+
+
+def _quote_identifier(identifier):
+    return '"' + identifier.replace('"', '""') + '"'
+
+
+def _sql_type(values):
+    nonempty = [value for value in values if value != ""]
+    if nonempty and all(re.fullmatch(r"[+-]?\d+", value) for value in nonempty):
+        return "INTEGER"
+    if nonempty:
+        try:
+            for value in nonempty:
+                float(value)
+            return "REAL"
+        except ValueError:
+            pass
+    return "TEXT"
+
+
+def _load_tables(data, attrs):
+    schema_path = _question_file(data, attrs["database_schema"])
+    try:
+        with open(schema_path, encoding="utf-8") as file:
+            payload = json.load(file)
+    except json.JSONDecodeError as exc:
+        raise ValueError("database-schema must contain valid JSON.") from exc
+
+    table_specs = payload.get("tables") if isinstance(payload, dict) else None
+    if not isinstance(table_specs, list) or not table_specs:
+        raise ValueError("database-schema must define a nonempty tables array.")
+
+    tables = []
+    seen_names = set()
+    for table_spec in table_specs:
+        if not isinstance(table_spec, dict):
+            raise ValueError("Each database table must be a JSON object.")
+        table_name = table_spec.get("name")
+        source = table_spec.get("source")
+        if not isinstance(table_name, str) or not table_name.strip():
+            raise ValueError("Each database table needs a nonempty name.")
+        if table_name.casefold() in seen_names:
+            raise ValueError("Database table names must be unique.")
+        if not isinstance(source, str) or not source.strip():
+            raise ValueError(f"Database table {table_name!r} needs a CSV source.")
+
+        with open(
+            _question_file(data, source), newline="", encoding="utf-8"
+        ) as file:
+            reader = csv.DictReader(file)
+            columns = reader.fieldnames or []
+            rows = list(reader)
+        if not columns or any(not column for column in columns):
+            raise ValueError(f"CSV source for {table_name!r} has invalid columns.")
+        if len(rows) > MAX_INPUT_ROWS:
+            raise ValueError(
+                f"Database table {table_name!r} exceeds the {MAX_INPUT_ROWS}-row limit."
+            )
+        normalized_columns = [column.casefold() for column in columns]
+        if len(normalized_columns) != len(set(normalized_columns)):
+            raise ValueError("CSV column names must be unique, ignoring case.")
+
+        declared_columns = table_spec.get("columns")
+        declared_types = {}
+        if declared_columns is not None:
+            if not isinstance(declared_columns, list):
+                raise ValueError("database-schema columns must be an array.")
+            declared_names = [column.get("name") for column in declared_columns]
+            if declared_names != columns:
+                raise ValueError(
+                    f"Declared columns for {table_name!r} must match its CSV header."
+                )
+            declared_types = {
+                column["name"]: column.get("type") for column in declared_columns
+            }
+
+        types = {}
+        for column in columns:
+            declared_type = declared_types.get(column)
+            if declared_type is not None and declared_type not in {
+                "INTEGER",
+                "REAL",
+                "TEXT",
+            }:
+                raise ValueError(f"Unsupported SQLite type {declared_type!r}.")
+            types[column] = declared_type or _sql_type(
+                [row.get(column, "") for row in rows]
+            )
+        tables.append(
+            {
+                "name": table_name,
+                "columns": columns,
+                "types": types,
+                "rows": rows,
+            }
+        )
+        seen_names.add(table_name.casefold())
+    return tables
+
+
+def _convert_value(value, declared_type):
+    if value == "":
+        return None
+    if declared_type == "INTEGER":
+        return int(value)
+    if declared_type == "REAL":
+        return float(value)
+    return value
+
+
+def _database(data, attrs):
+    connection = sqlite3.connect(":memory:")
+    for table in _load_tables(data, attrs):
+        definitions = ", ".join(
+            f"{_quote_identifier(column)} {table['types'][column]}"
+            for column in table["columns"]
+        )
+        connection.execute(
+            f"CREATE TABLE {_quote_identifier(table['name'])} ({definitions})"
+        )
+        placeholders = ", ".join("?" for _ in table["columns"])
+        connection.executemany(
+            f"INSERT INTO {_quote_identifier(table['name'])} VALUES ({placeholders})",
+            [
+                [
+                    _convert_value(row.get(column, ""), table["types"][column])
+                    for column in table["columns"]
+                ]
+                for row in table["rows"]
+            ],
+        )
+    return connection
+
+
+def _run_query(data, attrs, query, limit):
+    if not re.match(r"^\s*(?:SELECT|WITH)\b", query, flags=re.IGNORECASE):
+        raise ValueError("Only SELECT or WITH queries are allowed.")
+
+    connection = _database(data, attrs)
+    if hasattr(connection, "setlimit"):
+        connection.setlimit(sqlite3.SQLITE_LIMIT_LENGTH, 1_000_000)
+        connection.setlimit(sqlite3.SQLITE_LIMIT_SQL_LENGTH, 50_000)
+        connection.setlimit(sqlite3.SQLITE_LIMIT_COLUMN, 200)
+    allowed_actions = {
+        sqlite3.SQLITE_SELECT,
+        sqlite3.SQLITE_READ,
+        sqlite3.SQLITE_FUNCTION,
+        getattr(sqlite3, "SQLITE_RECURSIVE", -1),
+    }
+
+    def authorize(action, _arg1, _arg2, _database_name, _trigger):
+        return sqlite3.SQLITE_OK if action in allowed_actions else sqlite3.SQLITE_DENY
+
+    steps = 0
+
+    def progress():
+        nonlocal steps
+        steps += 1
+        return 1 if steps > 50000 else 0
+
+    try:
+        connection.set_authorizer(authorize)
+        connection.set_progress_handler(progress, 1000)
+        cursor = connection.execute(query)
+        if cursor.description is None:
+            raise ValueError("The query did not return a result table.")
+        columns = [description[0] for description in cursor.description]
+        rows = cursor.fetchmany(limit + 1)
+        truncated = len(rows) > limit
+        display_rows = [
+            ["NULL" if value is None else str(value) for value in row]
+            for row in rows[:limit]
+        ]
+        return columns, display_rows, truncated
+    except sqlite3.Error as exc:
+        raise ValueError(f"ERROR: SQL could not be executed: {exc}") from exc
+    finally:
+        connection.close()
+
+
+def _load_preview(data, attrs):
+    try:
+        columns = json.loads(_answer(data, attrs["schema_name"], "[]"))
+        rows = json.loads(_answer(data, attrs["preview_name"], "[]"))
+    except (TypeError, ValueError, json.JSONDecodeError):
+        return [], []
+    return columns, rows
+
+
+def _preview_params(columns, rows):
+    return {
+        "has_preview": bool(columns),
+        "preview_columns": [{"value": value} for value in columns],
+        "preview_rows": [
+            {"cells": [{"value": value} for value in row]} for row in rows
+        ],
+    }
+
+
+def prepare(element_html, data):
+    attrs = _attributes(element_html)
+    if attrs["row_limit"] <= 0:
+        raise ValueError("row-limit must be positive.")
+    pl.check_answers_names(data, attrs["name"])
+    _load_tables(data, attrs)
+
+
+def render(element_html, data):
+    attrs = _attributes(element_html)
+    columns, rows = _load_preview(data, attrs)
+    params = {
+        "name": attrs["name"],
+        "query": _answer(data, attrs["name"]),
+        "editable": data.get("editable", True),
+        "parse_error": data["format_errors"].get(attrs["name"]),
+        **_preview_params(columns, rows),
+    }
+    if data["panel"] == "question":
+        params["question"] = True
+    elif data["panel"] == "submission":
+        params["submission"] = True
+    elif data["panel"] == "answer":
+        reference = data["correct_answers"].get(attrs["reference_name"])
+        if reference is None:
+            return ""
+        params["answer"] = True
+        params["reference_query"] = str(pl.from_json(reference))
+    else:
+        raise ValueError(f"Unknown PrairieLearn panel: {data['panel']}")
+
+    with open(TEMPLATE_FILE, encoding="utf-8") as file:
+        return chevron.render(file.read(), params).strip()
+
+
+def parse(element_html, data):
+    attrs = _attributes(element_html)
+    query = _answer(data, attrs["name"]).strip()
+    columns = []
+    rows = []
+    if not query:
+        data["format_errors"][attrs["name"]] = "Enter a SQLite query."
+    else:
+        try:
+            columns, rows, truncated = _run_query(
+                data, attrs, query, attrs["row_limit"]
+            )
+            if truncated:
+                rows.append(
+                    [f"Preview limited to {attrs['row_limit']} rows."]
+                    + [""] * (len(columns) - 1)
+                )
+        except ValueError as exc:
+            data["format_errors"][attrs["name"]] = str(exc)
+
+    _write_answer(data, attrs["name"], query)
+    _write_answer(data, attrs["schema_name"], json.dumps(columns))
+    _write_answer(data, attrs["preview_name"], json.dumps(rows))
+
+
+def _canonical_rows(rows):
+    return sorted((tuple(row) for row in rows), key=repr)
+
+
+def grade(element_html, data):
+    attrs = _attributes(element_html)
+    if attrs["name"] in data["format_errors"]:
+        return
+    query = _answer(data, attrs["name"]).strip()
+    reference = data["correct_answers"].get(attrs["reference_name"])
+    if reference is None:
+        return
+    try:
+        _, student_rows, student_truncated = _run_query(
+            data, attrs, query, MAX_GRADE_ROWS
+        )
+        _, reference_rows, reference_truncated = _run_query(
+            data, attrs, str(pl.from_json(reference)), MAX_GRADE_ROWS
+        )
+        if student_truncated or reference_truncated:
+            raise ValueError("The grading result exceeded the configured safety limit.")
+        correct = _canonical_rows(student_rows) == _canonical_rows(reference_rows)
+        data["partial_scores"][attrs["name"]] = {
+            "score": 1 if correct else 0,
+            "weight": attrs["weight"],
+            "feedback": (
+                "Your query returned the expected result."
+                if correct
+                else "Your query ran, but its result did not match the expected result."
+            ),
+        }
+    except ValueError as exc:
+        data["partial_scores"][attrs["name"]] = {
+            "score": 0,
+            "weight": attrs["weight"],
+            "feedback": str(exc),
+        }

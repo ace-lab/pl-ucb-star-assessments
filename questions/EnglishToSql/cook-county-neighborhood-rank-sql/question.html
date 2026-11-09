@@ -1,0 +1,59 @@
+<pl-question-panel>
+  <h3>Cook County property sales SQL query</h3>
+  <p>Consider a <code>cook_county</code> dataset with the following columns:</p>
+
+  <div class="table-responsive">
+    <table class="table table-bordered">
+      <thead>
+        <tr><th scope="col">Column</th><th scope="col">Description</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>property_id</code></td><td>a Cook County parcel identifier</td></tr>
+        <tr><td><code>property_class</code></td><td>the assessor's property-class code</td></tr>
+        <tr><td><code>neighborhood_code</code></td><td>the assessor's neighborhood code</td></tr>
+        <tr><td><code>building_sqft</code></td><td>the building area in square feet</td></tr>
+        <tr><td><code>sale_price</code></td><td>the recorded sale price in dollars</td></tr>
+        <tr><td><code>modeling_group</code></td><td>the modeling category: <code>SF</code>, <code>MF</code>, or <code>NCHARS</code></td></tr>
+        <tr><td><code>sale_year</code></td><td>the year of the sale</td></tr>
+        <tr><td><code>garage_indicator</code></td><td><code>1</code> when a garage is present and <code>0</code> otherwise</td></tr>
+        <tr><td><code>central_air</code></td><td><code>1</code> when central air is present and <code>0</code> otherwise</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>Each row of the dataset represents one property sale.</p>
+  <div class="alert alert-secondary">
+    <strong>Note:</strong> For this question, a valid sale has
+    <code>modeling_group = 'SF'</code>, <code>sale_price &gt;= 10000</code>, and
+    <code>building_sqft &gt; 0</code>.
+  </div>
+
+  <p>Write one SQLite query for the question below.</p>
+  <ul>
+    <li>Your query should start with the dataset above and result in a table that fully answers the question.</li>
+    <li>Your final table must only include rows relevant to the question. No extra rows.</li>
+    <li>Your final table must contain <code>sale_year</code>, <code>neighborhood_code</code>, <code>sale_count</code>, <code>avg_price_per_sqft</code>, and <code>rank_in_year</code>.</li>
+    <li>Result row order is not graded.</li>
+  </ul>
+
+  <blockquote class="blockquote border-left pl-3">
+    <strong>(a)</strong> For each <code>sale_year</code> from 2016 through 2019,
+    which three <code>neighborhood_code</code> values had the greatest average sale
+    price per building square foot among valid sales
+    {{#params.garage_variant}}with a garage{{/params.garage_variant}}{{#params.central_air_variant}}with central air{{/params.central_air_variant}}?
+    For each sale, define price per square foot as
+    <code>sale_price * 1.0 / building_sqft</code>. Only consider neighborhoods with
+    at least 10 qualifying sales. Round each neighborhood's average price per
+    square foot to two decimal places before ranking. Rank neighborhoods separately
+    within each year from greatest to least average, breaking ties by
+    <code>neighborhood_code</code> in ascending order, and return ranks 1 through 3.
+  </blockquote>
+</pl-question-panel>
+
+<pl-sql-console
+  answers-name="cook_county_sql"
+  database-schema="database_schema.json"
+  reference-name="reference_sql"
+  row-limit="20"
+  weight="1">
+</pl-sql-console>

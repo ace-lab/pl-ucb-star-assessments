@@ -1,0 +1,19 @@
+operations:
+  use table: Use an explicitly named table or intermediate result as a data source.
+  select: Return one or more explicitly named columns or computed results.
+  filter rows where: Keep ordinary rows that satisfy an explicitly stated condition.
+  group rows by: Divide rows into groups using one or more explicitly named columns.
+  compute count of: Count explicitly named values or rows.
+  compute average of: Compute the arithmetic mean of an explicitly named column or expression.
+  keep groups where: Keep aggregate groups that satisfy an explicitly stated condition.
+  round to decimal places: Round an explicitly named numeric expression to an explicitly stated number of decimal places.
+  order by: Sort rows using one or more explicitly named columns or computed results.
+  keep the first: Retain an explicitly stated number of rows from an ordered result.
+
+modifiers:
+  ascending: Sort from smallest to largest.
+  descending: Sort from largest to smallest.
+  equal to: Compare whether two values are equal.
+  greater than: Compare whether the left value is larger than the right value.
+  greater than or equal to: Compare whether the left value is at least the right value.
+  less than or equal to: Compare whether the left value is at most the right value.

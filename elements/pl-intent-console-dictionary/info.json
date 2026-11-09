@@ -1,0 +1,11 @@
+{
+  "controller": "pl-intent-console-dictionary.py",
+  "dependencies": {
+    "elementScripts": [
+      "pl-intent-console-dictionary.js"
+    ],
+    "elementStyles": [
+      "pl-intent-console-dictionary.css"
+    ]
+  }
+}
