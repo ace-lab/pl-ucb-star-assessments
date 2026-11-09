@@ -17,7 +17,9 @@
             {"id": "EnglishToSql/english-to-sql-transactions", "points": 10, "triesPerVariant": 99999, "maxPoints": 10},
             {"id": "EnglishToSql/english-to-sql-transactions-dictionary", "points": 10, "triesPerVariant": 99999, "maxPoints": 10},
             {"id": "EnglishToSql/english-to-sql-transactions-regen", "points": 10, "triesPerVariant": 99999, "maxPoints": 10},
-            {"id": "EnglishToSql/english-to-sql-transactions-two-pass", "points": 10, "triesPerVariant": 99999, "maxPoints": 10}
+            {"id": "EnglishToSql/english-to-sql-transactions-two-pass", "points": 10, "triesPerVariant": 99999, "maxPoints": 10},
+            {"id": "EnglishToSql/english-to-sql-top-customers-dictionary", "points": 10, "triesPerVariant": 99999, "maxPoints": 10},
+            {"id": "EnglishToSql/english-to-pandas-top-customers-dictionary", "points": 10, "triesPerVariant": 99999, "maxPoints": 10}
         ]
     }]
 }

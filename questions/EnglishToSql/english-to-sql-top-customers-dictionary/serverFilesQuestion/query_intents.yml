@@ -1,0 +1,37 @@
+# How to turn the normalized student plan into SQLite for this question.
+
+goal: Translate only the operations the student actually wrote. Preserve the student's logic and mistakes.
+
+rules:
+  - Use recognized_operations as the complete list of allowed SQL operations.
+  - Use recognized_modifiers as the complete list of allowed word-based comparisons and sort directions.
+  - Unmatched text may name tables, columns, aliases, intermediate results, values, or connect ideas. It may not add an operation or modifier.
+  - Copy every table, column, alias, and intermediate-result name the student explicitly gives, even if it is misspelled or unknown.
+  - Do not repair a missing year grouping, a ranking by amount instead of count, a global top 10 instead of a per-year top 10, incomplete join keys, or a missing final grouping.
+  - Add FROM only when the student explicitly names a table or intermediate result.
+  - A named intermediate result may be emitted as a CTE so that a later step can use it.
+  - Never invent a join. A join needs both source names and every matching column stated by the student.
+  - Always return best-effort SQL. If a clause cannot be written without guessing, omit only that clause and continue.
+  - SQL clauses and CTEs may be reordered only when SQLite syntax requires it.
+
+per_group_top_n:
+  - If and only if the student explicitly says to perform an order and keep operation separately for each named group, implement it with ROW_NUMBER() OVER (PARTITION BY the named group columns ORDER BY the supplied expression and direction).
+  - Keep rows whose generated row number is less than or equal to the supplied count.
+  - Do not add PARTITION BY year merely because the question asks about each year; the student's plan must explicitly say the ranking is for each year.
+  - Do not use a window function when the student requests one global ordering and limit.
+
+intermediate_results:
+  - A phrase such as "call this result customer_counts" names the output of the preceding step.
+  - Emit named intermediate results as CTEs when later steps refer to them.
+  - A join back to raw_df must use only the matching columns the student explicitly names.
+  - Do not silently carry original transaction columns through an aggregate; require a later join if the student needs original transaction rows.
+
+default_select:
+  - If a grouped step has no explicit SELECT list, select its grouping columns followed by its requested aggregates.
+  - If a final grouped step has no explicit SELECT list, select its grouping columns followed by its requested aggregates.
+  - Otherwise, select *.
+
+output:
+  - Return exactly one best-effort SQLite SELECT or WITH statement ending in a semicolon.
+  - Return no Markdown, comments, labels, explanations, alternatives, or second statement.
+  - Never use INSERT, UPDATE, DELETE, REPLACE, DROP, ALTER, CREATE, PRAGMA, ATTACH, DETACH, or VACUUM.

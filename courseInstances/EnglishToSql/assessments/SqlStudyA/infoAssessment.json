@@ -1,12 +1,13 @@
 {
-    "uuid": "52992364-2cb0-4f92-80da-c1183a4e9b8a",
+    "uuid": "86063d04-6de2-4773-998a-1a6cc669433d",
     "type": "Homework",
-    "title": "Cook County SQL User Study",
-    "set": "Homework",
-    "number": "2",
+    "title": "SQL User Study (A)",
+    "set": "SQL User Study",
+    "number": "1",
     "shuffleQuestions": false,
     "allowAccess": [
         {
+            "uids": [],
             "startDate": "2026-01-01T00:00:01",
             "endDate": "2027-12-31T23:59:59"
         }
