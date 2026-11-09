@@ -1,18 +1,21 @@
 {{#question}}
-<section class="pl-intent-console-dictionary" data-pl-intent-console-dictionary="{{name}}">
+<section class="pl-intent-console-dictionary" data-pl-intent-console-dictionary="{{name}}" data-intent-console-root="{{name}}" data-action-name="{{action_name}}" data-pending="{{#pending}}1{{/pending}}{{^pending}}0{{/pending}}">
   <div class="pl-intent-console-dictionary-field">
     <label class="pl-intent-console-dictionary-label" for="{{source_name}}">{{input_label}}</label>
     <textarea class="form-control pl-intent-console-dictionary-english" id="{{source_name}}" name="{{source_name}}" rows="4" placeholder="Describe the query in English…"{{^input_editable}} disabled{{/input_editable}}>{{source}}</textarea>
+    {{#input_editable}}
+    <div class="pl-intent-console-dictionary-actions">
+      <button type="button" class="btn btn-primary btn-sm" data-intent-console-generate{{^can_generate}} disabled{{/can_generate}}>{{generate_label}}</button>
+      <span class="pl-intent-console-dictionary-hint" data-intent-console-status>{{#pending}}Generating…{{/pending}}{{^pending}}Generations left: {{generations_left}}{{/pending}}</span>
+    </div>
+    {{/input_editable}}
   </div>
 
   <div class="pl-intent-console-dictionary-field">
     <label class="pl-intent-console-dictionary-label" for="{{code_name}}">{{code_label}}</label>
     <textarea class="form-control pl-intent-console-dictionary-code" id="{{code_name}}" name="{{code_name}}" rows="8" spellcheck="false" placeholder="{{code_placeholder}}"{{^code_editable}} readonly{{/code_editable}}>{{code}}</textarea>
-    <p class="pl-intent-console-dictionary-hint">Save regenerates this code and replaces edits. Save &amp; Grade grades the code currently shown.</p>
+    <p class="pl-intent-console-dictionary-hint">{{generate_label}} replaces this code. Save &amp; Grade grades the code shown.</p>
   </div>
-
-  <input type="hidden" name="{{runs_name}}" value="{{run_count}}">
-  <input type="hidden" name="{{generate_name}}" value="1" data-pl-intent-console-dictionary-generate>
 
   {{#parse_error}}
   <div class="alert alert-danger py-2" role="alert">{{parse_error}}</div>

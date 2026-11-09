@@ -2,14 +2,14 @@
   "uuid": "C7E74A23-FBD7-43A3-B21D-81A9CDFD1D18",
   "title": "Cook County neighborhood ranking: direct SQL",
   "topic": "Coding",
-  "tags": ["formative", "code", "alpha"],
+  "tags": ["formative", "hard", "alpha", "course-staff", "berkeley"],
   "type": "v3",
   "singleVariant": true,
   "preferences": {
     "problem_variant": {
       "type": "string",
-      "enum": ["task_a", "task_b"],
-      "default": "task_a"
+      "enum": ["garage", "central_air"],
+      "default": "garage"
     }
   }
 }

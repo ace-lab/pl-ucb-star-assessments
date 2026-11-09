@@ -1,0 +1,37 @@
+{
+    "uuid": "28461459-f59c-4740-ad55-6a16571254e5",
+    "type": "Homework",
+    "title": "SQL User Study (C)",
+    "set": "Homework",
+    "number": "4",
+    "shuffleQuestions": false,
+    "allowAccess": [
+        {
+            "uids": [],
+            "startDate": "2026-01-01T00:00:01",
+            "endDate": "2027-12-31T23:59:59"
+        }
+    ],
+    "zones": [
+        {
+            "title": "SQL tasks",
+            "questions": [
+                {
+                    "id": "EnglishToSql/top-customers-sql",
+                    "points": 10,
+                    "triesPerVariant": 99999,
+                    "maxPoints": 10
+                },
+                {
+                    "id": "EnglishToSql/cook-county-neighborhood-rank-english",
+                    "points": 10,
+                    "triesPerVariant": 99999,
+                    "maxPoints": 10,
+                    "preferences": {
+                        "problem_variant": "garage"
+                    }
+                }
+            ]
+        }
+    ]
+}

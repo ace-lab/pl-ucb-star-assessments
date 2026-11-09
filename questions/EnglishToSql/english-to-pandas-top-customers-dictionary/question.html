@@ -1,0 +1,69 @@
+<pl-question-panel>
+  <h3>Top customers by transaction count</h3>
+
+  <p>A company has three stores: Store A, Store B, and Store C. Every year, the
+    company identifies the 10 customers with the highest total <strong>count of
+    transactions</strong> combined across all stores in that year. It then computes
+    the total <strong>dollar amount</strong> those 10 customers spent at each store
+    during the year in which they were selected.</p>
+
+  <p>The source DataFrame is named <code>raw_df</code>. Each row represents one
+    transaction and has these columns:</p>
+
+  <div class="table-responsive">
+    <table class="table table-bordered">
+      <thead>
+        <tr><th scope="col">Column</th><th scope="col">Description</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>transaction_id</code></td><td>a unique identifier for the transaction</td></tr>
+        <tr><td><code>customer_id</code></td><td>the customer associated with the transaction</td></tr>
+        <tr><td><code>store_id</code></td><td>the store where the transaction occurred</td></tr>
+        <tr><td><code>year</code></td><td>the year of the transaction</td></tr>
+        <tr><td><code>amount</code></td><td>the dollar amount of the transaction</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>A scatterplot will use <code>year</code> on the x-axis, the total amount spent
+    by that year's selected customers on the y-axis, and <code>store_id</code> for
+    the point shape. The table used for the plot must therefore contain exactly one
+    row for each year and store.</p>
+
+  <p><strong>Write an analysis plan that transforms <code>raw_df</code> into the
+    table needed for the plot.</strong> Saving the plan generates editable pandas
+    code.</p>
+
+  <ul>
+    <li>The same customer may be selected in more than one year.</li>
+    <li>You may assume there are at least 10 unique customers in every year.</li>
+    <li>Your final table must contain only rows needed for the plot. Extra columns are allowed.</li>
+    <li>You may create and name intermediate results so later steps can refer to them.</li>
+  </ul>
+
+  <div class="alert alert-info">
+    <p><strong>Describe every operation clearly in English.</strong> Supported
+      operation phrases include:</p>
+    <ul class="mb-0">
+      <li><code>use table</code>, <code>select</code>, and <code>group rows by</code></li>
+      <li><code>compute count of</code> and <code>compute sum of</code></li>
+      <li><code>order by</code> with <code>ascending</code> or <code>descending</code></li>
+      <li><code>keep the first</code></li>
+      <li><code>join</code> with the table names and matching columns</li>
+    </ul>
+  </div>
+
+  <p>Name every table and column exactly as shown. Include the grouping columns,
+    calculation inputs, sort direction, row count, and join keys needed by your
+    steps. Code-like shorthand such as <code>groupby</code> or <code>df[...]</code>
+    is not accepted as English analysis-plan wording.</p>
+</pl-question-panel>
+
+<link rel="stylesheet" href="{{options.client_files_question_url}}/pl-intent-console-dictionary.css">
+<pl-question-panel>
+  <script src="{{options.client_files_question_url}}/pl-intent-console-dictionary.js"></script>
+</pl-question-panel>
+
+<!-- Replaced by server.py render() with the intent console for the current panel.
+     The element's settings live in ELEMENT_HTML in server.py. -->
+<div data-pl-intent-console-placeholder></div>

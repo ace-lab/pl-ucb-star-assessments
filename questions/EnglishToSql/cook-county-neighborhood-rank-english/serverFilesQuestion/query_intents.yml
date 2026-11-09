@@ -5,7 +5,7 @@ rules:
   - Use recognized_modifiers as the complete list of allowed word-based comparisons and sort directions.
   - Unmatched text may name tables, columns, aliases, expressions, intermediate results, values, or connect ideas. It may not add an operation or modifier.
   - Copy every table, column, alias, expression, and intermediate-result name the student explicitly gives, even if it is misspelled or unknown.
-  - Do not repair a missing filter, derived expression, grouping column, aggregate, minimum group size, rounding step, partition, sort direction, tie-breaker, or row limit.
+  - Do not repair a missing filter, row-level division, year grouping, neighborhood grouping, minimum group size, rounding step, per-year partition, sort direction, tie-breaker, or row limit.
   - A named intermediate result may be emitted as a CTE so that a later step can use it.
   - Always return best-effort SQL. If a clause cannot be written without guessing, omit only that clause and continue.
   - SQL clauses and CTEs may be reordered only when SQLite syntax requires it.
@@ -18,7 +18,7 @@ per_group_top_n:
   - If and only if the student explicitly says to order and keep rows separately for each named group, implement it with ROW_NUMBER() OVER (PARTITION BY the named group columns ORDER BY the supplied expressions and directions).
   - Preserve every explicitly stated tie-break expression and direction in the window ORDER BY.
   - Keep rows whose generated row number is less than or equal to the supplied count.
-  - Do not add a PARTITION BY clause merely because the question requests separate rankings; the student's plan must explicitly name the columns that define each separate ranking.
+  - Do not add PARTITION BY sale_year merely because the question asks about each year; the student's plan must explicitly say the ranking is separate for each sale_year.
   - Do not use a window function when the student requests one global ordering and limit.
 
 intermediate_results:
