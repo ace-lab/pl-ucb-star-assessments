@@ -1,0 +1,6 @@
+{
+  "proxy_url": "https://english-to-sql-proxy.cs194-llm-proxy.workers.dev",
+  "token": "PASTE_YOUR_ENGLISH_TO_SQL_PROXY_TOKEN_HERE",
+  "model": "gpt-4.1-mini"
+}
+
