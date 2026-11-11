@@ -14,6 +14,17 @@
     ],
     "zones": [
         {
+            "title": "Tutorial",
+            "questions": [
+                {
+                    "id": "EnglishToSql/english-to-sql-transactions-dictionary-tutorial",
+                    "points": 10,
+                    "triesPerVariant": 99999,
+                    "maxPoints": 10
+                }
+            ]
+        },
+        {
             "title": "SQL tasks",
             "questions": [
                 {
@@ -28,7 +39,7 @@
                     "triesPerVariant": 99999,
                     "maxPoints": 10,
                     "preferences": {
-                        "problem_variant": "garage"
+                        "problem_variant": "task_a"
                     }
                 }
             ]

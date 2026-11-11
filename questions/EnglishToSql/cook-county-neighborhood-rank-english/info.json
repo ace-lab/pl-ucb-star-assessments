@@ -1,6 +1,6 @@
 {
   "uuid": "B7B276E0-5E12-4500-A3D3-653E2B97E185",
-  "title": "Cook County neighborhood ranking: English to SQL",
+  "title": "Cook County nested aggregates: English to SQL",
   "topic": "Coding",
   "tags": ["formative", "hard", "alpha", "course-staff", "berkeley"],
   "type": "v3",
@@ -8,8 +8,8 @@
   "preferences": {
     "problem_variant": {
       "type": "string",
-      "enum": ["garage", "central_air"],
-      "default": "central_air"
+      "enum": ["task_a", "task_b"],
+      "default": "task_b"
     }
   }
 }

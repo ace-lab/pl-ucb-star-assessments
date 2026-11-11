@@ -4,11 +4,10 @@ operations:
   filter rows where: Keep ordinary rows that satisfy an explicitly stated condition.
   group rows by: Divide rows into groups using one or more explicitly named columns.
   compute count of: Count explicitly named values or rows.
+  compute sum of: Add the values of an explicitly named column or expression.
   compute average of: Compute the arithmetic mean of an explicitly named column or expression.
   keep groups where: Keep aggregate groups that satisfy an explicitly stated condition.
-  round to decimal places: Round an explicitly named numeric expression to an explicitly stated number of decimal places.
-  order by: Sort rows using one or more explicitly named columns or computed results.
-  keep the first: Retain an explicitly stated number of rows from an ordered result.
+  name result: Give the current result an explicit name so a later step can use it.
 
 modifiers:
   ascending: Sort from smallest to largest.

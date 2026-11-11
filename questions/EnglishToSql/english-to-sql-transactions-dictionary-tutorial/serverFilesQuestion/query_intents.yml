@@ -1,0 +1,44 @@
+# How to turn the normalized student plan into SQLite.
+
+goal: Translate only the operations the student actually wrote. Keep their logic and mistakes.
+
+rules:
+  - Use recognized_operations as the complete list of allowed SQL operations.
+  - Use recognized_modifiers as the complete list of allowed word-based comparisons, sort directions, and confirmations.
+  - Unmatched text may name tables, columns, values, or connect ideas. It may not add an operation or modifier.
+  - The symbols ==, =, !=, <>, >, >=, <, and <= may be used as comparisons even when they are not in recognized_modifiers.
+  - Copy every table, column, alias, and other SQL expression the student explicitly names, even if it is misspelled, unknown, or ambiguous in database_schema.
+  - Do not correct, qualify, replace, or infer an intended identifier. For example, if the student writes id, use id even when several tables have an id column.
+  - An explicit but invalid identifier is still a supplied detail. Generate the SQL and let SQLite or the autograder report the error.
+  - This question has exactly one source table. Use transactions as the FROM source even when the student does not explicitly name it.
+  - With multiple tables, use only named_tables.
+  - Never invent a join. A join needs the join operation, all table names, and the matching columns.
+  - Always return best-effort SQL. Never return a plan error because a detail is missing, invalid, unsupported, or ambiguous.
+  - Compile every recognized operation as far as the student's details allow. If a clause or expression cannot be written without guessing, omit only that part and continue with the rest of the query.
+  - Do not add a filter, group, aggregate, DISTINCT, subquery, sort, limit, or offset to improve the answer.
+  - Preserve the student's operation order in the generated SQL, even when that order is invalid SQLite.
+  - Never move a later filter before an earlier grouping, aggregate filter, sort, or limit to repair the query.
+  - If the student applies an aggregate filter and then applies an ordinary row filter, write HAVING first and append WHERE afterward. The resulting SQLite syntax error is intentional evidence of the student's ordering mistake.
+  - Use a subquery only when the student explicitly asks to aggregate a result.
+
+interpretation:
+  - A comparison against an aggregate is a group filter. A comparison against a regular column is a row filter.
+  - Preserve the semantic comparison direction and value. Render == as SQL =, and render a monetary numeric literal such as $100 as the number 100 without the dollar sign.
+  - When the student uses an ordinary-language field description instead of an exact identifier, map it to a schema column only when exactly one column name or schema description is a direct, unambiguous match. Otherwise, preserve the student's wording rather than guessing.
+  - '"For each X" and "for each unique X" mean group by every named X column. Here, "unique" does not also request SELECT DISTINCT.'
+  - '"Keep filtered rows" confirms the preceding filter; it is not a new SQL operation.'
+  - Symbolic comparisons do not require a word-based dictionary modifier. Normalize == to = when writing SQL; preserve the other comparison directions.
+  - Example preserving an intentionally invalid order: if a plan groups rows, applies an aggregate filter, and only afterward applies an ordinary row filter, emit the clauses as GROUP BY ... HAVING ... WHERE ... in that same order. Do not move the later WHERE before GROUP BY to make the query valid.
+
+default_select:
+  - If the student does not give a SELECT list, select the grouping columns followed by the requested aggregates.
+  - If there is grouping but no aggregate, select the grouping columns.
+  - "Otherwise, select *."
+  - These defaults may not add DISTINCT, an aggregate, a grouping column, a predicate, or an outer aggregation.
+
+output:
+  - Return exactly one best-effort SQLite SELECT or WITH statement ending in a semicolon.
+  - The statement does not need to execute successfully. Preserve student errors for SQLite or the autograder to catch.
+  - Never return PLAN_ERROR or ask for more detail.
+  - Return no Markdown, comments, labels, explanations, alternatives, or second statement.
+  - Never use INSERT, UPDATE, DELETE, REPLACE, DROP, ALTER, CREATE, PRAGMA, ATTACH, DETACH, or VACUUM.

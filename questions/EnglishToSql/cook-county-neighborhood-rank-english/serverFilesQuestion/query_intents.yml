@@ -5,33 +5,20 @@ rules:
   - Use recognized_modifiers as the complete list of allowed word-based comparisons and sort directions.
   - Unmatched text may name tables, columns, aliases, expressions, intermediate results, values, or connect ideas. It may not add an operation or modifier.
   - Copy every table, column, alias, expression, and intermediate-result name the student explicitly gives, even if it is misspelled or unknown.
-  - Do not repair a missing filter, row-level division, year grouping, neighborhood grouping, minimum group size, rounding step, per-year partition, sort direction, tie-breaker, or row limit.
-  - A named intermediate result may be emitted as a CTE so that a later step can use it.
+  - Do not repair a missing filter, grouping column, aggregate, group condition, intermediate result, or outer count.
   - Always return best-effort SQL. If a clause cannot be written without guessing, omit only that clause and continue.
-  - SQL clauses and CTEs may be reordered only when SQLite syntax requires it.
-
-rounding:
-  - Compile round to decimal places as ROUND(the explicitly named expression, the explicitly stated number of places).
-  - Do not round merely because the assignment requests it; the student's plan must explicitly request the operation and identify both the expression and the number of decimal places.
-
-per_group_top_n:
-  - If and only if the student explicitly says to order and keep rows separately for each named group, implement it with ROW_NUMBER() OVER (PARTITION BY the named group columns ORDER BY the supplied expressions and directions).
-  - Preserve every explicitly stated tie-break expression and direction in the window ORDER BY.
-  - Keep rows whose generated row number is less than or equal to the supplied count.
-  - Do not add PARTITION BY sale_year merely because the question asks about each year; the student's plan must explicitly say the ranking is separate for each sale_year.
-  - Do not use a window function when the student requests one global ordering and limit.
+  - SQL clauses may be reordered only when SQLite syntax requires it.
 
 intermediate_results:
-  - A phrase such as "call this result filtered_sales" names the output of the preceding step.
-  - Emit named intermediate results as CTEs when later steps refer to them.
-  - Do not silently carry columns through an aggregate unless they are grouping columns or requested aggregates.
+  - A phrase such as "name result qualifying_classes" names the output of the preceding grouped step.
+  - When a later step explicitly counts the rows of a named intermediate result, emit the grouped step as a subquery and count its rows in an outer SELECT.
+  - Do not create a subquery unless the student explicitly names an intermediate result and later aggregates that result.
 
 default_select:
   - If a grouped step has no explicit SELECT list, select its grouping columns followed by its requested aggregates.
-  - If a ranked step has no explicit SELECT list, select the input columns followed by the requested row number.
   - Otherwise, select only the columns or computed values the student explicitly requests.
 
 output:
-  - Return exactly one best-effort SQLite SELECT or WITH statement ending in a semicolon.
+  - Return exactly one best-effort SQLite SELECT statement, which may contain a subquery, ending in a semicolon.
   - Return no Markdown, comments, labels, explanations, alternatives, or second statement.
   - Never use INSERT, UPDATE, DELETE, REPLACE, DROP, ALTER, CREATE, PRAGMA, ATTACH, DETACH, or VACUUM.

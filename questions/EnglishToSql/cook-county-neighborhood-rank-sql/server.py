@@ -26,10 +26,21 @@ def _attributes(element_html):
         "name": name,
         "schema_name": f"{name}-result-schema",
         "preview_name": f"{name}-result-preview",
+        "grade_name": f"{name}-grade-on-submit",
+        "started_name": f"{name}-telemetry-started-at-ms",
+        "elapsed_name": f"{name}-telemetry-elapsed-ms",
+        "save_count_name": f"{name}-telemetry-save-count",
+        "grade_count_name": f"{name}-telemetry-grade-count",
+        "edit_count_name": f"{name}-telemetry-edit-count",
+        "inserted_count_name": f"{name}-telemetry-chars-inserted",
+        "deleted_count_name": f"{name}-telemetry-chars-deleted",
         "database_schema": pl.get_string_attrib(element, "database-schema"),
         "reference_name": pl.get_string_attrib(element, "reference-name"),
         "row_limit": pl.get_integer_attrib(
             element, "row-limit", DEFAULT_ROW_LIMIT
+        ),
+        "time_limit_minutes": pl.get_integer_attrib(
+            element, "time-limit-minutes", 0
         ),
         "weight": pl.get_integer_attrib(element, "weight", 1),
     }
@@ -56,6 +67,13 @@ def _answer(data, name, default=""):
 
 def _write_answer(data, name, value):
     data["submitted_answers"][name] = pl.to_json(value)
+
+
+def _nonnegative_int_answer(data, name):
+    try:
+        return max(0, int(_answer(data, name, "0")))
+    except ValueError:
+        return 0
 
 
 def _quote_identifier(identifier):
@@ -259,6 +277,8 @@ def _element_prepare(element_html, data):
     attrs = _attributes(element_html)
     if attrs["row_limit"] <= 0:
         raise ValueError("row-limit must be positive.")
+    if attrs["time_limit_minutes"] < 0:
+        raise ValueError("time-limit-minutes must be nonnegative.")
     pl.check_answers_names(data, attrs["name"])
     _load_tables(data, attrs)
 
@@ -269,6 +289,24 @@ def _element_render(element_html, data):
     params = {
         "name": attrs["name"],
         "query": _answer(data, attrs["name"]),
+        "grade_name": attrs["grade_name"],
+        "started_name": attrs["started_name"],
+        "elapsed_name": attrs["elapsed_name"],
+        "save_count_name": attrs["save_count_name"],
+        "grade_count_name": attrs["grade_count_name"],
+        "edit_count_name": attrs["edit_count_name"],
+        "inserted_count_name": attrs["inserted_count_name"],
+        "deleted_count_name": attrs["deleted_count_name"],
+        "started_at_ms": _answer(data, attrs["started_name"], "0"),
+        "elapsed_ms": _answer(data, attrs["elapsed_name"], "0"),
+        "save_count": _answer(data, attrs["save_count_name"], "0"),
+        "grade_count": _answer(data, attrs["grade_count_name"], "0"),
+        "edit_count": _answer(data, attrs["edit_count_name"], "0"),
+        "inserted_count": _answer(data, attrs["inserted_count_name"], "0"),
+        "deleted_count": _answer(data, attrs["deleted_count_name"], "0"),
+        "has_time_limit": attrs["time_limit_minutes"] > 0,
+        "time_limit_minutes": attrs["time_limit_minutes"],
+        "time_limit_seconds": attrs["time_limit_minutes"] * 60,
         "editable": data.get("editable", True),
         "parse_error": data["format_errors"].get(attrs["name"]),
         **_preview_params(columns, rows),
@@ -293,6 +331,18 @@ def _element_render(element_html, data):
 def _element_parse(element_html, data):
     attrs = _attributes(element_html)
     query = _answer(data, attrs["name"]).strip()
+    grade = _answer(data, attrs["grade_name"], "0") == "1"
+    started_at_ms = _nonnegative_int_answer(data, attrs["started_name"])
+    elapsed_ms = _nonnegative_int_answer(data, attrs["elapsed_name"])
+    save_count = _nonnegative_int_answer(data, attrs["save_count_name"])
+    grade_count = _nonnegative_int_answer(data, attrs["grade_count_name"])
+    edit_count = _nonnegative_int_answer(data, attrs["edit_count_name"])
+    inserted_count = _nonnegative_int_answer(data, attrs["inserted_count_name"])
+    deleted_count = _nonnegative_int_answer(data, attrs["deleted_count_name"])
+    if grade:
+        grade_count += 1
+    else:
+        save_count += 1
     columns = []
     rows = []
     if not query:
@@ -313,6 +363,13 @@ def _element_parse(element_html, data):
     _write_answer(data, attrs["name"], query)
     _write_answer(data, attrs["schema_name"], json.dumps(columns))
     _write_answer(data, attrs["preview_name"], json.dumps(rows))
+    _write_answer(data, attrs["started_name"], str(started_at_ms))
+    _write_answer(data, attrs["elapsed_name"], str(elapsed_ms))
+    _write_answer(data, attrs["save_count_name"], str(save_count))
+    _write_answer(data, attrs["grade_count_name"], str(grade_count))
+    _write_answer(data, attrs["edit_count_name"], str(edit_count))
+    _write_answer(data, attrs["inserted_count_name"], str(inserted_count))
+    _write_answer(data, attrs["deleted_count_name"], str(deleted_count))
 
 
 def _canonical_rows(rows):
@@ -361,107 +418,40 @@ ELEMENT_HTML = """<pl-sql-console
   database-schema="database_schema.json"
   reference-name="reference_sql"
   row-limit="20"
+  time-limit-minutes="12"
   weight="1">
 </pl-sql-console>"""
 
 
 REFERENCE_QUERIES = {
-    "garage": """WITH filtered_sales AS (
-    SELECT
-        sale_year,
-        neighborhood_code,
-        sale_price * 1.0 / building_sqft AS price_per_sqft
+    "task_a": """SELECT COUNT(*) AS property_class_count
+FROM (
+    SELECT property_class
     FROM cook_county
-    WHERE sale_year >= 2016
-      AND sale_year <= 2019
-      AND modeling_group = 'SF'
-      AND sale_price >= 10000
-      AND building_sqft > 0
-      AND garage_indicator = 1
-),
-neighborhood_summaries AS (
-    SELECT
-        sale_year,
-        neighborhood_code,
-        COUNT(*) AS sale_count,
-        ROUND(AVG(price_per_sqft), 2) AS avg_price_per_sqft
-    FROM filtered_sales
-    GROUP BY sale_year, neighborhood_code
-    HAVING COUNT(*) >= 10
-),
-ranked_neighborhoods AS (
-    SELECT
-        sale_year,
-        neighborhood_code,
-        sale_count,
-        avg_price_per_sqft,
-        ROW_NUMBER() OVER (
-            PARTITION BY sale_year
-            ORDER BY avg_price_per_sqft DESC, neighborhood_code ASC
-        ) AS rank_in_year
-    FROM neighborhood_summaries
-)
-SELECT
-    sale_year,
-    neighborhood_code,
-    sale_count,
-    avg_price_per_sqft,
-    rank_in_year
-FROM ranked_neighborhoods
-WHERE rank_in_year <= 3;""",
-    "central_air": """WITH filtered_sales AS (
-    SELECT
-        sale_year,
-        neighborhood_code,
-        sale_price * 1.0 / building_sqft AS price_per_sqft
+    WHERE garage_indicator = 1
+    GROUP BY property_class
+    HAVING COUNT(*) >= 30
+       AND AVG(building_sqft) > 2500
+) AS qualifying_property_classes;""",
+    "task_b": """SELECT COUNT(*) AS neighborhood_count
+FROM (
+    SELECT neighborhood_code
     FROM cook_county
-    WHERE sale_year >= 2016
-      AND sale_year <= 2019
-      AND modeling_group = 'SF'
-      AND sale_price >= 10000
-      AND building_sqft > 0
-      AND central_air = 1
-),
-neighborhood_summaries AS (
-    SELECT
-        sale_year,
-        neighborhood_code,
-        COUNT(*) AS sale_count,
-        ROUND(AVG(price_per_sqft), 2) AS avg_price_per_sqft
-    FROM filtered_sales
-    GROUP BY sale_year, neighborhood_code
-    HAVING COUNT(*) >= 10
-),
-ranked_neighborhoods AS (
-    SELECT
-        sale_year,
-        neighborhood_code,
-        sale_count,
-        avg_price_per_sqft,
-        ROW_NUMBER() OVER (
-            PARTITION BY sale_year
-            ORDER BY avg_price_per_sqft DESC, neighborhood_code ASC
-        ) AS rank_in_year
-    FROM neighborhood_summaries
-)
-SELECT
-    sale_year,
-    neighborhood_code,
-    sale_count,
-    avg_price_per_sqft,
-    rank_in_year
-FROM ranked_neighborhoods
-WHERE rank_in_year <= 3;""",
+    WHERE central_air = 1
+    GROUP BY neighborhood_code
+    HAVING COUNT(*) >= 30
+       AND SUM(sale_price) > 200000000
+) AS qualifying_neighborhoods;""",
 }
 
 
 def generate(data):
-    variant = data["preferences"].get("problem_variant", "garage")
-    if variant not in REFERENCE_QUERIES:
-        raise ValueError(f"Unknown problem_variant: {variant!r}")
-    data["params"]["garage_variant"] = variant == "garage"
-    data["params"]["central_air_variant"] = variant == "central_air"
-    data["correct_answers"]["reference_sql"] = REFERENCE_QUERIES[variant]
+    task = data["preferences"].get("problem_variant", "task_a")
+    if task not in REFERENCE_QUERIES:
+        raise ValueError(f"Unknown problem_variant: {task!r}")
+    data["params"]["task_a"] = task == "task_a"
+    data["params"]["task_b"] = task == "task_b"
+    data["correct_answers"]["reference_sql"] = REFERENCE_QUERIES[task]
 
 
 # --- Question lifecycle: run the inlined element on ELEMENT_HTML ---------------------

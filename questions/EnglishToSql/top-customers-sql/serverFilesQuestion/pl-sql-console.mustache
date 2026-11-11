@@ -1,8 +1,23 @@
 {{#question}}
-<section class="pl-sql-console">
+<section class="pl-sql-console" data-pl-sql-console="{{name}}" data-time-limit-seconds="{{time_limit_seconds}}">
+  {{#has_time_limit}}
+  <div class="alert alert-light border py-2" role="status">
+    <strong>Time for this question:</strong> {{time_limit_minutes}} minutes.
+    <span data-pl-study-timer>Time remaining: --:--</span>
+  </div>
+  {{/has_time_limit}}
   <label class="pl-sql-console-label" for="{{name}}">SQLite query</label>
   <textarea class="form-control pl-sql-console-editor" id="{{name}}" name="{{name}}" rows="14" spellcheck="false" placeholder="Write one SELECT or WITH query…"{{^editable}} readonly{{/editable}}>{{query}}</textarea>
   <p class="pl-sql-console-hint">Save checks the query and refreshes the preview. Save &amp; Grade compares its result with the expected result.</p>
+
+  <input type="hidden" name="{{grade_name}}" value="0" data-pl-sql-console-grade>
+  <input type="hidden" name="{{started_name}}" value="{{started_at_ms}}" data-pl-study-started>
+  <input type="hidden" name="{{elapsed_name}}" value="{{elapsed_ms}}" data-pl-study-elapsed>
+  <input type="hidden" name="{{save_count_name}}" value="{{save_count}}">
+  <input type="hidden" name="{{grade_count_name}}" value="{{grade_count}}">
+  <input type="hidden" name="{{edit_count_name}}" value="{{edit_count}}" data-pl-study-edit-count>
+  <input type="hidden" name="{{inserted_count_name}}" value="{{inserted_count}}" data-pl-study-inserted-count>
+  <input type="hidden" name="{{deleted_count_name}}" value="{{deleted_count}}" data-pl-study-deleted-count>
 
   {{#parse_error}}<div class="alert alert-danger py-2 mt-3" role="alert">{{parse_error}}</div>{{/parse_error}}
   {{#has_preview}}
