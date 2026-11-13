@@ -7,7 +7,7 @@ so this server simply sees / and no path prefix).
 
   GET  /health                -> {"ok": true}
   POST /sync {"code": s}      -> writes $HOME/egg.py
-  POST /sync-challenge {code, aslr, canary, nx}
+  POST /sync-challenge {code, architecture, aslr, canary, nx}
                               -> writes + compiles $HOME/.challenge/vuln.c with the
                                  requested protections; gdb is configured for ASLR
   WS   /term                  -> raw text in/out of a pty running gdb
@@ -26,6 +26,7 @@ import select
 import signal
 import struct
 import subprocess
+import tempfile
 import termios
 import threading
 
@@ -52,11 +53,15 @@ BUILD_INFO = os.path.join(CHALLENGE_DIR, "build.json")
 # The three protections the instructor chooses per question (element attributes
 # enable-aslr, enable-canary, enable-non-exec-pages). All default to off.
 SETTING_NAMES = ("aslr", "canary", "nx")
+# "32" builds a 32-bit x86 program (-m32), "64" the native 64-bit one. A fourth
+# question setting (element attribute `architecture`).
+ARCHITECTURES = ("32", "64")
 
 
-def cflags(canary: bool, nx: bool) -> list[str]:
-    """Compiler flags for the requested protections.
+def cflags(canary: bool, nx: bool, architecture: str = "64") -> list[str]:
+    """Compiler flags for the requested architecture and protections.
 
+    architecture: "32" adds -m32 (needs the 32-bit libraries from gcc-multilib).
     canary: -fstack-protector-all puts a canary in every function; otherwise it is
             switched off explicitly (Ubuntu's gcc would enable one by default).
     nx:     -z noexecstack marks the stack non-executable; otherwise -z execstack
@@ -64,11 +69,12 @@ def cflags(canary: bool, nx: bool) -> list[str]:
     -no-pie keeps the program's own addresses fixed whatever ASLR does.
     ASLR is a runtime setting: see gdb_command().
     """
-    return [
+    flags = [
         "-g", "-O0", "-no-pie",
         "-fstack-protector-all" if canary else "-fno-stack-protector",
         "-Wl,-z,noexecstack" if nx else "-Wl,-z,execstack",
     ]
+    return ["-m32", *flags] if architecture == "32" else flags
 
 
 IS_ROOT = os.getuid() == 0
@@ -108,23 +114,75 @@ def _write_build_info(info: dict) -> None:
         os.chown(BUILD_INFO, UID, GID)
 
 
-def _fingerprint(code: str, canary: bool, nx: bool) -> str:
+def _fingerprint(code: str, canary: bool, nx: bool, architecture: str) -> str:
     # ASLR is not part of the build, so changing only it never forces a recompile.
-    payload = json.dumps({"code": code, "flags": cflags(canary, nx)}, sort_keys=True)
+    payload = json.dumps(
+        {"code": code, "flags": cflags(canary, nx, architecture)}, sort_keys=True
+    )
     return hashlib.sha256(payload.encode("utf-8")).hexdigest()
 
 
+_m32_lock = threading.Lock()
+_m32_result: tuple[bool, str] | None = None
+
+
+def _probe_32bit() -> tuple[bool, str]:
+    """Can this container build AND run a 32-bit program? (ok, reason if not)"""
+    os.makedirs(CHALLENGE_DIR, exist_ok=True)
+    with tempfile.TemporaryDirectory(prefix="m32-", dir=CHALLENGE_DIR) as tmp:
+        src, exe = os.path.join(tmp, "probe.c"), os.path.join(tmp, "probe")
+        with open(src, "w", encoding="utf-8") as f:
+            f.write("int main(void) { return 0; }\n")
+        try:
+            built = subprocess.run(
+                ["gcc", "-m32", "-o", exe, src], capture_output=True, text=True, timeout=30
+            )
+        except subprocess.TimeoutExpired:
+            return False, "the 32-bit test build timed out"
+        if built.returncode != 0:
+            detail = (built.stderr.strip().splitlines() or ["unknown error"])[-1]
+            return False, (
+                "this workspace image was built without 32-bit support (the 32-bit compiler "
+                "libraries are missing; they are only installed on amd64 builds). "
+                f"Compiler said: {detail}"
+            )
+        try:
+            ran = subprocess.run([exe], capture_output=True, timeout=10)
+        except (OSError, subprocess.TimeoutExpired) as e:
+            return False, f"this Docker host cannot run 32-bit programs ({e})"
+        if ran.returncode != 0:
+            return False, (
+                "this Docker host cannot run 32-bit programs "
+                f"(the test program exited with status {ran.returncode})"
+            )
+    return True, ""
+
+
+def check_32bit_support() -> tuple[bool, str]:
+    """Probe once per container; the answer cannot change while it runs."""
+    global _m32_result
+    with _m32_lock:
+        if _m32_result is None:
+            _m32_result = _probe_32bit()
+        return _m32_result
+
+
 def compile_challenge(code: str, settings: dict) -> None:
-    """Write and compile vuln.c with the requested protections.
+    """Write and compile vuln.c with the requested architecture and protections.
 
     Does nothing if this exact source and flags are already built. Always records
     the settings (including aslr) so the next terminal connection uses them.
     """
     canary, nx = settings["canary"], settings["nx"]
+    arch = settings.get("architecture", "64")
     with _compile_lock:
         os.makedirs(CHALLENGE_DIR, exist_ok=True)
-        fingerprint = _fingerprint(code, canary, nx)
-        info = {"fingerprint": fingerprint, **{k: settings[k] for k in SETTING_NAMES}}
+        fingerprint = _fingerprint(code, canary, nx, arch)
+        info = {
+            "fingerprint": fingerprint,
+            "architecture": arch,
+            **{k: settings[k] for k in SETTING_NAMES},
+        }
 
         if os.path.exists(CHALLENGE_BIN) and _read_build_info().get("fingerprint") == fingerprint:
             _write_build_info(info)  # only aslr may have changed
@@ -140,7 +198,7 @@ def compile_challenge(code: str, settings: dict) -> None:
         try:
             # Absolute paths, so gdb's `list` finds vuln.c from the debug info.
             result = subprocess.run(
-                ["gcc", *cflags(canary, nx), "-o", CHALLENGE_BIN, CHALLENGE_SRC],
+                ["gcc", *cflags(canary, nx, arch), "-o", CHALLENGE_BIN, CHALLENGE_SRC],
                 capture_output=True, text=True, timeout=30,
             )
         except subprocess.TimeoutExpired:
@@ -233,6 +291,15 @@ def sync_challenge():
         if not isinstance(value, bool):
             return jsonify(ok=False, error=f"'{name}' must be true or false"), 400
         settings[name] = value
+    architecture = payload.get("architecture", "64")
+    if architecture not in ARCHITECTURES:
+        return jsonify(ok=False, error="'architecture' must be \"32\" or \"64\""), 400
+    settings["architecture"] = architecture
+
+    if architecture == "32":
+        supported, reason = check_32bit_support()
+        if not supported:
+            return jsonify(ok=False, error=f"32-bit programs are not available: {reason}"), 400
     try:
         compile_challenge(code, settings)
     except CompileError as e:

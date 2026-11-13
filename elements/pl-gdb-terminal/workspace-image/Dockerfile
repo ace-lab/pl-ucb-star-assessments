@@ -6,10 +6,16 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 # PrairieLearn workspace image: one container per student, proxied by PrairieLearn.
 # gcc/libc6-dev: compile the vulnerable program at runtime (from /sync-challenge).
+# gcc-multilib: 32-bit libraries and headers, so questions can use architecture="32".
+#   It only exists for amd64; on other architectures (e.g. an arm64 build on Apple
+#   Silicon) the image still builds, and 32-bit questions report that clearly.
 # gdb-minimal: no Python scripting needed; python3 is for the server and egg.py.
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
         python3 python3-venv gdb-minimal gcc libc6-dev util-linux && \
+    if [ "$(dpkg --print-architecture)" = "amd64" ]; then \
+        apt-get install -y --no-install-recommends gcc-multilib; \
+    fi && \
     rm -rf /var/lib/apt/lists/*
 
 RUN useradd -m -u 1001 -s /usr/sbin/nologin student && chmod 755 /home/student

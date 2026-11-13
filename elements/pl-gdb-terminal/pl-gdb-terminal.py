@@ -7,7 +7,7 @@ import prairielearn as pl
 OPTIONAL = ["input-program", "vulnerable-program", "enable-aslr", "enable-canary",
             "enable-non-exec-pages", "enable-interact", "width",
             "shellcode-in-environ-var", "vulnerable-source-file",
-            "autostart-iframe"]
+            "autostart-iframe", "architecture", "fallback-seconds"]
 
 XTERM_VERSION = "5.3.0"
 CDN = f"https://cdn.jsdelivr.net/npm/xterm@{XTERM_VERSION}"
@@ -61,16 +61,35 @@ def render(element_html, data):
     with open(src_path, "r", encoding="utf-8") as f:
         source_code = f.read()
 
+    architecture = pl.get_string_attrib(element, "architecture", "64").strip()
+    if architecture not in ("32", "64"):
+        raise ValueError(
+            f'pl-gdb-terminal: architecture must be "32" or "64", not "{architecture}"'
+        )
+
+    raw_delay = pl.get_string_attrib(element, "fallback-seconds", "15").strip()
+    try:
+        fallback_seconds = int(raw_delay)
+        if not 0 <= fallback_seconds <= 600:
+            raise ValueError
+    except ValueError:
+        raise ValueError(
+            f'pl-gdb-terminal: fallback-seconds must be a whole number from 0 to 600, not "{raw_delay}"'
+        )
+
     config = {
+        "architecture": architecture,
         "aslr": pl.get_boolean_attrib(element, "enable-aslr", False),
         "canary": pl.get_boolean_attrib(element, "enable-canary", False),
         "nx": pl.get_boolean_attrib(element, "enable-non-exec-pages", False),
         "source": source_code,
         "workspaceUrl": workspace_url,
         "base": workspace_url.rstrip("/") + "/container/",
-        # Experimental: load the workspace page in a hidden iframe so the
-        # container starts without the student clicking "Open workspace".
-        "autostart": pl.get_boolean_attrib(element, "autostart-iframe", False),
+        # PrairieLearn starts a workspace when its page is opened (the page sends the
+        # start request). Load that page in an invisible frame so the container starts
+        # without a second browser tab. On by default; autostart-iframe="false" opts out.
+        "autostart": pl.get_boolean_attrib(element, "autostart-iframe", True),
+        "fallbackSeconds": fallback_seconds,
     }
     css_url, js_url = xterm_urls(data)
     html_path = os.path.join(os.path.dirname(__file__), "pl-gdb-terminal.html")
