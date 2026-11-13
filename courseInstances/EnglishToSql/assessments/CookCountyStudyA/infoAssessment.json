@@ -1,0 +1,50 @@
+{
+  "uuid": "0ada0dd2-773d-479f-a8de-aa7e2a9b7623",
+  "type": "Homework",
+  "title": "Cook County SQL User Study (Form A)",
+  "set": "Homework",
+  "number": "6A",
+  "shuffleQuestions": true,
+  "allowAccess": [
+    {
+      "startDate": "2026-01-01T00:00:01",
+      "endDate": "2027-12-31T23:59:59"
+    }
+  ],
+  "zones": [
+    {
+      "title": "Tutorial",
+      "questions": [
+        {
+          "id": "EnglishToSql/english-to-sql-transactions-dictionary-tutorial",
+          "points": 10,
+          "triesPerVariant": 99999,
+          "maxPoints": 10
+        }
+      ]
+    },
+    {
+      "title": "Study tasks",
+      "questions": [
+        {
+          "id": "EnglishToSql/cook-county-neighborhood-rank-sql",
+          "points": 10,
+          "triesPerVariant": 99999,
+          "maxPoints": 10,
+          "preferences": {
+            "problem_variant": "task_a"
+          }
+        },
+        {
+          "id": "EnglishToSql/cook-county-neighborhood-rank-english",
+          "points": 10,
+          "triesPerVariant": 99999,
+          "maxPoints": 10,
+          "preferences": {
+            "problem_variant": "task_b"
+          }
+        }
+      ]
+    }
+  ]
+}

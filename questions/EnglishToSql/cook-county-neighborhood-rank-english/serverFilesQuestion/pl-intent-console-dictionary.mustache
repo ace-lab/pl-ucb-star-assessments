@@ -1,0 +1,81 @@
+{{#question}}
+<section class="pl-intent-console-dictionary" data-pl-intent-console-dictionary="{{name}}" data-intent-console-root="{{name}}" data-action-name="{{action_name}}" data-time-limit-seconds="{{time_limit_seconds}}" data-pending="{{#pending}}1{{/pending}}{{^pending}}0{{/pending}}">
+  {{#has_time_limit}}
+  <div class="alert alert-light border py-2" role="status">
+    <strong>Time for this question:</strong> {{time_limit_minutes}} minutes.
+    <span data-pl-study-timer>Time remaining: --:--</span>
+  </div>
+  {{/has_time_limit}}
+  <div class="pl-intent-console-dictionary-field">
+    <label class="pl-intent-console-dictionary-label" for="{{source_name}}">{{input_label}}</label>
+    <textarea class="form-control pl-intent-console-dictionary-english" id="{{source_name}}" name="{{source_name}}" rows="4" placeholder="Describe the query in English…"{{^input_editable}} disabled{{/input_editable}}>{{source}}</textarea>
+    {{#input_editable}}
+    <div class="pl-intent-console-dictionary-actions">
+      <button type="button" class="btn btn-primary btn-sm" data-intent-console-generate{{^can_generate}} disabled{{/can_generate}}>{{generate_label}}</button>
+      <span class="pl-intent-console-dictionary-hint" data-intent-console-status>{{#pending}}Generating…{{/pending}}{{^pending}}Generations left: {{generations_left}}{{/pending}}</span>
+    </div>
+    {{/input_editable}}
+  </div>
+
+  <div class="pl-intent-console-dictionary-field">
+    <label class="pl-intent-console-dictionary-label" for="{{code_name}}">{{code_label}}</label>
+    <textarea class="form-control pl-intent-console-dictionary-code" id="{{code_name}}" name="{{code_name}}" rows="8" spellcheck="false" placeholder="{{code_placeholder}}"{{^code_editable}} readonly{{/code_editable}}>{{code}}</textarea>
+    <p class="pl-intent-console-dictionary-hint">{{generate_label}} replaces this code. Save &amp; Grade grades the code shown.</p>
+  </div>
+
+  <input type="hidden" name="{{started_name}}" value="{{started_at_ms}}" data-pl-study-started>
+  <input type="hidden" name="{{elapsed_name}}" value="{{elapsed_ms}}" data-pl-study-elapsed>
+  <input type="hidden" name="{{save_count_name}}" value="{{save_count}}" data-pl-study-save-count>
+  <input type="hidden" name="{{grade_count_name}}" value="{{grade_count}}" data-pl-study-grade-count>
+  <input type="hidden" name="{{failure_count_name}}" value="{{failure_count}}">
+  <input type="hidden" name="{{edit_count_name}}" value="{{edit_count}}" data-pl-study-edit-count>
+  <input type="hidden" name="{{inserted_count_name}}" value="{{inserted_count}}" data-pl-study-inserted-count>
+  <input type="hidden" name="{{deleted_count_name}}" value="{{deleted_count}}" data-pl-study-deleted-count>
+
+  {{#parse_error}}
+  <div class="alert alert-danger py-2" role="alert">{{parse_error}}</div>
+  {{/parse_error}}
+
+  {{#has_preview}}
+  <div class="pl-intent-console-dictionary-preview">
+    <div class="pl-intent-console-dictionary-preview-title">Result preview</div>
+    <div class="table-responsive">
+      <table class="table table-sm table-bordered mb-0">
+        <thead><tr>{{#preview_columns}}<th scope="col">{{value}}</th>{{/preview_columns}}</tr></thead>
+        <tbody>
+          {{#preview_rows}}<tr>{{#cells}}<td>{{value}}</td>{{/cells}}</tr>{{/preview_rows}}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  {{/has_preview}}
+</section>
+{{/question}}
+
+{{#submission}}
+<section class="pl-intent-console-dictionary pl-intent-console-dictionary--submission">
+  <div class="pl-intent-console-dictionary-label">English analysis plan</div>
+  <div class="pl-intent-console-dictionary-submitted-source">{{source}}</div>
+  <div class="pl-intent-console-dictionary-label mt-3">{{submitted_code_label}}</div>
+  <pre class="pl-intent-console-dictionary-submitted-code"><code>{{code}}</code></pre>
+  {{#parse_error}}<div class="alert alert-danger py-2" role="alert">{{parse_error}}</div>{{/parse_error}}
+  {{#has_preview}}
+  <div class="pl-intent-console-dictionary-preview">
+    <div class="pl-intent-console-dictionary-preview-title">Result preview</div>
+    <div class="table-responsive">
+      <table class="table table-sm table-bordered mb-0">
+        <thead><tr>{{#preview_columns}}<th scope="col">{{value}}</th>{{/preview_columns}}</tr></thead>
+        <tbody>{{#preview_rows}}<tr>{{#cells}}<td>{{value}}</td>{{/cells}}</tr>{{/preview_rows}}</tbody>
+      </table>
+    </div>
+  </div>
+  {{/has_preview}}
+</section>
+{{/submission}}
+
+{{#answer}}
+<section class="pl-intent-console-dictionary pl-intent-console-dictionary--answer">
+  <div class="pl-intent-console-dictionary-label">{{reference_label}}</div>
+  <pre class="pl-intent-console-dictionary-submitted-code"><code>{{reference_code}}</code></pre>
+</section>
+{{/answer}}

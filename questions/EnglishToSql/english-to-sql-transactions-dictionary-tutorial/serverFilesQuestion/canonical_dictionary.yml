@@ -1,0 +1,33 @@
+# The key is the wording used in the normalized plan.
+# The value defines its meaning for the dictionary-mapping model.
+
+operations:
+  use table: Use an explicitly named table as a data source.
+  select: Return one or more explicitly named columns or computed results.
+  select distinct: Return only unique combinations of explicitly named columns.
+  filter rows where: Keep individual source rows using a condition on a non-aggregate column.
+  filter where: Apply a condition to an explicitly named non-aggregate column.
+  group rows by: Divide rows into groups using one or more explicitly named columns.
+  join: Combine explicitly named tables using an explicitly stated matching condition.
+  compute count distinct of: Count the unique values of an explicitly named column.
+  compute count of: Count explicitly named values or rows.
+  compute sum of: Add the values of an explicitly named column or expression.
+  compute average of: Calculate the arithmetic mean of an explicitly named column or expression.
+  compute minimum of: Find the smallest value of an explicitly named column or expression.
+  compute maximum of: Find the largest value of an explicitly named column or expression.
+  keep groups where: Keep grouped result rows using a condition on an aggregate such as a sum, count, average, minimum, or maximum.
+  aggregate the result with: Apply an explicitly stated aggregate to the result of earlier operations.
+  order by: Sort rows using an explicitly named column or computed result.
+  keep the first: Limit the result to an explicitly stated number of rows.
+  skip the first: Skip an explicitly stated number of rows before returning results.
+
+modifiers:
+  ascending: Sort from smallest to largest.
+  descending: Sort from largest to smallest.
+  greater than or equal to: Compare whether the left value is at least the right value.
+  less than or equal to: Compare whether the left value is at most the right value.
+  greater than: Compare whether the left value is larger than the right value.
+  less than: Compare whether the left value is smaller than the right value.
+  equal to: Compare whether two values are equal.
+  not equal to: Compare whether two values are different.
+  keep filtered rows: Confirm that the rows selected by the immediately preceding filter are retained.

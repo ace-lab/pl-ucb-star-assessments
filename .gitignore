@@ -11,3 +11,6 @@ __pycache__/
 node_modules
 
 **/.DS_Store
+
+# Private proxy configuration (example templates remain trackable).
+**/serverFilesQuestion/llm_config.json

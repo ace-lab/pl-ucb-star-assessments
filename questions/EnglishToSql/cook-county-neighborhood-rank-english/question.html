@@ -1,0 +1,88 @@
+<pl-question-panel>
+  <h3>Cook County property sales analysis plan</h3>
+  <p>Consider a <code>cook_county</code> dataset with the following columns:</p>
+
+  <div class="table-responsive">
+    <table class="table table-bordered">
+      <thead>
+        <tr><th scope="col">Column</th><th scope="col">Description</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>property_id</code></td><td>a Cook County parcel identifier</td></tr>
+        <tr><td><code>property_class</code></td><td>the assessor's property-class code</td></tr>
+        <tr><td><code>neighborhood_code</code></td><td>the assessor's neighborhood code</td></tr>
+        <tr><td><code>building_sqft</code></td><td>the building area in square feet</td></tr>
+        <tr><td><code>sale_price</code></td><td>the recorded sale price in dollars</td></tr>
+        <tr><td><code>modeling_group</code></td><td>the modeling category: <code>SF</code>, <code>MF</code>, or <code>NCHARS</code></td></tr>
+        <tr><td><code>sale_year</code></td><td>the year of the sale</td></tr>
+        <tr><td><code>garage_indicator</code></td><td><code>1</code> when a garage is present and <code>0</code> otherwise</td></tr>
+        <tr><td><code>central_air</code></td><td><code>1</code> when central air is present and <code>0</code> otherwise</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>
+    Each row represents one single-family property sale. The dataset contains
+    sales from 2013 through 2019.
+  </p>
+  <div class="alert alert-secondary">
+    <strong>Note:</strong> A property class or neighborhood may appear in many rows.
+  </div>
+
+  <p>Write an analysis plan for the question below.</p>
+  <ul>
+    <li>Your analysis plan should start with the dataset above and result in a <code>table</code> that answers the question.</li>
+    <li>Your final <code>table</code> must only include rows that are relevant to the question. No extra rows.</li>
+    <li>Your final <code>table</code> should require no additional computation to fully answer the question.</li>
+    <li>You may name an intermediate result so that a later step can count its rows.</li>
+  </ul>
+
+  <div class="alert alert-info">
+    <p><strong>Describe every operation clearly in English.</strong> Phrases such as the following are supported:</p>
+    <ul class="mb-0">
+      <li><code>use table</code>, <code>select</code>, or <code>filter rows where</code></li>
+      <li><code>group rows by</code>, <code>compute count of</code>, <code>compute sum of</code>, or <code>compute average of</code></li>
+      <li><code>keep groups where</code></li>
+      <li><code>name result</code> and then <code>compute count of</code> its rows</li>
+    </ul>
+  </div>
+  <p>Name every table and column exactly as shown above. Include every expression,
+    comparison, value, grouping column, calculation input, intermediate-result
+    name, and output alias needed by your steps. Code-like shorthand such as
+    <code>groupby</code> or <code>df[...]</code> is not accepted as English
+    analysis-plan wording.</p>
+
+  {{#params.task_a}}
+    <h4>(a) Property classes with large garage-equipped homes</h4>
+    <p>
+      How many <code>property_class</code> values have at least 30 sales with a
+      garage and an average <code>building_sqft</code> greater than 2,500?
+    </p>
+    <p>
+      The final table must contain one row and one column named
+      <code>property_class_count</code>.
+    </p>
+  {{/params.task_a}}
+
+  {{#params.task_b}}
+    <h4>(b) High-value central-air neighborhoods</h4>
+    <p>
+      How many <code>neighborhood_code</code> values have at least 30 sales with
+      central air and a combined <code>sale_price</code> greater than
+      $200,000,000?
+    </p>
+    <p>
+      The final table must contain one row and one column named
+      <code>neighborhood_count</code>.
+    </p>
+  {{/params.task_b}}
+</pl-question-panel>
+
+<link rel="stylesheet" href="{{options.client_files_question_url}}/pl-intent-console-dictionary.css">
+<pl-question-panel>
+  <script src="{{options.client_files_question_url}}/pl-intent-console-dictionary.js"></script>
+</pl-question-panel>
+
+<!-- Replaced by server.py render() with the intent console for the current panel.
+     The element's settings live in ELEMENT_HTML in server.py. -->
+<div data-pl-intent-console-placeholder></div>
